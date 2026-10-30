@@ -4,7 +4,7 @@
 
 ## 项目简介与课程目标
 
-选题为**实验室设备预约管理系统**，拟围绕实验室设备预约中的实际问题开展需求核验与系统建设。吴亚彤已确认现实预约方式、痛点、约58人的计划服务规模及首版范围，见[产品简报](product-brief.md)。同一设备重叠时段不能存在冲突的有效预约是核心约束，技术实现尚未决定；正式PRD需求基线尚未形成。
+选题为**实验室设备预约管理系统**，拟围绕实验室设备预约中的实际问题开展需求核验与系统建设。吴亚彤已确认现实预约方式、痛点、约58人的计划服务规模及首版范围，见[产品简报](_bmad-output/planning-artifacts/product-brief.md)。同一设备重叠时段不能存在冲突的有效预约是核心约束，技术实现尚未决定；正式PRD需求基线尚未形成。
 
 课程以4周、2个Sprint、M1–M4四个里程碑组织 AI辅助敏捷交付，重点考察BMAD方法、敏捷过程、人类判断与可追溯证据。所有产物应集中在同一个GitHub仓库，保留真实的文档迭代、决策、评审、测试和Git历史。
 
@@ -48,24 +48,32 @@ BMAD 工作流以已安装的 [bmad-help](.agents/skills/bmad-help/SKILL.md) 为
 
 ```text
 bmad-lab-booking-system/
-├── README.md
-├── AGENTS.md
-├── .gitignore
-├── docs/
-│   ├── course-requirements.md
-│   └── bmad-installation.md
-├── .agents/skills/          # 29 个已安装的 BMAD 技能目录
-└── _bmad/                  # 安装清单、配置及运行支持
-    ├── _config/
-    ├── bmm/
-    ├── core/
-    ├── custom/
-    ├── render/
-    ├── scripts/
-    └── config.toml
+└── .agents/
+└── .gitignore
+└── AGENTS.md
+└── README.md
+└── _bmad/
+└── _bmad-output/
+    └── planning-artifacts/
+        └── briefs/
+            └── brief-bmad-lab-booking-system-2026-10-29/
+                └── .memlog.md
+                └── addendum.md
+                └── brief.md
+                └── finalization.md
+        └── product-brief.md
+└── decision-log.md
+└── docs/
+    └── bmad-installation.md
+    └── course-requirements.md
+    └── team/
+        └── README.md
+        └── quality-review.md
+        └── requirements-review.md
+        └── round1-summary.md
 ```
 
-`_bmad-output/` 已生成本轮原始产物，导航见下文。新增文件尚未提交，以下相对链接可在团队提交后供 GitHub 网页访问；本次未执行暂存、提交或推送。
+M1 第一轮提交凭证：[0a7bd59499359156c0179e2b9ef5623146c3698f](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/0a7bd59499359156c0179e2b9ef5623146c3698f)。
 
 ## 三人团队分工
 
@@ -80,7 +88,7 @@ bmad-lab-booking-system/
 
 ## M1 第一轮产物导航
 
-- [课程交付版产品简报](product-brief.md)
+- [课程交付版产品简报](_bmad-output/planning-artifacts/product-brief.md)
 - [原始 BMAD 简报](_bmad-output/planning-artifacts/briefs/brief-bmad-lab-booking-system-2026-10-29/brief.md)
 - [补充材料](_bmad-output/planning-artifacts/briefs/brief-bmad-lab-booking-system-2026-10-29/addendum.md)
 - [原始记忆日志](_bmad-output/planning-artifacts/briefs/brief-bmad-lab-booking-system-2026-10-29/.memlog.md)
@@ -94,7 +102,7 @@ bmad-lab-booking-system/
 
 | 里程碑 | 课程要求与门禁 | 产物与证据导航 | 当前状态 |
 | --- | --- | --- | --- |
-| M1 / 第 1 周 | 选题登记；完成分析、PRD与需求评审；门禁不计分但必须通过 | [产品简报](product-brief.md)、[第一轮总结](docs/team/round1-summary.md)及B/C记录已具备；选题登记证据、PRD及整体门禁待完成 | 第一轮完成；第二轮未开始；整体门禁尚未通过 |
+| M1 / 第 1 周 | 选题登记；完成分析、PRD与需求评审；门禁不计分但必须通过 | [产品简报](_bmad-output/planning-artifacts/product-brief.md)、[第一轮总结](docs/team/round1-summary.md)及B/C记录已具备；选题登记证据、PRD及整体门禁待完成 | 第一轮完成；第二轮未开始；整体门禁尚未通过 |
 | M2 / 第 2 周 | 先架构与ADR，再 Epic/Story；完成规则、就绪检查与初始Sprint状态；门禁不计分但必须通过 | `architecture.md`（至少 5 条 ADR，含被否决方案及理由）、`epics.md` 与故事卡（至少 3 Epic、12 Story）、`project-context.md`（至少 8 条规则）、就绪检查记录、`sprint-status.yaml` 均待完成 | 待完成 |
 | M3 / 第 3 周 | 推进Sprint 1核心史诗与运行Demo；收到老师真实变更后先做影响分析，当天18:00前提交分析，变更实现安排在Sprint 2 | 真实变更通知、影响分析表、人工范围取舍、Story状态历史、开发/评审/测试记录、核心Demo及Git证据均待完成 | 待完成；变更内容待老师下发 |
 | M4 / 第 4 周 | Sprint 2、实验 A、实验 B 复盘、最终验收与仓库封存 | 源码与测试、NFR 证据、两实验原始记录及结果、根目录 `retrospective.md`、完整 README、10 分钟演示录屏、最终 Git 证据均待完成 | 待完成 |
@@ -124,3 +132,5 @@ bmad-lab-booking-system/
 - 按里程碑顺序生成后续必交产物，持续保存人工决策、工作流、评审、实验和 Git 证据，并补齐导航。
 - 实现后补充经实际验证的程序启动步骤、运行环境、测试方法与结果；当前尚无业务程序启动命令或业务测试结果。
 - 最终补齐AI使用声明、10 分钟演示录屏和仓库封存证据。
+
+后续 PRD、architecture、epics、stories、sprint-status 等由相应工作流生成到 BMAD 默认目录，不提前建立空白交付物。retrospective.md 尚未创建，后续必须放根目录。

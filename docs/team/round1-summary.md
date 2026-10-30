@@ -29,7 +29,7 @@
 
 团队人工审核后明确同意定稿，BMAD Finalize已完成，包括过程日志归档核对和结构、文字检查。两份简报均为final，内容一致。
 
-- [课程交付版 product-brief.md](../../product-brief.md)
+- [课程交付版 product-brief.md](../../_bmad-output/planning-artifacts/product-brief.md)
 - [原始 BMAD brief.md](../../_bmad-output/planning-artifacts/briefs/brief-bmad-lab-booking-system-2026-10-29/brief.md)
 - [补充材料 addendum.md](../../_bmad-output/planning-artifacts/briefs/brief-bmad-lab-booking-system-2026-10-29/addendum.md)
 - [原始记忆日志 .memlog.md](../../_bmad-output/planning-artifacts/briefs/brief-bmad-lab-booking-system-2026-10-29/.memlog.md)
