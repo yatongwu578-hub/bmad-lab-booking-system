@@ -1,0 +1,62 @@
+[
+    {
+        "file":  "_bmad-output/planning-artifacts/prds/prd-bmad-lab-booking-system-2026-10-30/finalize-review.md",
+        "sha256":  "78B9049C0994576B94537C54AE8FC7193CD58B9C4CAAF3736C11B50F37353E53"
+    },
+    {
+        "file":  "_bmad-output/planning-artifacts/prds/prd-bmad-lab-booking-system-2026-10-30/finalize-static-checks.md",
+        "sha256":  "6AC8A95FB9E14F4D23DCD372E22880FECC1A3E805ABAD1F321B63C680EF6160B"
+    },
+    {
+        "file":  "_bmad-output/planning-artifacts/prds/prd-bmad-lab-booking-system-2026-10-30/memlog-audit.md",
+        "sha256":  "3B75D2292DAED07C2050C13AF8253F2565FCF7E7C101AFA41DCFC142AD7930FD"
+    },
+    {
+        "file":  "_bmad-output/planning-artifacts/prds/prd-bmad-lab-booking-system-2026-10-30/open-items-triage.md",
+        "sha256":  "A749C802683318496D6128D381E96133FF602F335F0F60747ABD28A1F3B40DF9"
+    },
+    {
+        "file":  "_bmad-output/planning-artifacts/prds/prd-bmad-lab-booking-system-2026-10-30/reconcile-product-brief.md",
+        "sha256":  "CB0064A3A621E4200BB969691F513DD3F17BEFEDFCE22453088DA29F768D98CC"
+    },
+    {
+        "file":  "_bmad-output/planning-artifacts/prds/prd-bmad-lab-booking-system-2026-10-30/reconcile-quality-review.md",
+        "sha256":  "D7010BED06123F61280EC3CC13C22D431A33BF67219063A3FE12E8216C627BFF"
+    },
+    {
+        "file":  "_bmad-output/planning-artifacts/prds/prd-bmad-lab-booking-system-2026-10-30/reconcile-requirements-review.md",
+        "sha256":  "113A0ED87E17C70BE7B84F004BF9B353DDBB6CCC580FC3FB161F7E70A90EBBD5"
+    },
+    {
+        "file":  "_bmad-output/planning-artifacts/prds/prd-bmad-lab-booking-system-2026-10-30/review-editorial-prose.md",
+        "sha256":  "D7FDB04E7F2CE7D239FBD4F76BE85485F7E03C7C61E70D758F5A748CAECC72C4"
+    },
+    {
+        "file":  "_bmad-output/planning-artifacts/prds/prd-bmad-lab-booking-system-2026-10-30/review-editorial-structure.md",
+        "sha256":  "1752494A233A721711322F05F64B364B0918E2144304CBDA16A392314361529D"
+    },
+    {
+        "file":  "_bmad-output/planning-artifacts/prds/prd-bmad-lab-booking-system-2026-10-30/review-permissions-scope.md",
+        "sha256":  "95A131D611BD9979858679B3ACB24EA35F44D112439B16F68715EFBDAC1DAE4D"
+    },
+    {
+        "file":  "_bmad-output/planning-artifacts/prds/prd-bmad-lab-booking-system-2026-10-30/review-rubric.md",
+        "sha256":  "16025B2547799E47A9C8BBDEB9DCB18C09FE4856391E179625328CEB4C806354"
+    },
+    {
+        "file":  "_bmad-output/planning-artifacts/prds/prd-bmad-lab-booking-system-2026-10-30/review-state-concurrency.md",
+        "sha256":  "3A7B4950C6AC42C0A6BD6EE58C5544EB7C4914F7FF22C1762233C298B5084B84"
+    },
+    {
+        "file":  "docs/team/round2-review-disposition.md",
+        "sha256":  "CBAF9B01957EC2A66B3FF7B1AB10011BAEA528188B95E493A2FAB24E85632D61"
+    },
+    {
+        "file":  "docs/team/round2-requirements-review.md",
+        "sha256":  "E5C1FBAA59F551CB3772761D1BBF499BFF468800A846B80D0EA820ED07F7ABF0"
+    },
+    {
+        "file":  "docs/team/round2-quality-review.md",
+        "sha256":  "478F0C3027C1C79BED6CFA540BCE2FE8C345C458643B6BFEB574DCDCC5159DD6"
+    }
+]
