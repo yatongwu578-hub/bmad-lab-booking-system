@@ -45,3 +45,9 @@
 本地Git历史已确认：[原稿3c3a09d](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/3c3a09d)、[罗思婕审核96e6619](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/96e6619)、[周何馨审核41c58d6](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/41c58d6)。本轮不联网核验远程可达性；定稿和证据整理仍在工作区，没有为它们编造新commit或tag。
 
 选题登记凭证、老师/课程M1门禁通过记录尚未提供；不能以负责人批准PRD推断门禁已通过。课程PPT原页缺失继续按[课程要求基线](../course-requirements.md)执行，未声称直接核实原页。M2未开始，完整FR→ADR→Story→Test链路及实际NFR结果留待后续阶段。
+
+## 2026-11-05 M1收尾状态补记
+
+以上为2026-11-04整理时的历史状态。第二轮成果现已提交GitHub main，提交为[63d6fac](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/63d6fac8bb815412e2a2e82c058748a5b9e54a97)；本地main及origin/main均指向该提交，GitHub提交成功由团队本次确认。团队同时确认选题登记已通过，取消老师M1单独门禁，老师仅审查最后完整GitHub仓库。M1保留内部文档核验，不再以缺少老师M1通过记录作为阻塞。
+
+本次同步README、课程基线及两份PRD当前状态，18条FR、2条NFR、业务规则和范围边界保持不变；历史审查、原始成员审核、memlog和真实决策不追改。四项非阻塞验证待办仍未执行；本次不自动提交或推送，不进入M2。
