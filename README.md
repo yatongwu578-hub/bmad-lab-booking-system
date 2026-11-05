@@ -6,16 +6,16 @@
 
 项目通过支持电脑和手机浏览器的Web系统提供设备查询、预约申请、冲突检查、管理员审核、取消、状态查询和设备维护，按具体实物唯一编号管理。计划服务学生约50人、教师约6人、管理员约2人。当前业务基线见[Product Brief](_bmad-output/planning-artifacts/product-brief.md)和[正式PRD](_bmad-output/planning-artifacts/PRD.md)。
 
-**截至2026-11-04：M1第一轮简报、第二轮PRD及其人工审核/Finalize均已完成；尚无老师或课程M1门禁通过记录，M2未开始。** 本轮证据整理只在工作区，无新Git提交或推送。
+**截至2026-11-05：选题登记已通过，M1简报、PRD及人工审核/Finalize已完成；第二轮成果已提交GitHub main，M2未开始。** 最新交付提交：[63d6fac](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/63d6fac8bb815412e2a2e82c058748a5b9e54a97)。按团队本次确认，老师只审查最后完整GitHub仓库，不再设置老师M1单独门禁；M1保留内部文档核验。
 
 | 事项 | 当前状态与证据 |
 | --- | --- |
-| 选题 | 已确定实验室设备预约管理系统；选题登记与合规核验凭证尚待提供 |
+| 选题 | 已确定实验室设备预约管理系统；选题登记已通过（团队于2026-11-05确认） |
 | 团队协作 | 吴亚彤负责项目/Codex与人工批准；罗思婕、周何馨已提交两轮原始审核 |
 | M1第一轮 | Product Brief已定稿；[第一轮总结](docs/team/round1-summary.md)保留当时历史 |
 | M1第二轮 | PRD于2026-11-04正式定稿，18条FR、2条可测NFR；成员意见全部处理；[第二轮总结](docs/team/round2-summary.md) |
 | 正式审查 | 0 Critical、0 High、无业务阻塞；负责人已人工确认，四项非阻塞待办继续跟踪 |
-| M1整体门禁 | 未提供通过记录；PRD定稿不等于老师已通过门禁 |
+| M1内部核验 | 文档定稿与审核证据已具备；老师不单独审查M1，仅审查最后完整GitHub仓库（团队本次确认） |
 | M2、M3、M4 | 未开始；未进入架构或其他后续工作流 |
 | 业务代码、运行测试、实验及复盘 | 尚未开展，当前无业务程序启动命令或测试结果 |
 
@@ -35,7 +35,7 @@
 | 定稿验证与后续待办 | [正文一致性验证](_bmad-output/planning-artifacts/prds/prd-bmad-lab-booking-system-2026-10-30/finalization-verification.md)、[四项责任人及节点](_bmad-output/planning-artifacts/prds/prd-bmad-lab-booking-system-2026-10-30/finalization.md#四项非阻塞待办继续跟踪) |
 | 本次证据整理 | [第二轮总结](docs/team/round2-summary.md)、[相对链接和简报一致性检查](docs/team/round2-evidence-check.md) |
 
-原稿提交证据为[3c3a09d](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/3c3a09d)。以上已有提交由本地Git历史核对，远程可达性本轮未联网验证；未为工作区定稿或整理伪造commit/tag。原审查报告中的draft及“等待确认”是当时事实，当前状态以2026-11-04定稿追加记录为准。
+原稿提交证据为[3c3a09d](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/3c3a09d)。以上已有提交由本地Git历史核对，远程可达性本轮未联网验证；第二轮定稿及证据整理已纳入[63d6fac](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/63d6fac8bb815412e2a2e82c058748a5b9e54a97)，本地main与origin/main均指向该提交；GitHub提交成功依据团队本次确认。原审查报告中的draft及“等待确认”是当时事实，当前状态以2026-11-04定稿追加记录为准。
 
 ## 三人分工
 
@@ -53,62 +53,64 @@
 | --- | --- |
 | BMAD-Method | 6.12.4，core/bmm及Codex集成；[安装清单](_bmad/_config/manifest.yaml)、[安装说明](docs/bmad-installation.md) |
 | Codex | 主要AI工具，已有1个ChatGPT Plus可使用Codex；客户端/模型版本未补造，待实际记录；[技能入口](.agents/skills/) |
-| GitHub | origin为yatongwu578-hub/bmad-lab-booking-system；三人协作权限尚待确认；本轮不提交或推送 |
+| GitHub | origin为yatongwu578-hub/bmad-lab-booking-system；已有三人审核贡献；本次收尾修改不自动提交或推送 |
 
-以下为当前工作区主要实际路径，包含尚未提交的M1产物；不是“全部已纳入Git”的声明。工具附带代码和测试不属于业务实现证据。
+以下目录树依据本次 git ls-files 生成；工具目录折叠显示，其余列出全部跟踪文件。仅存在本地的未跟踪目录不列入交付。工具附带代码和测试不属于业务实现证据。
 
 ```text
 bmad-lab-booking-system/
-├── .agents/skills/
-├── .codex/
-├── _bmad/
-├── bmad-course-setup/
+├── .agents/（已跟踪工具文件，折叠）
+├── .gitignore
 ├── AGENTS.md
 ├── README.md
+├── _bmad-output/
+│   └── planning-artifacts/
+│       ├── PRD.md
+│       ├── briefs/
+│       │   └── brief-bmad-lab-booking-system-2026-10-29/
+│       │       ├── .memlog.md
+│       │       ├── addendum.md
+│       │       ├── brief.md
+│       │       └── finalization.md
+│       ├── prds/
+│       │   └── prd-bmad-lab-booking-system-2026-10-30/
+│       │       ├── .memlog.md
+│       │       ├── decision-log-before-evidence-2026-11-04.txt
+│       │       ├── finalization-history-manifest.json
+│       │       ├── finalization-verification.md
+│       │       ├── finalization.md
+│       │       ├── finalize-review.md
+│       │       ├── finalize-static-checks.md
+│       │       ├── memlog-audit.md
+│       │       ├── open-items-triage.md
+│       │       ├── prd-review-snapshot-2026-11-03.md
+│       │       ├── prd.md
+│       │       ├── reconcile-product-brief.md
+│       │       ├── reconcile-quality-review.md
+│       │       ├── reconcile-requirements-review.md
+│       │       ├── review-editorial-prose.md
+│       │       ├── review-editorial-structure.md
+│       │       ├── review-permissions-scope.md
+│       │       ├── review-rubric.md
+│       │       └── review-state-concurrency.md
+│       └── product-brief.md
+├── _bmad/（已跟踪工具文件，折叠）
 ├── decision-log.md
-├── _bmad-output/planning-artifacts/
-│   ├── product-brief.md
-│   ├── PRD.md
-│   ├── briefs/brief-bmad-lab-booking-system-2026-10-29/
-│   │   ├── brief.md
-│   │   ├── addendum.md
-│   │   ├── .memlog.md
-│   │   └── finalization.md
-│   └── prds/prd-bmad-lab-booking-system-2026-10-30/
-│       ├── prd.md
-│       ├── .memlog.md
-│       ├── memlog-audit.md
-│       ├── reconcile-product-brief.md
-│       ├── reconcile-requirements-review.md
-│       ├── reconcile-quality-review.md
-│       ├── review-rubric.md
-│       ├── review-state-concurrency.md
-│       ├── review-permissions-scope.md
-│       ├── review-editorial-structure.md
-│       ├── review-editorial-prose.md
-│       ├── finalize-review.md
-│       ├── finalize-static-checks.md
-│       ├── open-items-triage.md
-│       ├── prd-review-snapshot-2026-11-03.md
-│       ├── finalization.md
-│       ├── finalization-verification.md
-│       ├── finalization-history-manifest.json
-│       └── decision-log-before-evidence-2026-11-04.txt
 └── docs/
-    ├── course-requirements.md
     ├── bmad-installation.md
+    ├── course-requirements.md
     └── team/
         ├── README.md
-        ├── requirements-review.md
         ├── quality-review.md
+        ├── requirements-review.md
         ├── round1-summary.md
-        ├── round2-requirements-review.md
-        ├── round2-quality-review.md
-        ├── round2-review-disposition.md
-        ├── round2-resolution-check.md
+        ├── round2-evidence-check.md
         ├── round2-open-decisions.md
-        ├── round2-summary.md
-        └── round2-evidence-check.md
+        ├── round2-quality-review.md
+        ├── round2-requirements-review.md
+        ├── round2-resolution-check.md
+        ├── round2-review-disposition.md
+        └── round2-summary.md
 ```
 
 ## 第一轮历史与当前简报
@@ -123,7 +125,7 @@ bmad-lab-booking-system/
 
 | 阶段/要求 | 当前证据及待办 |
 | --- | --- |
-| M1 | 简报、PRD、需求/质量审核和人工决定已具备；选题登记、正式M1门禁及定稿提交凭证尚待补齐 |
+| M1 | 选题登记已通过；简报、PRD、需求/质量审核和人工决定已具备，第二轮定稿已提交main；老师M1单独门禁已取消，保留内部核验 |
 | M2 | architecture.md及至少5条ADR、至少3 Epic/12 Story、project-context.md至少8条规则、就绪门禁和sprint-status.yaml均未开始 |
 | M3 | 核心Demo、真实变更影响分析、Sprint状态及实现/评审/测试证据均未开展；不预造老师变更 |
 | M4 | 两项必做实验、结果和局限、根目录retrospective.md、源码/测试、启动说明、10分钟录屏及封存证据均待完成 |
@@ -135,4 +137,4 @@ bmad-lab-booking-system/
 
 Codex协助完成简报与PRD的讨论、草稿、意见映射、审查、结构文字整理、Finalize及本次课程证据整理。吴亚彤实际作出并传达人工决定、审核批准；罗思婕和周何馨提供原始审核记录。Finalize使用了独立AI审查子代理，其结果不冒充组员意见或老师验收。
 
-当前无业务实现、业务运行测试或实验数据。课程PPT原页未在仓库发现，约束依据docs/course-requirements.md；没有声称已直接核实PPT原页或老师已通过M1门禁。后续需保存真实工具/模型信息、会话与Git证据、每条NFR测试结果及实验数据。本轮不提交Git、不进入M2。
+当前无业务实现、业务运行测试或实验数据。课程PPT原页未在仓库发现，约束依据docs/course-requirements.md；没有声称已直接核实PPT原页；老师仅审查最终完整GitHub仓库的安排依据团队本次确认。后续需保存真实工具/模型信息、会话与Git证据、每条NFR测试结果及实验数据。本轮不提交Git、不进入M2。
