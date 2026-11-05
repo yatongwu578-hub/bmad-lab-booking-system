@@ -2,11 +2,17 @@
 
 实验室设备预约管理系统｜软件工程管理课程大作业｜3人团队
 
+## 2026-11-05 老师最新通知
+
+老师取消 M1～M4 阶段性门禁检查和实验 B（需求变更注入），不再下发临时需求变更。团队根据已定需求继续按 BMAD 与敏捷流程完成项目，内部审查和负责人确认后可进入下一工作流，无需等待老师阶段批准。**最终在老师规定的截止日前仅提交本 GitHub 项目仓库链接**，具体截止日期待老师明确。详见最高优先级[课程要求基线](docs/course-requirements.md)。
+
+实验 A 仍为必做；其余产物、两个真实 Sprint、测试、决策、三人贡献及持续 Git 历史要求继续保留。实验 B 取消后的评分处理待老师明确，不自行重分配分数。
+
 ## 项目与当前进度
 
 项目通过支持电脑和手机浏览器的Web系统提供设备查询、预约申请、冲突检查、管理员审核、取消、状态查询和设备维护，按具体实物唯一编号管理。计划服务学生约50人、教师约6人、管理员约2人。当前业务基线见[Product Brief](_bmad-output/planning-artifacts/product-brief.md)和[正式PRD](_bmad-output/planning-artifacts/PRD.md)。
 
-**截至2026-11-05：选题登记已通过，M1简报、PRD及人工审核/Finalize已完成；第二轮成果已提交GitHub main，M2未开始。** 最新交付提交：[63d6fac](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/63d6fac8bb815412e2a2e82c058748a5b9e54a97)。按团队本次确认，老师只审查最后完整GitHub仓库，不再设置老师M1单独门禁；M1保留内部文档核验。
+**截至2026-11-05：选题登记已通过，M1两轮Product Brief和PRD、内部审核及负责人Finalize确认均已完成，可进入M2架构阶段；M2尚未开始。** 最新交付提交：[63d6fac](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/63d6fac8bb815412e2a2e82c058748a5b9e54a97)。M1～M4仅作为内部管理阶段，老师不逐阶段验收。
 
 | 事项 | 当前状态与证据 |
 | --- | --- |
@@ -15,11 +21,11 @@
 | M1第一轮 | Product Brief已定稿；[第一轮总结](docs/team/round1-summary.md)保留当时历史 |
 | M1第二轮 | PRD于2026-11-04正式定稿，18条FR、2条可测NFR；成员意见全部处理；[第二轮总结](docs/team/round2-summary.md) |
 | 正式审查 | 0 Critical、0 High、无业务阻塞；负责人已人工确认，四项非阻塞待办继续跟踪 |
-| M1内部核验 | 文档定稿与审核证据已具备；老师不单独审查M1，仅审查最后完整GitHub仓库（团队本次确认） |
+| M1内部核验 | 文档审查及负责人定稿确认已完成，可进入M2架构；无需等待老师批准 |
 | M2、M3、M4 | 未开始；未进入架构或其他后续工作流 |
 | 业务代码、运行测试、实验及复盘 | 尚未开展，当前无业务程序启动命令或测试结果 |
 
-课程采用4周、2个Sprint、M1～M4里程碑，核心考察BMAD、敏捷过程、人类判断和真实证据。每次新BMAD工作流前先读[AGENTS.md](AGENTS.md)及[课程要求基线](docs/course-requirements.md)；命令以已安装[bmad-help](.agents/skills/bmad-help/SKILL.md)为准，独立工作流使用新会话。课程指定产物、实验及门禁不因默认流程裁剪而省略。
+课程原规划为4周、2个Sprint；M1～M4现为内部里程碑，核心考察BMAD、敏捷过程、人类判断和真实证据。每次新BMAD工作流前先读[AGENTS.md](AGENTS.md)及[课程要求基线](docs/course-requirements.md)；命令以已安装[bmad-help](.agents/skills/bmad-help/SKILL.md)为准，独立工作流使用新会话。未取消的课程产物、实验A及BMAD内部就绪检查不因默认流程裁剪而省略。
 
 ## M1第二轮交付与三人审核证据
 
@@ -125,10 +131,10 @@ bmad-lab-booking-system/
 
 | 阶段/要求 | 当前证据及待办 |
 | --- | --- |
-| M1 | 选题登记已通过；简报、PRD、需求/质量审核和人工决定已具备，第二轮定稿已提交main；老师M1单独门禁已取消，保留内部核验 |
+| M1 | 两轮Product Brief和PRD及内部审核、负责人确认已完成，第二轮定稿已提交main，可进入M2架构 |
 | M2 | architecture.md及至少5条ADR、至少3 Epic/12 Story、project-context.md至少8条规则、就绪门禁和sprint-status.yaml均未开始 |
-| M3 | 核心Demo、真实变更影响分析、Sprint状态及实现/评审/测试证据均未开展；不预造老师变更 |
-| M4 | 两项必做实验、结果和局限、根目录retrospective.md、源码/测试、启动说明、10分钟录屏及封存证据均待完成 |
+| M3 | 核心Demo、Sprint 1状态及实现/评审/测试证据待开展；实验B已取消，不等待老师变更 |
+| M4 | Sprint 2、必做实验A及结果和局限、根目录retrospective.md、源码/测试、启动说明、10分钟录屏及最终版本证据均待完成 |
 | 人机决策 | [D-001～D-011共11条真实决策](decision-log.md)，五要素整理；课程至少15条总量未达成，否决/实质修改按实际证据核对，不凑数 |
 | FR追溯 | 已有18条编号FR；FR→ADR→Story→Test完整链路待后续阶段建立 |
 | NFR | 已有2条可测NFR；实际测试证据尚未产生，不能据文档审查宣称测试通过 |
@@ -137,4 +143,4 @@ bmad-lab-booking-system/
 
 Codex协助完成简报与PRD的讨论、草稿、意见映射、审查、结构文字整理、Finalize及本次课程证据整理。吴亚彤实际作出并传达人工决定、审核批准；罗思婕和周何馨提供原始审核记录。Finalize使用了独立AI审查子代理，其结果不冒充组员意见或老师验收。
 
-当前无业务实现、业务运行测试或实验数据。课程PPT原页未在仓库发现，约束依据docs/course-requirements.md；没有声称已直接核实PPT原页；老师仅审查最终完整GitHub仓库的安排依据团队本次确认。后续需保存真实工具/模型信息、会话与Git证据、每条NFR测试结果及实验数据。本轮不提交Git、不进入M2。
+当前无业务实现、业务运行测试或实验数据。课程PPT原页未在仓库发现，约束依据docs/course-requirements.md；没有声称已直接核实PPT原页。2026-11-05最新通知依据团队本次转述，未另附通知原件。历史PRD、Product Brief、原始BMAD日志和过去总结保留当时状态，涉及旧门禁的文字不构成当前等待要求。后续需保存真实工具/模型信息、会话与Git证据、每条NFR测试结果及实验A数据。本轮仅更新课程说明，待人工审核，不提交Git、不启动M2工作流。
