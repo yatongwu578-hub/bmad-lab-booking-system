@@ -42,7 +42,7 @@
 | 定稿验证与后续待办 | [正文一致性验证](_bmad-output/planning-artifacts/prds/prd-bmad-lab-booking-system-2026-10-30/finalization-verification.md)、[四项责任人及节点](_bmad-output/planning-artifacts/prds/prd-bmad-lab-booking-system-2026-10-30/finalization.md#四项非阻塞待办继续跟踪) |
 | 本次证据整理 | [第二轮总结](docs/team/round2-summary.md)、[相对链接和简报一致性检查](docs/team/round2-evidence-check.md) |
 
-原稿提交证据为[3c3a09d](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/3c3a09d)。以上已有提交由本地Git历史核对，远程可达性本轮未联网验证；第二轮定稿及证据整理已纳入[63d6fac](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/63d6fac8bb815412e2a2e82c058748a5b9e54a97)，当时本地main与origin/main均指向该提交；GitHub提交成功依据团队当时确认。当前main及origin/main已更新至M2定稿提交4e2ff4fdbe58。原审查报告中的draft及“等待确认”是当时事实，M1当前状态以2026-11-04定稿追加记录为准。
+原稿提交证据为[3c3a09d](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/3c3a09d)。以上已有提交由本地Git历史核对，远程可达性本轮未联网验证；第二轮定稿及证据整理已纳入[63d6fac](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/63d6fac8bb815412e2a2e82c058748a5b9e54a97)，当时本地main与origin/main均指向该提交；GitHub提交成功依据团队当时确认。截至2026-11-10，本地main及origin/main均指向状态同步提交[f31a1d115679](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/f31a1d1156791f6dde7ef5c3918aed4d6873a4f1)，正式架构提交为4e2ff4fdbe58。原审查报告中的draft及“等待确认”是当时事实，M1当前状态以2026-11-04定稿追加记录为准。
 
 ## 三人分工
 
@@ -133,7 +133,7 @@ bmad-lab-booking-system/
 | 阶段/要求 | 当前证据及待办 |
 | --- | --- |
 | M1 | 两轮Product Brief和PRD及内部审核、负责人确认已完成，第二轮定稿已提交main，可进入M2架构 |
-| M2 | 第一轮Architecture及至少5条ADR已定稿；详见[架构]( _bmad-output/planning-artifacts/architecture.md)、[M2总结](docs/team/m2-architecture-summary.md)和[审核处理证据](docs/team/m2-architecture-review-disposition.md)。Epic/Story、project-context、就绪门禁和sprint-status.yaml尚未开始 |
+| M2 | 第一轮Architecture及至少5条ADR已定稿，准备进入M2第二轮；详见[架构](_bmad-output/planning-artifacts/architecture.md)、[M2总结](docs/team/m2-architecture-summary.md)和[审核处理证据](docs/team/m2-architecture-review-disposition.md)。Epic/Story、project-context、就绪门禁和sprint-status.yaml尚未开始 |
 | M3 | 核心Demo、Sprint 1状态及实现/评审/测试证据待开展；实验B已取消，不等待老师变更 |
 | M4 | Sprint 2、必做实验A及结果和局限、根目录retrospective.md、源码/测试、启动说明、10分钟录屏及最终版本证据均待完成 |
 | 人机决策 | [D-001～D-012共12条真实决策](decision-log.md)，按五要素记录；课程至少15条总量未达成，否决/实质修改按实际证据核对，不凑数 |

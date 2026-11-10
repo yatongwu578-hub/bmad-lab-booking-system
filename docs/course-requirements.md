@@ -90,7 +90,7 @@
 | --- | --- | --- | --- | --- |
 | 1 | 分析 | `product-brief.md` | 问题陈述、目标用户、成功度量、明确不做的范围。 | [x] [产品简报](../_bmad-output/planning-artifacts/product-brief.md) |
 | 2 | 规划 | `PRD.md` | 带编号的 FR；至少 2 条可测量 NFR；明确范围边界。 | [x] [正式PRD](../_bmad-output/planning-artifacts/PRD.md) |
-| 3 | 方案 | `architecture.md` | **至少 5 条 ADR**；每条必须写被否决的备选方案和否决理由。 | [ ] |
+| 3 | 方案 | `architecture.md` | **至少 5 条 ADR**；每条必须写被否决的备选方案和否决理由。 | [x] [正式架构](../_bmad-output/planning-artifacts/architecture.md) |
 | 4 | 方案 | `epics.md` + `stories` | **至少 12 个故事**、**至少 3 个史诗**；故事验收标准能直接翻译成测试断言。 | [ ] |
 | 5 | 方案 | `project-context.md` | 技术栈及版本；**至少 8 条**具体、有约束力的开发规则。 | [ ] |
 | 6 | 方案/实施 | `sprint-status.yaml` | Git 版本控制；有**多次真实状态变化记录**，不是一笔改成 done。 | [ ] |
@@ -335,3 +335,4 @@
 | 2026-10-23 | 创建课程要求基线，包括老师最新通知。 | PPT 第31–39页及通知 | A |
 | 2026-11-05 | 同步选题登记通过、正式PRD和第二轮提交状态；按团队明确确认取消老师M1单独门禁，老师仅审查最终完整GitHub；保留PPT原安排及其他要求，未完成项不勾选。 | 本次任务用户明确确认；本地main及origin/main为63d6fac8；正式PRD与审核记录 | 用户本次明确确认执行安排；文档核对由Codex协助 |
 | 2026-11-05 | 按进一步通知取消全部阶段性验收及实验B；保留历史条款、实验A和其余要求；仅最终提交仓库链接，评分调整待老师明确。此前同日记录保留历史。 | 团队在本次任务转述老师2026-11-05最新通知 | Codex协助修订，待用户人工审核；不代签团队确认 |
+| 2026-11-10 | 同步M2第一轮Architecture正式定稿状态，勾选第3类产物并补正式文件链接；第4～10类仍未完成。 | 用户确认GitHub状态；本地核对正式架构提交[4e2ff4fdbe58](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/4e2ff4fdbe58024e4bbfea0c63808f639f03c2a5)，main最新状态提交f31a1d115679 | 定稿及GitHub状态由用户本次明确确认；Codex协助核对和同步 |
