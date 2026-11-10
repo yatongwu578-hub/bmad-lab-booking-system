@@ -12,7 +12,7 @@
 
 项目通过支持电脑和手机浏览器的Web系统提供设备查询、预约申请、冲突检查、管理员审核、取消、状态查询和设备维护，按具体实物唯一编号管理。计划服务学生约50人、教师约6人、管理员约2人。当前业务基线见[Product Brief](_bmad-output/planning-artifacts/product-brief.md)和[正式PRD](_bmad-output/planning-artifacts/PRD.md)。
 
-**截至2026-11-10：M1两轮Product Brief和PRD已定稿；M2第一轮Architecture已完成内部审查并经负责人批准定稿。** 架构文档及本次证据更新在本地工作区，尚未提交或推送。M1～M4仅作为内部管理阶段，老师不逐阶段验收。
+**截至2026-11-10：M1两轮Product Brief和PRD已定稿；M2第一轮Architecture已完成内部审查并经负责人批准定稿。** 架构文档及审核证据已提交并推送至GitHub，真实提交为[4e2ff4fdbe58](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/4e2ff4fdbe58024e4bbfea0c63808f639f03c2a5)。M1～M4仅作为内部管理阶段，老师不逐阶段验收。
 
 | 事项 | 当前状态与证据 |
 | --- | --- |
@@ -42,7 +42,7 @@
 | 定稿验证与后续待办 | [正文一致性验证](_bmad-output/planning-artifacts/prds/prd-bmad-lab-booking-system-2026-10-30/finalization-verification.md)、[四项责任人及节点](_bmad-output/planning-artifacts/prds/prd-bmad-lab-booking-system-2026-10-30/finalization.md#四项非阻塞待办继续跟踪) |
 | 本次证据整理 | [第二轮总结](docs/team/round2-summary.md)、[相对链接和简报一致性检查](docs/team/round2-evidence-check.md) |
 
-原稿提交证据为[3c3a09d](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/3c3a09d)。以上已有提交由本地Git历史核对，远程可达性本轮未联网验证；第二轮定稿及证据整理已纳入[63d6fac](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/63d6fac8bb815412e2a2e82c058748a5b9e54a97)，本地main与origin/main均指向该提交；GitHub提交成功依据团队本次确认。原审查报告中的draft及“等待确认”是当时事实，当前状态以2026-11-04定稿追加记录为准。
+原稿提交证据为[3c3a09d](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/3c3a09d)。以上已有提交由本地Git历史核对，远程可达性本轮未联网验证；第二轮定稿及证据整理已纳入[63d6fac](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/63d6fac8bb815412e2a2e82c058748a5b9e54a97)，当时本地main与origin/main均指向该提交；GitHub提交成功依据团队当时确认。当前main及origin/main已更新至M2定稿提交4e2ff4fdbe58。原审查报告中的draft及“等待确认”是当时事实，M1当前状态以2026-11-04定稿追加记录为准。
 
 ## 三人分工
 
@@ -60,7 +60,7 @@
 | --- | --- |
 | BMAD-Method | 6.12.4，core/bmm及Codex集成；[安装清单](_bmad/_config/manifest.yaml)、[安装说明](docs/bmad-installation.md) |
 | Codex | 主要AI工具，已有1个ChatGPT Plus可使用Codex；客户端/模型版本未补造，待实际记录；[技能入口](.agents/skills/) |
-| GitHub | origin为yatongwu578-hub/bmad-lab-booking-system；已有三人审核贡献；本次收尾修改不自动提交或推送 |
+| GitHub | origin为yatongwu578-hub/bmad-lab-booking-system；已有三人审核贡献；M2第一轮Architecture定稿及审核证据已提交并推送，提交为[4e2ff4fdbe58](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/4e2ff4fdbe58024e4bbfea0c63808f639f03c2a5) |
 
 以下目录树依据本次 git ls-files 生成；工具目录折叠显示，其余列出全部跟踪文件。仅存在本地的未跟踪目录不列入交付。工具附带代码和测试不属于业务实现证据。
 
@@ -145,4 +145,4 @@ bmad-lab-booking-system/
 
 Codex协助完成简报与PRD的讨论、草稿、意见映射、审查、结构文字整理、Finalize及本次课程证据整理。吴亚彤实际作出并传达人工决定、审核批准；罗思婕和周何馨提供原始审核记录。Finalize使用了独立AI审查子代理，其结果不冒充组员意见或老师验收。
 
-当前无业务实现、业务运行测试或实验数据。课程PPT原页未在仓库发现，约束依据docs/course-requirements.md；没有声称已直接核实PPT原页。2026-11-05最新通知依据团队本次转述，未另附通知原件。历史PRD、Product Brief、原始BMAD日志和过去总结保留当时状态，涉及旧门禁的文字不构成当前等待要求。后续需保存真实工具/模型信息、会话与Git证据、每条NFR测试结果及实验A数据。本轮仅更新课程说明，待人工审核，不提交Git、不启动M2工作流。
+当前无业务实现、业务运行测试或实验数据。课程PPT原页未在仓库发现，约束依据docs/course-requirements.md；没有声称已直接核实PPT原页。2026-11-05最新通知依据团队本次转述，未另附通知原件。历史PRD、Product Brief、原始BMAD日志和过去总结保留当时状态，涉及旧门禁的文字不构成当前等待要求。后续需保存真实工具/模型信息、会话与Git证据、每条NFR测试结果及实验A数据。M2第一轮Architecture已正式定稿并提交GitHub，提交证据见上文；后续工作流尚未开始。

@@ -26,3 +26,11 @@ R-01～R-05中的模块/角色表示、查询候选语义、环境依赖、Admin
 ## 课程约束与范围
 
 遵循2026-11-05通知：M1～M4仅为内部管理阶段；实验B取消；实验A及其他未取消要求继续保留。此次只完成Architecture定稿，不创建Epic/Story、project-context、Sprint或业务代码，不提交/推送Git。后续仍须按BMAD正确顺序开展架构后的规划与实现工作。
+
+## 2026-11-10 正式GitHub提交后的状态追加
+
+M2第一轮Architecture正式定稿及审核证据已提交并推送至GitHub，真实提交为[4e2ff4fdbe58](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/4e2ff4fdbe58024e4bbfea0c63808f639f03c2a5)（完整SHA：`4e2ff4fdbe58024e4bbfea0c63808f639f03c2a5`），提交说明为`docs: finalize M2 architecture and review evidence`，Git记录的提交时间为2026-11-10 16:53:29 +08:00。提交对象已由本地Git记录核对，GitHub提交及推送完成依据负责人在本次会话中的明确确认。
+
+上文“未Git提交或推送”“不提交/推送Git”保留提交前的历史状态；当前提交状态以本追加记录为准。原有内部审核、意见处理及负责人定稿批准的证据仍见上文链接，本追加不代表发生了新的审核或批准。
+
+本次仅追加提交后的状态与Git证据，不改变FR/NFR、ADR、Sprint范围或实验条件。T-01～T-04、环境安装及运行验证仍未完成，没有新增业务测试、NFR测试或实验结果；Epic/Story、project-context及Sprint计划仍待后续独立工作流开展。
