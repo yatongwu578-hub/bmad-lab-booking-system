@@ -12,7 +12,7 @@
 
 项目通过支持电脑和手机浏览器的Web系统提供设备查询、预约申请、冲突检查、管理员审核、取消、状态查询和设备维护，按具体实物唯一编号管理。计划服务学生约50人、教师约6人、管理员约2人。当前业务基线见[Product Brief](_bmad-output/planning-artifacts/product-brief.md)和[正式PRD](_bmad-output/planning-artifacts/PRD.md)。
 
-**截至2026-11-05：选题登记已通过，M1两轮Product Brief和PRD、内部审核及负责人Finalize确认均已完成，可进入M2架构阶段；M2尚未开始。** 最新交付提交：[63d6fac](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/63d6fac8bb815412e2a2e82c058748a5b9e54a97)。M1～M4仅作为内部管理阶段，老师不逐阶段验收。
+**截至2026-11-10：M1两轮Product Brief和PRD已定稿；M2第一轮Architecture已完成内部审查并经负责人批准定稿。** 架构文档及本次证据更新在本地工作区，尚未提交或推送。M1～M4仅作为内部管理阶段，老师不逐阶段验收。
 
 | 事项 | 当前状态与证据 |
 | --- | --- |
@@ -22,8 +22,9 @@
 | M1第二轮 | PRD于2026-11-04正式定稿，18条FR、2条可测NFR；成员意见全部处理；[第二轮总结](docs/team/round2-summary.md) |
 | 正式审查 | 0 Critical、0 High、无业务阻塞；负责人已人工确认，四项非阻塞待办继续跟踪 |
 | M1内部核验 | 文档审查及负责人定稿确认已完成，可进入M2架构；无需等待老师批准 |
-| M2、M3、M4 | 未开始；未进入架构或其他后续工作流 |
-| 业务代码、运行测试、实验及复盘 | 尚未开展，当前无业务程序启动命令或测试结果 |
+| M2第一轮 Architecture | [课程版architecture.md](_bmad-output/planning-artifacts/architecture.md)、[原生ARCHITECTURE-SPINE.md](_bmad-output/planning-artifacts/architecture/architecture-bmad-lab-booking-system-2026-11-05/ARCHITECTURE-SPINE.md)已final；8条ADR/AD一一对应；[总结](docs/team/m2-architecture-summary.md)及[审核处理记录](docs/team/m2-architecture-review-disposition.md) |
+| M2后续Epic/Story、project-context、就绪及Sprint计划 | 尚未开始；须按BMAD顺序在架构后独立开展 |
+| M3、M4及业务代码、运行测试、实验和复盘 | 尚未开始；当前无业务程序启动命令或运行测试结果 |
 
 课程原规划为4周、2个Sprint；M1～M4现为内部里程碑，核心考察BMAD、敏捷过程、人类判断和真实证据。每次新BMAD工作流前先读[AGENTS.md](AGENTS.md)及[课程要求基线](docs/course-requirements.md)；命令以已安装[bmad-help](.agents/skills/bmad-help/SKILL.md)为准，独立工作流使用新会话。未取消的课程产物、实验A及BMAD内部就绪检查不因默认流程裁剪而省略。
 
@@ -132,12 +133,13 @@ bmad-lab-booking-system/
 | 阶段/要求 | 当前证据及待办 |
 | --- | --- |
 | M1 | 两轮Product Brief和PRD及内部审核、负责人确认已完成，第二轮定稿已提交main，可进入M2架构 |
-| M2 | architecture.md及至少5条ADR、至少3 Epic/12 Story、project-context.md至少8条规则、就绪门禁和sprint-status.yaml均未开始 |
+| M2 | 第一轮Architecture及至少5条ADR已定稿；详见[架构]( _bmad-output/planning-artifacts/architecture.md)、[M2总结](docs/team/m2-architecture-summary.md)和[审核处理证据](docs/team/m2-architecture-review-disposition.md)。Epic/Story、project-context、就绪门禁和sprint-status.yaml尚未开始 |
 | M3 | 核心Demo、Sprint 1状态及实现/评审/测试证据待开展；实验B已取消，不等待老师变更 |
 | M4 | Sprint 2、必做实验A及结果和局限、根目录retrospective.md、源码/测试、启动说明、10分钟录屏及最终版本证据均待完成 |
-| 人机决策 | [D-001～D-011共11条真实决策](decision-log.md)，五要素整理；课程至少15条总量未达成，否决/实质修改按实际证据核对，不凑数 |
+| 人机决策 | [D-001～D-012共12条真实决策](decision-log.md)，按五要素记录；课程至少15条总量未达成，否决/实质修改按实际证据核对，不凑数 |
 | FR追溯 | 已有18条编号FR；FR→ADR→Story→Test完整链路待后续阶段建立 |
 | NFR | 已有2条可测NFR；实际测试证据尚未产生，不能据文档审查宣称测试通过 |
+| Architecture验证待办 | T-01～T-04未完成；技术补丁、Windows安装及数据库环境也未实测；见[M2总结](docs/team/m2-architecture-summary.md) |
 
 ## AI使用声明与证据限制
 
