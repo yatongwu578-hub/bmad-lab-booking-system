@@ -1,23 +1,24 @@
 ---
 title: 实验室设备预约管理系统 Project Context
-status: draft
+status: final
 created: 2026-11-11
 updated: 2026-11-11
+finalized: 2026-11-11
 baseline_commit: 30c014c944740dd99e6fb2576046b50d64db5e8b
-review_status: 整理方案已获负责人确认；生成稿待人工审核，未Finalize
+review_status: 负责人已人工审核最终检查结果并正式批准Finalize；已定稿，未提交或推送
 ---
 
 # 实验室设备预约管理系统 Project Context
 
 ## 1. 状态、用途与依据
 
-本文件是课程PPT第33页要求的独立交付物，供后续Story设计、开发和评审显式读取，并为实验A记录规则违反情况提供稳定编号。当前为draft；负责人接受整理方案，不等于已审核生成稿，也不代表三名成员重新共同表决通过。没有运行软件或测试，不声明规则已由实现满足。
+本文件是课程PPT第33页要求的独立交付物，供后续Story设计、开发和评审显式读取，并为实验A记录规则违反情况提供稳定编号。当前为final，负责人于2026-11-11正式批准Finalize；本次正式定稿修改尚未Git提交或推送。草稿生成时，负责人仅接受整理方案，生成稿尚待人工审核；2026-11-11负责人明确表示已人工检查GitHub草稿，原则认可14条约束，无需重新讨论或增加数量，并要求完成收尾检查后等待明确批准才改为final。这不代表三名成员重新共同表决通过。没有运行软件或测试，不声明规则已由实现满足。
 
 依据为[课程基线第4节][course]、[定稿Product Brief][brief]、[定稿PRD][prd]、[定稿Architecture及8条ADR][architecture]、[原始Architecture Spine][spine]及其[memlog][memlog]、[根目录decision-log.md][decisions]、[M2架构总结][summary]和[审核意见处理记录][disposition]。ADR-001～008与AD-1～8一一对应。本文不改写18条FR、2条NFR或定稿ADR；具体实现细节的后续确认单列于第4节。
 
 本次人工依据为当前会话中负责人“我们对这次project-context的整理方案提出以下确认意见”消息的第一至六部分：接受五部分结构和PC-001～PC-014；接受R-01模块与唯一角色字段原则；有条件接受R-02；接受R-05不挂载Admin URL；R-03环境前确认，R-04继承既有决定。理由包括职责清晰、减少无关锁及重复入口、保持失效和历史一致、控制课程范围。本文保留该确认摘要，不虚构会话归档链接、成员投票、决策编号或Git提交；根目录决策日志本轮未修改。
 
-核对基线为本地HEAD [30c014c94474][baseline]，与负责人提供的GitHub main核对提交一致；本次未联网复核远端。M1及M2第一轮已正式定稿，不重跑这些工作流。2026-11-05老师通知优先：取消老师M1～M4阶段验收和实验B，保留实验A、内部就绪检查及其他未取消课程要求。
+草稿生成时核对基线为当时本地HEAD [30c014c94474][baseline]，与负责人当时提供的GitHub main核对提交一致；生成时未联网复核远端。草稿随后已入库，真实提交为[02eec258a3ac][draft-commit]（完整SHA：`02eec258a3ac768fe68753914fa77ac994620197`，提交说明：`docs: add M2 project-context draft for review`，Git提交时间：2026-11-11 09:59:09 +08:00），该提交仅新增本文件。本次由本地Git对象及HEAD核实提交；GitHub草稿可见性依据负责人本次已人工检查的明确陈述，未自行联网复核远端。`baseline_commit`保留生成基线，不冒充草稿提交。M1及M2第一轮已正式定稿，不重跑这些工作流。2026-11-05老师通知优先：取消老师M1～M4阶段验收和实验B，保留实验A、内部就绪检查及其他未取消课程要求。
 
 当前安装的BMAD为6.12.4，入口来自[本地bmad-help目录][catalog]：`[PC] bmad-project-context`主要管理AGENTS.md区块，`[CE] bmad-create-epics-and-stories`拆分故事，`[SP] bmad-sprint-planning`执行规划就绪检查和Sprint规划。本次按负责人明确要求，参考[PC技能][skill]的证据核验方法创建独立文件；不迁移、覆盖或更新AGENTS.md，不以其代替课程交付物。
 
@@ -158,9 +159,15 @@ T-01～T-04仍未完成。周何馨继续按既有记录跟踪：T-01相关Story
 
 实验A沿课程基线执行：X提供PRD、ADR、本文及故事卡，Y使用全新干净会话仅给一句功能需求，不人为泄漏X规划上下文；同人、同日、同宿主、同模型、难度相当及相同评审标准不变。记录违反PC规则时回指稳定编号及实际证据，不预填次数，不把整理14条规则当成14条人工决策；具体统计记录须保留真实上下文和口径，不擅自改变实验条件。本轮不开展实验A，不开展已取消的实验B。
 
-文档一致性检查范围为：独立文件及draft状态、技术系列与待核验事实、PC-001～PC-014连续唯一编号和依据/检查字段、与18FR/2NFR/8ADR及本次确认的一致性、Deferred状态和来源链接。课程PPT第33页要求依据仓库课程基线第4节摘录核对，不声称本次直接复核PPT原页。
+文档一致性检查范围为：独立文件及final状态和实际定稿批准依据、技术系列与待核验事实、PC-001～PC-014连续唯一编号和依据/检查字段、与18FR/2NFR/8ADR及本次确认的一致性、Deferred状态和来源链接。课程PPT第33页要求依据仓库课程基线第4节摘录核对，不声称本次直接复核PPT原页。
 
-本稿具备技术栈及版本系列和14条具体开发规则，满足上述摘录的文档内容要求；实际补丁锁定、Windows环境、运行测试、人工审核、Finalize及Git入库均未完成，不能据此宣布整项课程验收通过或软件达标。本次仅创建本草稿，不修改AGENTS.md、定稿PRD、Architecture、Spine、memlog或决策日志，不生成业务代码、不运行测试、不执行Finalize、commit或push。文档检查的实际结果由本轮回复报告。
+本稿具备技术栈及版本系列和14条具体开发规则，满足上述摘录的文档内容要求。草稿生成时，人工审核、Finalize及Git入库均未完成；后续Git入库和负责人对生成稿的人工检查已发生，证据见第1节，历史事实不追改。实际补丁锁定、Windows安装与环境核验、数据库连接迁移、第二台机器复现、运行测试及T-01～T-04仍未完成；本文已按负责人正式批准完成Finalize，该批准不表示上述验证已完成。不得据文档内容核对宣布整项课程验收通过或软件达标。
+
+2026-11-11收尾静态核对结果：五部分结构保留；11个相对链接目标均存在，引用式链接定义完整；PC-001～PC-014连续且唯一，14条均保留禁止／必须、依据与理由、检查方法。Python 3.13.x、Django 5.2 LTS、PostgreSQL 17.x、psycopg 3.x且至少3.1.8及页面／运行形态与Architecture第3节、ADR-001/007/008一致；补丁和Windows时区数据仍待实机核验。FR-001～018、NFR-001/002、ADR-001～008及AD-1～8引用与正式来源核对未见阻塞性冲突；D-007/008/009/012均有真实记录。R-01/02/05保留本轮既有确认及条件，R-03保留环境前确认，R-04保留模型设计与实现验证节点；Read Committed仍待相关事务Story ready前确认，T-01～T-04仍按第4节节点跟踪。
+
+定稿前收尾记录（历史状态）：未发现阻碍本文定稿的文档问题；当时status保持draft，等待负责人明确批准后才可改为final。本次只修正本文件状态表述、补充真实草稿提交与人工检查依据及静态核对结果，不修改14条约束、FR/NFR、ADR、Sprint范围或实验条件；不修改AGENTS.md、定稿PRD、Architecture、Spine、memlog或决策日志，不生成业务代码、不运行测试、不进入Epic/Story、不执行Finalize、commit或push。本次收尾修改尚未提交。
+
+2026-11-11正式定稿记录：负责人在本次会话明确表示已人工审核最终检查结果，确认五部分结构、14条PC约束、技术栈及版本、FR/NFR/ADR映射和Deferred处理符合当前课程要求，并明确批准project-context.md Finalize。据此将status改为final，记录实际定稿日期和审核状态；第2～4节及PC-001～PC-014原文、稳定编号均保留。R-03、Read Committed、实际补丁、Windows环境、数据库连接迁移、第二台机器复现及T-01～T-04仍按原节点确认和验证。正式定稿尚无Git提交，02eec258a3ac仅为草稿提交，不作定稿提交证据。本次同步README的M2第二轮进度；Epic/Story、就绪检查及Sprint计划尚未开始，不启动后续工作流，不编写业务代码、不运行测试、不执行commit或push，不修改已定稿Product Brief、PRD、Architecture及原始BMAD历史。
 
 [course]: ../../docs/course-requirements.md
 [brief]: product-brief.md
@@ -174,3 +181,5 @@ T-01～T-04仍未完成。周何馨继续按既有记录跟踪：T-01相关Story
 [baseline]: https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/30c014c944740dd99e6fb2576046b50d64db5e8b
 [catalog]: ../../_bmad/_config/bmad-help.csv
 [skill]: ../../.agents/skills/bmad-project-context/SKILL.md
+
+[draft-commit]: https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/02eec258a3ac768fe68753914fa77ac994620197
