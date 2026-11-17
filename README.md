@@ -12,7 +12,7 @@
 
 项目通过支持电脑和手机浏览器的Web系统提供设备查询、预约申请、冲突检查、管理员审核、取消、状态查询和设备维护，按具体实物唯一编号管理。计划服务学生约50人、教师约6人、管理员约2人。当前业务基线见[Product Brief](_bmad-output/planning-artifacts/product-brief.md)和[正式PRD](_bmad-output/planning-artifacts/PRD.md)。
 
-**截至2026-11-17：M1两轮Product Brief和PRD已定稿；M2第一轮Architecture及第二轮project-context已定稿；Epic/Story已形成3 Epic、13 Story的draft。** 架构定稿提交为[4e2ff4fdbe58](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/4e2ff4fdbe58024e4bbfea0c63808f639f03c2a5)。罗思婕1项、周何馨4项真实审核意见已由负责人逐项决定并落实文档修改，见[本轮审核汇总](docs/team/m2-epics-summary.md)及[处置记录](docs/team/m2-epics-review-disposition.md)。本次修改和Step-04复核待负责人审阅，未Finalize、未提交或推送，未进入Sprint规划或代码开发。M1～M4仅作为内部管理阶段，老师不逐阶段验收。
+**截至2026-11-17：M1两轮Product Brief和PRD已定稿；M2第一轮Architecture及第二轮project-context已定稿；Epic/Story文档已final，保留3 Epic、13 Story；Story生命周期仍为draft。** 架构定稿提交为[4e2ff4fdbe58](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/4e2ff4fdbe58024e4bbfea0c63808f639f03c2a5)。罗思婕1项、周何馨4项真实审核意见已由负责人逐项决定并落实文档修改，见[本轮审核汇总](docs/team/m2-epics-summary.md)及[处置记录](docs/team/m2-epics-review-disposition.md)。负责人已正式批准处理及Step-04第三次复核，并授权[C]完成定稿；本次Finalize修改未提交或推送，未进入Sprint规划或代码开发。M1～M4仅作为内部管理阶段，老师不逐阶段验收。
 
 | 事项 | 当前状态与证据 |
 | --- | --- |
@@ -24,7 +24,7 @@
 | M1内部核验 | 文档审查及负责人定稿确认已完成，可进入M2架构；无需等待老师批准 |
 | M2第一轮 Architecture | [课程版architecture.md](_bmad-output/planning-artifacts/architecture.md)、[原生ARCHITECTURE-SPINE.md](_bmad-output/planning-artifacts/architecture/architecture-bmad-lab-booking-system-2026-11-05/ARCHITECTURE-SPINE.md)已final；8条ADR/AD一一对应；[总结](docs/team/m2-architecture-summary.md)及[审核处理记录](docs/team/m2-architecture-review-disposition.md) |
 | M2第二轮 project-context | [独立文档](_bmad-output/planning-artifacts/project-context.md)已final，2026-11-11负责人正式批准；五部分结构、PC-001～PC-014共14条约束保留；[02eec258a3ac](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/02eec258a3ac768fe68753914fa77ac994620197)仅为草稿提交，正式定稿修改尚未提交或推送 |
-| M2 Epic/Story | [草稿](_bmad-output/planning-artifacts/epics.md)3 Epic/13 Story全部draft；[组员原文](docs/team/m2-epics-requirements-review.md)、[质量原文](docs/team/m2-epics-quality-review.md)及[处置记录](docs/team/m2-epics-review-disposition.md)；[Step-04报告](_bmad-output/planning-artifacts/epics-step-04-validation.md)保留历次验证，本次复核待负责人审阅 |
+| M2 Epic/Story | [定稿](_bmad-output/planning-artifacts/epics.md)文档final，3 Epic/13 Story的Story状态仍draft；[组员原文](docs/team/m2-epics-requirements-review.md)、[质量原文](docs/team/m2-epics-quality-review.md)及[处置记录](docs/team/m2-epics-review-disposition.md)；[Step-04报告](_bmad-output/planning-artifacts/epics-step-04-validation.md)保留历次验证，第三次复核零开放发现，负责人已批准并完成[C]；见报告第11节 |
 | M2后续就绪及Sprint计划 | 尚未开始；按BMAD顺序在后续独立会话开展，不据文档复核将Story标为ready |
 | M3、M4及业务代码、运行测试、实验和复盘 | 尚未开始；当前无业务程序启动命令或运行测试结果 |
 
@@ -135,7 +135,7 @@ bmad-lab-booking-system/
 | 阶段/要求 | 当前证据及待办 |
 | --- | --- |
 | M1 | 两轮Product Brief和PRD及内部审核、负责人确认已完成，第二轮定稿已提交main，可进入M2架构 |
-| M2 | Architecture及8条ADR、[project-context](_bmad-output/planning-artifacts/project-context.md)及14条PC已定稿；Epic/Story为3 Epic/13 Story的draft，组员5项意见已按负责人决定修改，见[本轮汇总](docs/team/m2-epics-summary.md)。本次Step-04复核待审，未Finalize；后续就绪检查及sprint-status.yaml尚未开始，不表示M2整体完成 |
+| M2 | Architecture及8条ADR、[project-context](_bmad-output/planning-artifacts/project-context.md)及14条PC已定稿；Epic/Story文档已final，3 Epic/13 Story的Story状态仍draft，组员5项意见已按负责人决定修改，见[本轮汇总](docs/team/m2-epics-summary.md)。第三次Step-04复核已获负责人批准并完成Finalize；后续就绪检查及sprint-status.yaml尚未开始，不表示M2整体完成 |
 | M3 | 核心Demo、Sprint 1状态及实现/评审/测试证据待开展；实验B已取消，不等待老师变更 |
 | M4 | Sprint 2、必做实验A及结果和局限、根目录retrospective.md、源码/测试、启动说明、10分钟录屏及最终版本证据均待完成 |
 | 人机决策 | [D-001～D-012共12条真实决策](decision-log.md)，按五要素记录；课程至少15条总量未达成，否决/实质修改按实际证据核对，不凑数 |
@@ -147,4 +147,4 @@ bmad-lab-booking-system/
 
 Codex协助完成简报与PRD的讨论、草稿、意见映射、审查、结构文字整理、Finalize及本次课程证据整理。吴亚彤实际作出并传达人工决定、审核批准；罗思婕和周何馨提供原始审核记录。Finalize使用了独立AI审查子代理，其结果不冒充组员意见或老师验收。
 
-当前无业务实现、业务运行测试或实验数据。课程PPT原页未在仓库发现，约束依据docs/course-requirements.md；没有声称已直接核实PPT原页。2026-11-05最新通知依据团队转述，未另附通知原件。历史PRD、Product Brief、原始BMAD日志和过去总结保留当时状态，涉及旧门禁的文字不构成当前等待要求。后续需保存真实工具/模型信息、会话与Git证据、每条NFR测试结果及实验A数据。Epic/Story组员审核及负责人处置已有真实记录，本次文档修改未commit/push；当前保持draft，环境、运行验证及后续就绪/Sprint流程未完成。
+当前无业务实现、业务运行测试或实验数据。课程PPT原页未在仓库发现，约束依据docs/course-requirements.md；没有声称已直接核实PPT原页。2026-11-05最新通知依据团队转述，未另附通知原件。历史PRD、Product Brief、原始BMAD日志和过去总结保留当时状态，涉及旧门禁的文字不构成当前等待要求。后续需保存真实工具/模型信息、会话与Git证据、每条NFR测试结果及实验A数据。Epic/Story组员审核及负责人处置已有真实记录，本次文档修改未commit/push；epics.md现已final，13条Story仍draft；环境、运行验证及后续就绪/Sprint流程未完成。本次定稿修改等待负责人确认后再提交。

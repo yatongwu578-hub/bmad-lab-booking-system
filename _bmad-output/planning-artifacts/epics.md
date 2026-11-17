@@ -1,15 +1,17 @@
 ---
-status: draft
+status: final
 stepsCompleted:
   - step-01-validate-prerequisites
   - step-02-design-epics
   - step-03-create-stories
+  - step-04-final-validation
 currentStep: step-04-final-validation
 step01Approval: 负责人在当前会话明确选择C，确认输入与完整需求清单，无增删文件
 step02Approval: 负责人在当前会话明确选择C，批准三个Epic及映射，并明确三项交付边界；不代表三名成员共同表决
 step03Approval: 负责人在当前会话正式批准Epic 3的Story设计完成检查，同意结束Step-03并进入Step-04；不等于Finalize或实施就绪批准
-step04Validation: passed_pending_owner_review
-step04Approval: pending
+workflowStatus: completed
+step04Validation: passed
+step04Approval: 负责人于2026-11-17在本次会话正式批准五项审核意见处理结果及第三次Step-04复核，并明确选择[C] Complete Workflow；不代表成员二次审核或软件测试通过
 step04ValidationReport: '_bmad-output/planning-artifacts/epics-step-04-validation.md'
 approvedStoryDesigns:
   - '1.1'
@@ -44,11 +46,11 @@ inputDocuments:
   - 'docs/team/m2-architecture-review-disposition.md'
 ---
 
-# 实验室设备预约管理系统 - Epic/Story拆分草稿
+# 实验室设备预约管理系统 - Epic/Story拆分定稿
 
 ## 概述
 
-Step-01需求清单及Step-02三个Epic、依赖顺序、FR映射、NFR落实和T-01～T-04安排已获负责人明确批准。负责人已正式批准Epic 1～3故事设计完成检查及Step-03结束，并允许进入Step-04。首次FR-015批准历史问题已获授权修复，前两轮记录见验证报告第1～9节。2026-11-17负责人已人工审阅罗思婕1项、周何馨4项真实意见及AI分析，批准R1/Q1/Q2/Q4接受、Q3部分接受，并授权本次文档修改与复核；[处置记录](../../docs/team/m2-epics-review-disposition.md)保留决定和依据。本次Step-04结果见[验证报告第10节](epics-step-04-validation.md#10-团队审核处置后的第三次step-04复核2026-11-17)，文档开放发现0，待负责人审核本次实际修改及复核。13条Story均draft；不代表两位组员已再次复核或软件已通过测试，不执行Finalize。
+Step-01需求清单及Step-02三个Epic、依赖顺序、FR映射、NFR落实和T-01～T-04安排已获负责人明确批准。负责人已正式批准Epic 1～3故事设计完成检查及Step-03结束，并允许进入Step-04。首次FR-015批准历史问题已获授权修复，前两轮记录见验证报告第1～9节。2026-11-17负责人已人工审阅罗思婕1项、周何馨4项真实意见及AI分析，批准R1/Q1/Q2/Q4接受、Q3部分接受，并授权本次文档修改与复核；[处置记录](../../docs/team/m2-epics-review-disposition.md)保留决定和依据。本次Step-04结果见[验证报告第10节](epics-step-04-validation.md#10-团队审核处置后的第三次step-04复核2026-11-17)，文档开放发现0。负责人于2026-11-17在本次会话正式批准本轮处理及复核结果，并授权执行[C] Complete Workflow；本文件已final，Step-04已完成。13条Story仍为draft；后续实施就绪检查、Sprint及开发尚未执行，不代表两位组员再次复核或软件测试通过。
 
 ## 需求清单
 
@@ -2086,3 +2088,11 @@ So that 我能够反映设备当前情况，同时防止状态变化破坏既有
 **V-01授权修复及第二次Step-04记录：** 负责人已人工审核首次0 Critical/0 High/1 Medium结果并授权最小修复。已在2.6 AC-1补齐成功批准历史的真实字段、同事务提交/确认失败回滚、无重复及与AC-6到期失效的分支一致性；在2.5 AC-6补齐批准等实际转换的管理员授权只读历史及字段，原详情入口FR-018责任保持不变，并追加两条Story的后续验证引用。未新增编号AC或Story。完整重跑Step-04六项检查后，V-01在文档验收层面关闭，当前0 Critical/0 High/0 Medium/0其他开放发现。详细复核与历史区分见[验证报告第9节](epics-step-04-validation.md#9-v-01修复及第二次完整step-04复核当前结果)。状态保持draft，step04Approval为pending；R-01/R-03/R-04/Read Committed和T-01～T-04仍按原节点待确认或验证，不执行Finalize、代码开发、软件测试、Sprint分配或Git提交推送。
 
 **2026-11-17团队审核处置及第三次Step-04记录：** 上段保留第二次复核时事实。本次按负责人明确批准修正R1（3.1 AC-7）、Q1（2.4/2.7/2.8 AC-1）、Q2（2.2 AC-1）、Q3（2.1 AC-11及证据要求），Q4统一限定11处已有未知提交分支并补客户端断网及故障取证说明。两位组员原文保留，罗思婕文件仅规范扩展名。3 Epic/13 Story/103条编号AC和73条前置依赖不变，PRD/Architecture/project-context未改。第三次Step-04文档复核开放发现0，详见报告第10节；仍等待负责人审阅本次修改和复核，未Finalize、未运行软件测试、未进入就绪/Sprint或实施，也未commit/push。
+
+## 2026-11-17负责人批准与[C]完成记录
+
+负责人在本次真实会话确认R1及Q1～Q4共5项意见已处理、处置记录与总结已生成，正式批准第三次Step-04的0 Critical、0 High、0 Medium、0其他开放发现结果，并明确要求按安装版6.12.4执行[C] Complete Workflow。此批准替代此前“等待负责人确认、不得Finalize”的当前限制；上述各轮过程正文保留为历史。
+
+已将文档status设为final，stepsCompleted加入step-04-final-validation，workflowStatus设为completed。3 Epic、13 Story、103条编号AC、73条前置依赖保持不变，13条Story生命周期仍为draft。PRD、Architecture、project-context及既定业务规则未修改，NFR-001仍为20个请求×10轮，不强制20个不同账号。
+
+依安装版完成规则调用bmad-help定位后续入口：[SP] Sprint Planning（bmad-sprint-planning）先检查实施就绪，再生成Sprint状态；本次仅报告入口，不启动。T-01～T-04、R-01/R-03/R-04、Read Committed及环境、软件运行验证继续按原节点待办。未运行软件测试或实验，未暂存、提交或推送Git；本次Finalize等待负责人确认后再提交。
