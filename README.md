@@ -8,6 +8,14 @@
 
 实验 A 仍为必做；其余产物、两个真实 Sprint、测试、决策、三人贡献及持续 Git 历史要求继续保留。实验 B 取消后的评分处理待老师明确，不自行重分配分数。
 
+## Sprint规划与待审核入口（2026-11-17更新）
+
+实施就绪结论为[CONCERNS](_bmad-output/planning-artifacts/implementation-readiness.md)，负责人已接受并有条件允许规划，未改为PASS。安装版BMAD 6.12.4已生成[sprint-status.yaml](_bmad-output/implementation-artifacts/sprint-status.yaml)，3个Epic及13条Story全部backlog，epics正文Story仍draft；3个回顾项为模板optional，不免除课程回顾。格式校验不是软件测试。
+
+负责人初步有条件接受[Sprint计划](_bmad-output/planning-artifacts/sprint-plan.md)：S1为1.1～1.4、2.1、2.2、2.3、2.5；S2为2.4、2.6、2.7、2.8、3.1。待[罗思婕业务及周何馨质量审核](docs/team/sprint-planning-review.md)实际完成并由负责人最终确认范围后，再启动Sprint1。两位成员本轮尚未审核，实验A的2.6/2.7仍是候选，R-01/03/04、Read Committed和T-01～04仍开放。本轮决定见[decision-log D-013](decision-log.md#d-013-2026-11-17-负责人有条件接受concerns及两轮sprint候选范围)。
+
+正式开发一条Story一个独立bmad-build会话，代码实现后新开会话执行bmad-code-review；真实测试、问题处置及负责人验收满足后才能done，不批量完成13条Story。实验Y的一句需求干净对照路径须实验前确认，不能自动加载规划材料污染隔离。当前不开发、不运行测试、不执行Git提交或推送；不使用Docker、不增加PRD外业务。当前更新优先于下文旧轮次的历史进度说明。
+
 ## 项目与当前进度
 
 项目通过支持电脑和手机浏览器的Web系统提供设备查询、预约申请、冲突检查、管理员审核、取消、状态查询和设备维护，按具体实物唯一编号管理。计划服务学生约50人、教师约6人、管理员约2人。当前业务基线见[Product Brief](_bmad-output/planning-artifacts/product-brief.md)和[正式PRD](_bmad-output/planning-artifacts/PRD.md)。
@@ -25,7 +33,7 @@
 | M2第一轮 Architecture | [课程版architecture.md](_bmad-output/planning-artifacts/architecture.md)、[原生ARCHITECTURE-SPINE.md](_bmad-output/planning-artifacts/architecture/architecture-bmad-lab-booking-system-2026-11-05/ARCHITECTURE-SPINE.md)已final；8条ADR/AD一一对应；[总结](docs/team/m2-architecture-summary.md)及[审核处理记录](docs/team/m2-architecture-review-disposition.md) |
 | M2第二轮 project-context | [独立文档](_bmad-output/planning-artifacts/project-context.md)已final，2026-11-11负责人正式批准；五部分结构、PC-001～PC-014共14条约束保留；[02eec258a3ac](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/02eec258a3ac768fe68753914fa77ac994620197)仅为草稿提交，正式定稿修改尚未提交或推送 |
 | M2 Epic/Story | [定稿](_bmad-output/planning-artifacts/epics.md)文档final，3 Epic/13 Story的Story状态仍draft；[组员原文](docs/team/m2-epics-requirements-review.md)、[质量原文](docs/team/m2-epics-quality-review.md)及[处置记录](docs/team/m2-epics-review-disposition.md)；[Step-04报告](_bmad-output/planning-artifacts/epics-step-04-validation.md)保留历次验证，第三次复核零开放发现，负责人已批准并完成[C]；见报告第11节 |
-| M2后续就绪及Sprint计划 | 尚未开始；按BMAD顺序在后续独立会话开展，不据文档复核将Story标为ready |
+| M2后续就绪及Sprint计划 | CONCERNS已获条件接受，初始状态已生成；8/5范围初步接受，团队审核及Sprint1启动确认仍待完成，见上方规划入口 |
 | M3、M4及业务代码、运行测试、实验和复盘 | 尚未开始；当前无业务程序启动命令或运行测试结果 |
 
 课程原规划为4周、2个Sprint；M1～M4现为内部里程碑，核心考察BMAD、敏捷过程、人类判断和真实证据。每次新BMAD工作流前先读[AGENTS.md](AGENTS.md)及[课程要求基线](docs/course-requirements.md)；命令以已安装[bmad-help](.agents/skills/bmad-help/SKILL.md)为准，独立工作流使用新会话。未取消的课程产物、实验A及BMAD内部就绪检查不因默认流程裁剪而省略。
@@ -138,7 +146,7 @@ bmad-lab-booking-system/
 | M2 | Architecture及8条ADR、[project-context](_bmad-output/planning-artifacts/project-context.md)及14条PC已定稿；Epic/Story文档已final，3 Epic/13 Story的Story状态仍draft，组员5项意见已按负责人决定修改，见[本轮汇总](docs/team/m2-epics-summary.md)。第三次Step-04复核已获负责人批准并完成Finalize；后续就绪检查及sprint-status.yaml尚未开始，不表示M2整体完成 |
 | M3 | 核心Demo、Sprint 1状态及实现/评审/测试证据待开展；实验B已取消，不等待老师变更 |
 | M4 | Sprint 2、必做实验A及结果和局限、根目录retrospective.md、源码/测试、启动说明、10分钟录屏及最终版本证据均待完成 |
-| 人机决策 | [D-001～D-012共12条真实决策](decision-log.md)，按五要素记录；课程至少15条总量未达成，否决/实质修改按实际证据核对，不凑数 |
+| 人机决策 | [D-001～D-013共13条真实决策](decision-log.md)，D-013为本次条件接受，不计作否决/实质修改；课程至少15条总量仍未达成，按实际证据积累，不凑数 |
 | FR追溯 | 18条FR已有ADR/PC及Story/AC和待执行验证场景落点；尚无真实Test运行证据末端，不宣称完整链路已验证 |
 | NFR | 已有2条可测NFR；实际测试证据尚未产生，不能据文档审查宣称测试通过 |
 | Architecture及project-context后续待办 | R-03环境方案、Read Committed仍待原节点确认；T-01～T-04未完成；实际补丁、Windows安装、数据库连接迁移和第二台机器复现未验证；见[project-context第4节](_bmad-output/planning-artifacts/project-context.md#4-deferred处理及后续确认节点)及[M2第一轮总结](docs/team/m2-architecture-summary.md) |
