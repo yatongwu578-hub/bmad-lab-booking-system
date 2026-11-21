@@ -4,7 +4,7 @@
 
 ## 2026-11-05 老师最新通知
 
-老师取消 M1～M4 阶段性门禁检查和实验 B（需求变更注入），不再下发临时需求变更。团队根据已定需求继续按 BMAD 与敏捷流程完成项目，内部审查和负责人确认后可进入下一工作流，无需等待老师阶段批准。**最终在老师规定的截止日前仅提交本 GitHub 项目仓库链接**，具体截止日期待老师明确。详见最高优先级[课程要求基线](docs/course-requirements.md)。
+老师取消 M1～M4 阶段性门禁检查和实验 B（需求变更注入），不再下发临时需求变更。团队根据已定需求继续按 BMAD 与敏捷流程完成项目，内部审查和负责人确认后可进入下一工作流，无需等待老师阶段批准。负责人补充的**最终截止日期为 2026 年 11 月 30 日**，最终只提交本 GitHub 项目仓库链接。 [课程要求基线](docs/course-requirements.md)
 
 实验 A 仍为必做；其余产物、两个真实 Sprint、测试、决策、三人贡献及持续 Git 历史要求继续保留。实验 B 取消后的评分处理待老师明确，不自行重分配分数。
 
@@ -12,7 +12,7 @@
 
 实施就绪结论为[CONCERNS](_bmad-output/planning-artifacts/implementation-readiness.md)，负责人已接受并有条件允许规划，未改为PASS。安装版BMAD 6.12.4已生成[sprint-status.yaml](_bmad-output/implementation-artifacts/sprint-status.yaml)，3个Epic及13条Story全部backlog，epics正文Story仍draft；3个回顾项为模板optional，不免除课程回顾。格式校验不是软件测试。
 
-罗思婕、周何馨于 2026-11-19 完成业务与质量审核。吴亚彤于 2026-11-21 正式批准[Sprint 计划](_bmad-output/planning-artifacts/sprint-plan.md)和[逐项处置](docs/team/sprint-planning-review-disposition.md)。Sprint 1 为 1.1～1.4、2.1、2.2、2.3、2.5，交付可运行的申请与查询增量并受控演示。Sprint 2 为 2.4、2.6、2.7、2.8、3.1，交付批准、拒绝、取消、维修停用及人工处置闭环。两轮实际起止日期、可用工时和启动批准待确认。2.1 首次验收保留 NFR-001 的 20 个独立授权请求 × 10 轮。实验 A 的 2.6／2.7 保留为候选，R-01、R-03、R-04、Read Committed 与 T-01～T-04 继续按节点跟踪。[团队审核材料](docs/team/sprint-planning-review.md) · [D-014](decision-log.md#d-014-2026-11-21-负责人正式批准两轮-sprint-范围及审核处置)
+罗思婕、周何馨于 2026-11-19 完成业务与质量审核。吴亚彤于 2026-11-21 批准两轮范围和逐项处置，随后确认排期并正式批准 Sprint 1 启动。Sprint 1 为 11 月 22 日至 26 日，保留 1.1～1.4、2.1、2.2、2.3、2.5。Sprint 2 为 11 月 27 日至 29 日，保留 2.4、2.6、2.7、2.8、3.1。2.1 首次验收保留 NFR-001 的 20 个独立授权请求 × 10 轮，实验 A 的 2.6／2.7 保留为候选。R-01、R-03 沿用批准和验收证据，R-04、Read Committed 与 T-01～T-04 按既定节点落实。 [Sprint 启动交接](_bmad-output/planning-artifacts/sprint-plan.md#9-sprint-1-启动确认与-story-11-交接) · [D-017](decision-log.md#d-017-2026-11-21-负责人正式批准-sprint-1-启动)
 
 正式开发一条Story一个独立bmad-build会话，代码实现后新开会话执行bmad-code-review；真实测试、问题处置及负责人验收满足后才能done，不批量完成13条Story。实验Y的一句需求干净对照路径须实验前确认，不能自动加载规划材料污染隔离。当前不开发、不运行测试、不执行Git提交或推送；不使用Docker、不增加PRD外业务。当前更新优先于下文旧轮次的历史进度说明。
 
@@ -33,7 +33,7 @@
 | M2第一轮 Architecture | [课程版architecture.md](_bmad-output/planning-artifacts/architecture.md)、[原生ARCHITECTURE-SPINE.md](_bmad-output/planning-artifacts/architecture/architecture-bmad-lab-booking-system-2026-11-05/ARCHITECTURE-SPINE.md)已final；8条ADR/AD一一对应；[总结](docs/team/m2-architecture-summary.md)及[审核处理记录](docs/team/m2-architecture-review-disposition.md) |
 | M2第二轮 project-context | [独立文档](_bmad-output/planning-artifacts/project-context.md)已final，2026-11-11负责人正式批准；五部分结构、PC-001～PC-014共14条约束保留；[02eec258a3ac](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/02eec258a3ac768fe68753914fa77ac994620197)仅为草稿提交，正式定稿修改尚未提交或推送 |
 | M2 Epic/Story | [定稿](_bmad-output/planning-artifacts/epics.md)文档final，3 Epic/13 Story的Story状态仍draft；[组员原文](docs/team/m2-epics-requirements-review.md)、[质量原文](docs/team/m2-epics-quality-review.md)及[处置记录](docs/team/m2-epics-review-disposition.md)；[Step-04报告](_bmad-output/planning-artifacts/epics-step-04-validation.md)保留历次验证，第三次复核零开放发现，负责人已批准并完成[C]；见报告第11节 |
-| M2 后续就绪及 Sprint 计划 | CONCERNS 保留，初始状态已生成。两位组员审核及负责人范围批准已完成，实际日期、容量及 Sprint 1 启动批准待确认。 |
+| M2 后续就绪及 Sprint 计划 | CONCERNS 保留，两轮日期及 8／5 范围已确认。Sprint 1 启动已获批准，首条 Story 按实际开发状态推进。 [Sprint 1 启动交接](_bmad-output/planning-artifacts/sprint-plan.md#9-sprint-1-启动确认与-story-11-交接) |
 | M3、M4及业务代码、运行测试、实验和复盘 | 尚未开始；当前无业务程序启动命令或运行测试结果 |
 
 课程原规划为4周、2个Sprint；M1～M4现为内部里程碑，核心考察BMAD、敏捷过程、人类判断和真实证据。每次新BMAD工作流前先读[AGENTS.md](AGENTS.md)及[课程要求基线](docs/course-requirements.md)；命令以已安装[bmad-help](.agents/skills/bmad-help/SKILL.md)为准，独立工作流使用新会话。未取消的课程产物、实验A及BMAD内部就绪检查不因默认流程裁剪而省略。
@@ -149,10 +149,10 @@ bmad-lab-booking-system/
 | 人机决策 | [D-001～D-014 共 14 条真实决策](decision-log.md)。D-013 为条件接受，D-014 为真实审核后的正式范围批准，按批准类统计。课程累计至少 15 条的要求随真实决定继续积累。 |
 | FR追溯 | 18条FR已有ADR/PC及Story/AC和待执行验证场景落点；尚无真实Test运行证据末端，不宣称完整链路已验证 |
 | NFR | 已有2条可测NFR；实际测试证据尚未产生，不能据文档审查宣称测试通过 |
-| Architecture及project-context后续待办 | R-03环境方案、Read Committed仍待原节点确认；T-01～T-04未完成；实际补丁、Windows安装、数据库连接迁移和第二台机器复现未验证；见[project-context第4节](_bmad-output/planning-artifacts/project-context.md#4-deferred处理及后续确认节点)及[M2第一轮总结](docs/team/m2-architecture-summary.md) |
+| Architecture及project-context后续待办 | R-03 本机环境和数据库连接已验证。R-04、Read Committed、T-01～T-04 按原节点落实，应用迁移和第二台机器复现随后取证。 [project-context 第 4 节](_bmad-output/planning-artifacts/project-context.md#4-deferred处理及后续确认节点) |
 
 ## AI使用声明与证据限制
 
 Codex协助完成简报与PRD的讨论、草稿、意见映射、审查、结构文字整理、Finalize及本次课程证据整理。吴亚彤实际作出并传达人工决定、审核批准；罗思婕和周何馨提供原始审核记录。Finalize使用了独立AI审查子代理，其结果不冒充组员意见或老师验收。
 
-当前无业务实现、业务运行测试或实验数据。课程 PPT 原页未在仓库发现，依据[课程基线](docs/course-requirements.md)及团队审核材料记录的第 27 页口径。2026-11-05 通知由团队转述，未另附通知原件。历史文档及过去记录保留当时事实。后续需保存实际工具与模型、会话和 Git 证据、每条 NFR 的运行测试及实验 A 数据。规划范围已获批准，环境验证和 Sprint 1 启动审批待完成。
+当前无业务实现、业务运行测试或实验数据。课程 PPT 原页未在仓库发现，依据[课程基线](docs/course-requirements.md)及团队审核材料记录的第 27 页口径。2026-11-05 通知由团队转述，未另附通知原件。历史文档及过去记录保留当时事实。后续需保存实际工具与模型、会话和 Git 证据、每条 NFR 的运行测试及实验 A 数据。R-03 本机环境验证已验收，Sprint 1 启动已批准，Story 1.1 的实际实施证据将在独立工作流中产生。

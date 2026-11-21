@@ -127,3 +127,32 @@
 3. **人类判断与依据**：吴亚彤正式批准 Sprint 1 的 1.1～1.4、2.1、2.2、2.3、2.5 和 Sprint 2 的 2.4、2.6、2.7、2.8、3.1。接受受控演示、原功能覆盖和依赖，以及在 2.1 内细化完整 NFR-001 验收。当前缺少实际容量，维持 2.3／2.5 的分配。按既定节点落实 R-01、R-03、R-04、Read Committed 及 T-01～T-04，保留 T-02 原复查未闭环并批准补查安排。实验 A 暂留 X=2.6 批准、Y=2.7 拒绝，待实际实验前人工确认控制条件。两轮日期、工时和启动仍待确认。此条是从 D-013 条件接受到真实审核后正式批准范围的独立决定，按批准类统计。
 4. **结果**：新增[逐项处置记录](docs/team/sprint-planning-review-disposition.md)，更新[Sprint 计划](_bmad-output/planning-artifacts/sprint-plan.md)、[团队审核材料](docs/team/sprint-planning-review.md)及[README](README.md)。正式 18 FR、2 NFR、8 ADR、14 PC 和 13 条 Story 保持原基线。两份审核原文、CONCERNS 和初始 backlog 状态均保留。
 5. **事后验证**：本轮核对文档内容、链接和 Git 差异。实际容量及启动批准、开放技术条件、T-02 补查与运行证据、两个 Sprint 的实现及验收、实验 A 均待相应真实工作节点复核。现有 D 编号共 14 条，课程至少 15 条的总量要求继续随真实决定积累。
+
+## D-015 2026-11-21 负责人批准 R-01 自定义账号模型
+
+1. **触发**：Sprint 1 启动准备中，R-01 按[就绪报告](_bmad-output/planning-artifacts/implementation-readiness.md)和[Sprint 计划](_bmad-output/planning-artifacts/sprint-plan.md)须在 Story 1.1 进入 ready 和首次迁移前决定。依据是负责人在本次真实会话中明确表示已检查 Sprint 1 启动准备报告并批准 R-01。当前无共享会话链接。
+2. **AI 建议及理由**：此前规划列出自定义 User 与关联 Profile 两条实现路径，要求人工先确定唯一业务角色来源及迁移依赖。现有 [PC-008](_bmad-output/planning-artifacts/project-context.md#pc-008-服务端角色归属及单一业务入口) 与 ADR-002 约束服务端角色检查，以免权限分散或由 Django 管理标志绕过业务规则。
+3. **人类判断与依据**：负责人批准 `accounts.User` 继承 Django `AbstractUser`，添加必填 `role`，只允许学生、教师、管理员。沿用 Django 认证、密码哈希和会话；服务端按 `role` 执行业务授权，`is_staff` 和 `is_superuser` 不作为角色依据。保留预置初始化，关闭自助注册，不额外创建 Profile 表或增设权限框架。决定落实 FR-001、FR-002 与 ADR-002 的既有要求。负责人给出了选择和适用边界，未另述比较理由。本条按方案批准记录。
+4. **结果**：本日志记录人工决定，并在 [R-01/R-03 准备记录](docs/team/sprint-1-environment-preparation.md)保留首次迁移和验证交接。R-01 的人工选型已完成，等待实现取证。Sprint 1 启动批准单列。
+5. **事后验证**：在 Story 1.1 首次迁移前核对 `AUTH_USER_MODEL = 'accounts.User'` 和 `accounts` 首个迁移的依赖。后续验证三类角色及必填限制、预置账号哈希和会话、业务角色独立于 Django 管理标志以及直接访问权限。实际结果待取得。
+
+**负责人补充要求**：在首次迁移前配置 `AUTH_USER_MODEL`，并明确角色取值、默认权限边界和初始化规则。实施口径已写入 [R-01 首次迁移与预置账号规则](docs/team/sprint-1-environment-preparation.md#r-01-首次迁移与预置账号规则)。其中 `student`、`teacher`、`admin` 是 Codex 据已批准的三个业务角色提出的存储值。文档核对后仍待实际迁移、授权及初始化取证。
+
+**启动准备复核**：负责人在本次会话再次确认沿用 `accounts.User`、`AbstractUser` 和单一必填 `role`，模型与迁移在 Story 1.1 开发中实现并验证。当前仅作选型和实施规则取证，Story 1.1 跟踪状态为 `backlog`。
+
+## D-016 2026-11-21 负责人批准 R-03 本地环境方案
+
+1. **触发**：Python、依赖和时区已完成本机核验，现有 PostgreSQL 11.17 服务位于 `5432`。Codex 提交独立 17.x 实例及项目库隔离方案，等待会创建集群、数据库和角色的操作获准。见 [Sprint 1 环境准备记录](docs/team/sprint-1-environment-preparation.md)。
+2. **AI 建议及理由**：通过 PostgreSQL 官网指向的 EDB Windows 安装器准备独立 17.x 服务及数据目录，拟用 `127.0.0.1:5433`。预建业务库 `lab_booking` 和测试库 `test_lab_booking`，分设运行、迁移和测试角色，把集群级建库权限留给部署管理员，避免业务和测试串库及旧实例受影响。建库后核验实际版本、连接和权限。
+3. **人类判断与依据**：负责人在本次会话明确回复“二、批准R-03环境方案”。此条记录对上述环境方案的批准，沿用真实结果取证及旧实例隔离约束。负责人未另述比较理由。应用迁移、业务预置账号写入及 Sprint 1 正式启动沿各自的确认节点。
+4. **结果与事后验证**：独立 Windows 服务 `postgresql-x64-17` 运行于 `127.0.0.1:5433`，认证查询确认服务端 PostgreSQL 17.12。两库与三个分离角色已创建，`psql`、psycopg 和临时 Django 设置完成实库连接验证，跨库拒绝及凭据访问权限通过实际复查。旧服务仍在 `5432` 接受连接。应用迁移、预置账号和第二台机器复现待各自节点取证。安装与验证失败、恢复命令及结果见 [R-03 批准后执行记录](docs/team/sprint-1-environment-preparation.md#r-03-批准后执行记录)。
+
+**负责人正式验收**：负责人在本次会话正式接受 R-03 本机环境准备及数据库连接验证结果，要求保留 D-016 和真实证据。正式项目采用独立 PostgreSQL 17.12 服务及 `5433`，既有 11.17 服务和数据库受保留。Codex 只读复查了依赖、时区、双服务状态和三角色的认证连接。此时两轮排期和启动尚待决定，后续见 D-017。 [环境复查](docs/team/sprint-1-environment-preparation.md#负责人验收与只读复查)
+
+## D-017 2026-11-21 负责人正式批准 Sprint 1 启动
+
+1. **触发**：负责人补充 2026-11-30 课程最终截止日期并提出两轮候选，随后在本次会话明确回复“我正式批准启动Sprint 1”，同时提供确认日期、分工、进度跟踪方式与技术边界。当前无共享会话链接。
+2. **AI 建议及理由**：此前将短窗口评为高风险，建议以人员工时、容量估算及 2.1 评审、修复和复测窗口核对可行性，并继续保留逐 Story 取证与两轮完整要求。
+3. **人类判断与依据**：负责人指出 PPT 未要求逐人每日工时记录，决定取消工时表、容量估算和逐小时排期作为启动门槛，以 Codex 辅助真实实施，并按 Story 状态、Git 提交与测试证据跟踪。Sprint 1 定于 2026-11-22 至 11-26，Sprint 2 定于 11-27 至 11-29，11-30 提交唯一仓库链接，沿用 8／5 划分。吴亚彤负责技术实施、代码和最终验收，罗思婕负责业务审核，周何馨负责质量审核和测试证据检查。保留 `CONCERNS`、D-015／D-016、R-04、Read Committed 和 T-01～T-04 原节点。实验 A 保留 X=2.6、Y=2.7 为候选，正式实验前确认公平性和隔离条件。本条是对先前启动门槛的实质修改和本轮启动授权。
+4. **结果**：更新既有 Sprint 计划与 README 启动状态，移除候选工时确认表。保留正式 PRD、Architecture、epics 与实际 Story 范围。未创建实施规格或记录虚构状态流转。 [Sprint 1 启动确认与交接](_bmad-output/planning-artifacts/sprint-plan.md#9-sprint-1-启动确认与-story-11-交接)
+5. **事后验证**：BMAD 6.12.4 原生校验返回 `valid=true`，同步预演返回 `in_sync=true`、`changed=0`。原生状态工具推荐 Story 1.1，13 条 Story 和 3 个 Epic 均为 `backlog`。1.1 的正式设计、无前置 Story、D-015 与 D-016 已核对，实施规格与 `ready-for-dev` 按独立 Build 的原生检查点实际发生。后续真实开发、评审、测试、负责人验收和 Git 提交尚待取证。
