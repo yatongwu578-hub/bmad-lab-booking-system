@@ -2,6 +2,72 @@
 
 实验室设备预约管理系统｜软件工程管理课程大作业｜3人团队
 
+## Windows 本地启动
+
+Story 1.1 提供统一的 `/login/` 和只读的 `/identity/`。使用 Python 3.13.17（64 位）、[固定依赖](requirements.txt)及独立的 PostgreSQL 17.12 实例 `127.0.0.1:5433`。环境准备记录列出两库、三个角色和受保护凭据文件的设置。 [Sprint 1 环境准备](docs/team/sprint-1-environment-preparation.md)
+
+在仓库根目录打开 PowerShell。Python 3.13.17 已安装但启动器不可用时，可用该版本的 `python.exe` 完整路径执行 `-m venv`。
+
+```powershell
+py -3.13-64 -m venv .venv
+$venvPython = '.\.venv\Scripts\python.exe'
+& $venvPython -m pip install --only-binary=:all: -r requirements.txt
+$env:PGPASSFILE = Join-Path $env:LOCALAPPDATA 'LabBooking\PostgreSQL17\pgpass.conf'
+$env:LAB_BOOKING_SECRET_KEY = & $venvPython -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+```
+
+如密码文件保存在其他受保护目录，将 `PGPASSFILE` 指向其绝对路径。以上密钥只保留在当前 PowerShell 进程环境中，重新生成会使原有登录会话失效。重启时需要继续保留会话，可在受保护的本机环境中沿用原密钥。缺少数据库模式、密码文件或密钥时，Django 会报出对应配置项。
+
+| `LAB_BOOKING_DB_MODE` | 数据库 | PostgreSQL 角色 | 用途 |
+| --- | --- | --- | --- |
+| `migration` | `lab_booking` | `lab_booking_migrator` | 审核迁移计划、执行获准迁移及预置 |
+| `runtime` | `lab_booking` | `lab_booking_app` | 本地应用运行 |
+| `test` | `test_lab_booking` | `lab_booking_test` | 在预建的独立测试库运行测试 |
+
+先以迁移角色检查配置、版本、实际身份及迁移计划。核对连接返回 `lab_booking`、`lab_booking_migrator`、`5433` 和 `17.12`。负责人确认目标及计划后，执行 `migrate`。
+
+```powershell
+$env:LAB_BOOKING_DB_MODE = 'migration'
+$pgBin = 'C:\Program Files\PostgreSQL\17\bin'
+& "$pgBin\psql.exe" -X -w -h 127.0.0.1 -p 5433 -U lab_booking_migrator -d lab_booking -v ON_ERROR_STOP=1 -c 'SELECT current_database(), current_user, inet_server_port(), current_setting(''server_version'');'
+& $venvPython manage.py check
+& $venvPython manage.py makemigrations --check --dry-run
+& $venvPython manage.py migrate --plan
+```
+
+```powershell
+& $venvPython manage.py migrate
+```
+
+迁移后由项目库对象所有者核对现有权限，并对运行角色执行所需授权。账号表的认证字段更新覆盖登录时间及 Django 的密码哈希升级，迁移记录只读供 `runserver` 启动检查，会话表支持会话维护。
+
+```sql
+GRANT USAGE ON SCHEMA public TO lab_booking_app;
+GRANT SELECT ON TABLE public.accounts_user TO lab_booking_app;
+GRANT UPDATE (last_login, password) ON TABLE public.accounts_user TO lab_booking_app;
+GRANT SELECT ON TABLE public.django_migrations TO lab_booking_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.django_session TO lab_booking_app;
+```
+
+迁移成功后，由负责人单独确认目标数据库及受保护的 UTF-8 JSON 清单，再执行预置。清单为数组，每项含 `username`、`role`、`password` 三个字符串字段。角色取 `student`、`teacher`、`admin`，账号按 Django 登录表单规则规范化。将真实清单放在仓库外、访问受限的本机目录，并把下例路径替换为实际路径。命令只报告计数或脱敏错误。
+
+```powershell
+$env:LAB_BOOKING_DB_MODE = 'migration'
+$manifestPath = Join-Path $env:LOCALAPPDATA 'LabBooking\Protected\accounts.json'
+& $venvPython manage.py seed_accounts --manifest $manifestPath
+$env:LAB_BOOKING_DB_MODE = 'runtime'
+& $venvPython manage.py runserver 127.0.0.1:8000 --noreload
+```
+
+访问 `http://127.0.0.1:8000/login/`，使用获准预置账号登录后核对身份页的账号、角色和刷新结果。匿名访问 `/identity/` 应回到登录页，错误或缺失凭据应显示表单错误，`/admin/` 和 `/register/` 应返回 404。三种角色均使用同一登录地址。`runserver` 仅用于本地开发和演示。
+
+以独立测试角色运行 Story 1.1 的 PostgreSQL 测试。首次测试会在预建的隔离测试库应用迁移，先核对实际目标并按团队约定确认。
+
+```powershell
+$env:LAB_BOOKING_DB_MODE = 'test'
+& $venvPython manage.py test accounts --keepdb --parallel 1 -v 2
+```
+
 ## 2026-11-05 老师最新通知
 
 老师取消 M1～M4 阶段性门禁检查和实验 B（需求变更注入），不再下发临时需求变更。团队根据已定需求继续按 BMAD 与敏捷流程完成项目，内部审查和负责人确认后可进入下一工作流，无需等待老师阶段批准。负责人补充的**最终截止日期为 2026 年 11 月 30 日**，最终只提交本 GitHub 项目仓库链接。 [课程要求基线](docs/course-requirements.md)
@@ -14,7 +80,7 @@
 
 罗思婕、周何馨于 2026-11-19 完成业务与质量审核。吴亚彤于 2026-11-21 批准两轮范围和逐项处置，随后确认排期并正式批准 Sprint 1 启动。Sprint 1 为 11 月 22 日至 26 日，保留 1.1～1.4、2.1、2.2、2.3、2.5。Sprint 2 为 11 月 27 日至 29 日，保留 2.4、2.6、2.7、2.8、3.1。2.1 首次验收保留 NFR-001 的 20 个独立授权请求 × 10 轮，实验 A 的 2.6／2.7 保留为候选。R-01、R-03 沿用批准和验收证据，R-04、Read Committed 与 T-01～T-04 按既定节点落实。 [Sprint 启动交接](_bmad-output/planning-artifacts/sprint-plan.md#9-sprint-1-启动确认与-story-11-交接) · [D-017](decision-log.md#d-017-2026-11-21-负责人正式批准-sprint-1-启动)
 
-正式开发一条Story一个独立bmad-build会话，代码实现后新开会话执行bmad-code-review；真实测试、问题处置及负责人验收满足后才能done，不批量完成13条Story。实验Y的一句需求干净对照路径须实验前确认，不能自动加载规划材料污染隔离。当前不开发、不运行测试、不执行Git提交或推送；不使用Docker、不增加PRD外业务。当前更新优先于下文旧轮次的历史进度说明。
+正式开发一条 Story 一个独立 bmad-build 会话，代码实现后新开会话执行 bmad-code-review。真实测试、问题处置及负责人验收满足后才能标为 done。实验 Y 的一句需求干净对照路径须实验前确认。Story 1.1 已进入实施，当前状态以 [Sprint 跟踪文件](_bmad-output/implementation-artifacts/sprint-status.yaml) 为准。
 
 ## 项目与当前进度
 
@@ -34,7 +100,7 @@
 | M2第二轮 project-context | [独立文档](_bmad-output/planning-artifacts/project-context.md)已final，2026-11-11负责人正式批准；五部分结构、PC-001～PC-014共14条约束保留；[02eec258a3ac](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/02eec258a3ac768fe68753914fa77ac994620197)仅为草稿提交，正式定稿修改尚未提交或推送 |
 | M2 Epic/Story | [定稿](_bmad-output/planning-artifacts/epics.md)文档final，3 Epic/13 Story的Story状态仍draft；[组员原文](docs/team/m2-epics-requirements-review.md)、[质量原文](docs/team/m2-epics-quality-review.md)及[处置记录](docs/team/m2-epics-review-disposition.md)；[Step-04报告](_bmad-output/planning-artifacts/epics-step-04-validation.md)保留历次验证，第三次复核零开放发现，负责人已批准并完成[C]；见报告第11节 |
 | M2 后续就绪及 Sprint 计划 | CONCERNS 保留，两轮日期及 8／5 范围已确认。Sprint 1 启动已获批准，首条 Story 按实际开发状态推进。 [Sprint 1 启动交接](_bmad-output/planning-artifacts/sprint-plan.md#9-sprint-1-启动确认与-story-11-交接) |
-| M3、M4及业务代码、运行测试、实验和复盘 | 尚未开始；当前无业务程序启动命令或运行测试结果 |
+| M3、M4及业务代码、运行测试、实验和复盘 | Story 1.1 实施中，见上文启动和测试命令。实验 A 和复盘后续开展。 |
 
 课程原规划为4周、2个Sprint；M1～M4现为内部里程碑，核心考察BMAD、敏捷过程、人类判断和真实证据。每次新BMAD工作流前先读[AGENTS.md](AGENTS.md)及[课程要求基线](docs/course-requirements.md)；命令以已安装[bmad-help](.agents/skills/bmad-help/SKILL.md)为准，独立工作流使用新会话。未取消的课程产物、实验A及BMAD内部就绪检查不因默认流程裁剪而省略。
 
@@ -155,4 +221,4 @@ bmad-lab-booking-system/
 
 Codex协助完成简报与PRD的讨论、草稿、意见映射、审查、结构文字整理、Finalize及本次课程证据整理。吴亚彤实际作出并传达人工决定、审核批准；罗思婕和周何馨提供原始审核记录。Finalize使用了独立AI审查子代理，其结果不冒充组员意见或老师验收。
 
-当前无业务实现、业务运行测试或实验数据。课程 PPT 原页未在仓库发现，依据[课程基线](docs/course-requirements.md)及团队审核材料记录的第 27 页口径。2026-11-05 通知由团队转述，未另附通知原件。历史文档及过去记录保留当时事实。后续需保存实际工具与模型、会话和 Git 证据、每条 NFR 的运行测试及实验 A 数据。R-03 本机环境验证已验收，Sprint 1 启动已批准，Story 1.1 的实际实施证据将在独立工作流中产生。
+课程 PPT 原页未在仓库发现，依据[课程基线](docs/course-requirements.md)及团队审核材料记录的第 27 页口径。2026-11-05 通知由团队转述，未另附通知原件。历史文档及过去记录保留当时事实。R-03 本机环境验证已验收，Sprint 1 启动已批准。后续继续保存实际工具与模型、会话和 Git 证据、每条 NFR 的运行测试及实验 A 数据。

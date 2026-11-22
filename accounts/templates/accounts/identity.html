@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>我的身份 · 实验室设备预约</title>
+</head>
+<body>
+    <main>
+        <h1>我的身份</h1>
+        <dl>
+            <dt>账号</dt>
+            <dd>{{ account.username }}</dd>
+            <dt>业务角色</dt>
+            <dd>{{ account.get_role_display }}</dd>
+        </dl>
+    </main>
+</body>
+</html>
