@@ -89,3 +89,17 @@ AC-1～AC-7 的当前本机检查结果见上述开发证据。真实 Chrome 三
 Django 全量 32／32，独立于常规套件的临时 Chrome 实测 6／6，测试库前后均为 9 张表、16 条迁移、0 个账号、0 条会话。项目 `.venv` 在普通 PowerShell 中正常运行，Python 未重装。业务库未连接。本机复验详情、AC 对照及环境边界见[开发证据](../../_bmad-output/implementation-artifacts/story-1-1-dev-evidence.md#2026-11-24-输入边界最终整改)。规格和 Sprint 保持 `in-review`／`review`，1.2 为 `backlog`，负责人最终验收待发生。
 
 已单独发起 Codex 会话「Story 1.1 输入边界独立复审」，会话 ID 为 `01a20b7b-053c-7de0-9b7f-4d3a7a7d6961`。提交给该会话的四文件统一差异以本轮开始时的工作区为对照，SHA-256 为 `B57E3F31F544548F709CA4E808B5C4AEE4D5A6F633A23C20311264A0AC570304`。复审结论以该会话实际返回为准。
+
+## 负责人最终验收前问题处置（2026-11-24，D-022）
+
+负责人已正式接受本轮四视角独立复审结果：关闭 CR-01～CR-03、CR-05～CR-14 及 U-01；并接受 CR-04 的既有真实 runtime 证据和残余风险后关闭 CR-04。输入边界修改仅涉及账号表单、登录模板、预置解析及测试，没有修改 runtime 启动、认证身份、角色、CSRF、会话或退出路径；因此 D-019 三类业务账号 Windows Chrome 运行证据仍有效。新增边界由独立 32/32 Django 与 10/10 Chrome 证据覆盖。负责人明确接受未在本轮输入修复后重新连接业务库认证的风险。没有重新运行测试，也没有连接业务库。
+
+此前正式评审的三项未编号 Medium 按负责人决定延期至项目级工作，均不阻塞 Story 1.1：新机预建隔离库首迁与权限准备说明（AC-7、D-016、R-03）；PowerShell 迁移失败传播的操作硬化（AC-7／D-016）；数据库测试运行器限制非回滚测试类（AC-7、隔离及 D-020）。原始内容、风险、缓解节点和理由见[延期工作记录](../../_bmad-output/implementation-artifacts/deferred-work.md)。第二台 Windows 复现仍未完成，保留为后续集成验证。九项既有 Low 建议仍在正式评审报告中明示为非阻塞建议，未被本次决定默认为关闭。
+
+AC-1～AC-7 证据清单、D-015～D-021 边界核对及课程页 26／27／33／34／36 映射见[实施规格最终验收清单](../../_bmad-output/implementation-artifacts/spec-1-1-preset-account-login.md#最终验收核对清单-d-022)。Story 1.1 可提交负责人最终验收；负责人尚未作出最终验收或状态推进决定，所以仍保持 `review`，Story 1.2 保持 `backlog`。实验 A 的 X/Y 条件和数据不受本轮影响。
+
+## 负责人最终验收与状态推进（2026-11-24，D-023）
+
+负责人随后正式批准 Story 1.1 最终验收通过。按安装版 BMAD 6.12.4 Build Step 5 将实施规格同步为 `done`，并依负责人明确批准将 Sprint Story 1.1 从 `review` 更新为 `done`。Epic 1 尚有未完成 Story，继续 `in-progress`；Story 1.2 及其他未开始 Story 保持 `backlog`。
+
+验收依据为 AC-1～AC-7、D-015～D-022、真实 runtime 证据、32/32 Django 独立测试、10/10 Chrome 独立测试、测试库隔离验证及四视角独立复审。CR-01～CR-14 与 U-01 全部关闭；负责人接受 CR-04 已有证据及残余风险。三项未编号 Medium 仍见 [`deferred-work.md`](../../_bmad-output/implementation-artifacts/deferred-work.md)，九项 Low 建议仍作为非阻塞事项，第二台 Windows 复现仍为后续集成验证。未重跑测试、访问数据库、修改业务代码或 Story 1.2，也未自动 commit/push。课程第 34 页实验 A 的条件和数据不受本次 Story 验收结果影响。 [最终验收清单与记录](../../_bmad-output/implementation-artifacts/spec-1-1-preset-account-login.md#负责人最终验收与完成状态-2026-11-24-d-023) · [D-023](../../decision-log.md#d-023-2026-11-24-story-11-负责人最终验收)

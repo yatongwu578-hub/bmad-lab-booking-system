@@ -105,7 +105,7 @@ $env:LAB_BOOKING_DB_MODE = 'test'
 
 罗思婕、周何馨于 2026-11-19 完成业务与质量审核。吴亚彤于 2026-11-21 批准两轮范围和逐项处置，随后确认排期并正式批准 Sprint 1 启动。Sprint 1 为 11 月 22 日至 26 日，保留 1.1～1.4、2.1、2.2、2.3、2.5。Sprint 2 为 11 月 27 日至 29 日，保留 2.4、2.6、2.7、2.8、3.1。2.1 首次验收保留 NFR-001 的 20 个独立授权请求 × 10 轮，实验 A 的 2.6／2.7 保留为候选。R-01、R-03 沿用批准和验收证据，R-04、Read Committed 与 T-01～T-04 按既定节点落实。 [Sprint 启动交接](_bmad-output/planning-artifacts/sprint-plan.md#9-sprint-1-启动确认与-story-11-交接) · [D-017](decision-log.md#d-017-2026-11-21-负责人正式批准-sprint-1-启动)
 
-正式开发一条 Story 一个独立 bmad-build 会话，代码实现后新开会话执行 bmad-code-review。真实测试、问题处置及负责人验收满足后才能标为 done。实验 Y 的一句需求干净对照路径须实验前确认。Story 1.1 已进入实施，当前状态以 [Sprint 跟踪文件](_bmad-output/implementation-artifacts/sprint-status.yaml) 为准。
+正式开发一条 Story 一个独立 bmad-build 会话，代码实现后新开会话执行 bmad-code-review。真实测试、问题处置及负责人验收满足后才能标为 done。实验 Y 的一句需求干净对照路径须实验前确认。Story 1.1 已于 2026-11-24 经负责人最终验收并标记 done；Epic 1 仍为 in-progress，Story 1.2 及其他未开始 Story 保持 backlog。状态以 [Sprint 跟踪文件](_bmad-output/implementation-artifacts/sprint-status.yaml) 为准，验收与评审证据见 [D-023](decision-log.md#d-023-2026-11-24-story-11-负责人最终验收)。
 
 ## 项目与当前进度
 
@@ -123,9 +123,9 @@ $env:LAB_BOOKING_DB_MODE = 'test'
 | M1内部核验 | 文档审查及负责人定稿确认已完成，可进入M2架构；无需等待老师批准 |
 | M2第一轮 Architecture | [课程版architecture.md](_bmad-output/planning-artifacts/architecture.md)、[原生ARCHITECTURE-SPINE.md](_bmad-output/planning-artifacts/architecture/architecture-bmad-lab-booking-system-2026-11-05/ARCHITECTURE-SPINE.md)已final；8条ADR/AD一一对应；[总结](docs/team/m2-architecture-summary.md)及[审核处理记录](docs/team/m2-architecture-review-disposition.md) |
 | M2第二轮 project-context | [独立文档](_bmad-output/planning-artifacts/project-context.md)已final，2026-11-11负责人正式批准；五部分结构、PC-001～PC-014共14条约束保留；[02eec258a3ac](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/02eec258a3ac768fe68753914fa77ac994620197)仅为草稿提交，正式定稿修改尚未提交或推送 |
-| M2 Epic/Story | [定稿](_bmad-output/planning-artifacts/epics.md)文档final，3 Epic/13 Story的Story状态仍draft；[组员原文](docs/team/m2-epics-requirements-review.md)、[质量原文](docs/team/m2-epics-quality-review.md)及[处置记录](docs/team/m2-epics-review-disposition.md)；[Step-04报告](_bmad-output/planning-artifacts/epics-step-04-validation.md)保留历次验证，第三次复核零开放发现，负责人已批准并完成[C]；见报告第11节 |
+| M2 Epic/Story | [定稿](_bmad-output/planning-artifacts/epics.md)文档final，保留3 Epic/13 Story的批准基线；故事设计稿状态与实施状态分开记录，当前实施状态以 [Sprint 跟踪文件](_bmad-output/implementation-artifacts/sprint-status.yaml) 为准（Story 1.1 已 done，其余未开始Story为backlog）；[组员原文](docs/team/m2-epics-requirements-review.md)、[质量原文](docs/team/m2-epics-quality-review.md)及[处置记录](docs/team/m2-epics-review-disposition.md)；[Step-04报告](_bmad-output/planning-artifacts/epics-step-04-validation.md)保留历次验证，第三次复核零开放发现，负责人已批准并完成[C]；见报告第11节 |
 | M2 后续就绪及 Sprint 计划 | CONCERNS 保留，两轮日期及 8／5 范围已确认。Sprint 1 启动已获批准，首条 Story 按实际开发状态推进。 [Sprint 1 启动交接](_bmad-output/planning-artifacts/sprint-plan.md#9-sprint-1-启动确认与-story-11-交接) |
-| M3、M4及业务代码、运行测试、实验和复盘 | Story 1.1 实施中，见上文启动和测试命令。实验 A 和复盘后续开展。 |
+| M3、M4及业务代码、运行测试、实验和复盘 | Story 1.1 已完成负责人最终验收（32/32 Django、10/10 独立 Chrome、四视角独立复审及 AC-1～AC-7 证据）；三项 Medium 项目级延期、九项 Low 非阻塞建议及第二台 Windows 复现保留跟踪。Epic 1 仍 in-progress，Story 1.2 等仍 backlog。实验 A 和复盘后续开展，Story 1.1 测试不计入实验 A。 [完成规格](_bmad-output/implementation-artifacts/spec-1-1-preset-account-login.md) · [验收记录](docs/team/story-1-1-review-disposition.md#负责人最终验收与状态推进2026-11-24-d-023) |
 
 课程原规划为4周、2个Sprint；M1～M4现为内部里程碑，核心考察BMAD、敏捷过程、人类判断和真实证据。每次新BMAD工作流前先读[AGENTS.md](AGENTS.md)及[课程要求基线](docs/course-requirements.md)；命令以已安装[bmad-help](.agents/skills/bmad-help/SKILL.md)为准，独立工作流使用新会话。未取消的课程产物、实验A及BMAD内部就绪检查不因默认流程裁剪而省略。
 

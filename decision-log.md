@@ -190,3 +190,19 @@
 3. **人工判断**。负责人确认基础解释器路径存在，要求先区分 Codex 权限与 `.venv` 损坏，仅修复两处输入边界。要求保留 Django 默认用户名规则，确保合法 150 码点不会被截断，4097 码点密码明确拒绝，并以实际测试验证。只允许连接 `test_lab_booking`，随后进行独立 Code Review。Story 1.1 保持 `review`，1.2 保持 `backlog`，不自动提交或推送。依据为本轮负责人明确指令及 FR-001／002、ADR-001／002／008、D-015／016。
 4. **结果**。在表单、模板、预置解析和回归中落实原始输入及共用验证。保留正式 AC、冻结区和现有项目环境。 [整改处置](docs/team/story-1-1-review-disposition.md#step-4-输入边界整改2026-11-24)
 5. **事后验证**。普通 PowerShell 的原 `.venv` 运行 Python 3.13.17。系统、迁移一致性检查通过，隔离库 Django 32 项及实际 Chrome 6 个表单用例通过。本次未连接业务库。此记录依据负责人实际授权和已完成的测试，最终验收与 Git 提交待实际发生。 [开发证据](_bmad-output/implementation-artifacts/story-1-1-dev-evidence.md#2026-11-24-输入边界最终整改)
+
+## D-022 2026-11-24 负责人接受 Story 1.1 最终复审证据并处置残余事项
+
+1. **触发**：BMAD 6.12.4 四个独立评审视角已恢复并完成；负责人要求在 Story 1.1 最终验收前核对 CR-04 的历史 runtime 证据有效性、列出此前评审范围外的 Medium 项，并形成 AC-1～AC-7 验收清单。依据为本次负责人明确指令、正式实施规格及独立评审报告。
+2. **AI 建议及理由**：最新输入边界差异仅改账号表单、登录模板、预置解析和对应测试；没有改动 runtime 启动、登录／身份视图、CSRF、中间件、会话、角色或退出处理。既有 Windows runtime 三角色 Chrome 证据仍能证明实际业务账号的登录、身份展示、刷新、CSRF 和退出；既有独立 32/32 Django 回归与 10/10 Chrome 表单用例覆盖新增输入边界。建议不访问业务库重复认证，关闭 CR-04，并明确记录负责人接受“业务 runtime 登录未在最后一次输入边界修改后重跑”的残余风险。此前三个未编号 Medium 项分别属于新机环境交接、PowerShell 迁移操作失败传播和测试运行器防护，应保留为项目级集成／工具链事项，不扩展 Story 1.1。
+3. **人类判断与依据**：负责人正式接受既有 Windows runtime 和三类业务账号 Chrome 证据，接受与最新隔离库回归证据组合满足正式 AC 的判断，并批准关闭 CR-04。理由是边界修复不改变既有业务账号的常规认证路径及认证后的角色、会话、CSRF 和退出行为；Django 32/32 与真实 Chrome 10/10 已独立覆盖新表单边界。负责人接受未在本轮重新连接业务库认证的残余风险。负责人同时确认此前未编号 Medium 项转为后续项目级验证／硬化事项，第二台 Windows 复现继续保留在原定集成节点，不计为Story 1.1阻塞。其他 CR-01～CR-03、CR-05～CR-14 及 U-01 按本次正式独立复审结论关闭。依据 FR-001／002、AC-1～AC-7、D-015～D-021、ADR-001／002／008、PC-001／002／008／011 及真实证据记录。
+4. **结果**：将 CR-04 标为关闭；把三项未编号 Medium 发现按负责人决定记为 `defer` 并纳入 `deferred-work.md`；新增 Story 1.1 最终验收清单及证据映射。Story 1.1 仍为 `review`，Story 1.2 仍为 `backlog`，等待负责人另行批准最终状态推进。本次不改业务代码、数据库或正式需求，不运行测试，不开发 1.2，不执行 commit/push。
+5. **事后验证**：只读核对最新表单边界差异及既有 runtime、Django、Chrome、隔离数据库证据；确认 AC-1～AC-7 的测试映射、D-015～D-021 未被改变，实验 A 数据和条件未受本轮测试影响。没有重新运行测试或访问 `lab_booking`。第二台 Windows 机器尚未复现，仍待项目集成验证节点取证。 [独立评审结论](_bmad-output/implementation-artifacts/spec-1-1-preset-account-login.md#2026-11-24-story-11-输入边界独立复审恢复) · [开发证据](_bmad-output/implementation-artifacts/story-1-1-dev-evidence.md#2026-11-24-输入边界最终整改) · [独立复审检查点](docs/team/story-1-1-independent-review-checkpoint-2026-11-24.md)
+
+## D-023 2026-11-24 Story 1.1 负责人最终验收
+
+1. **触发**：BMAD 6.12.4 独立代码评审和问题处置完成后，负责人在本次会话正式批准 Story 1.1「使用预置账号登录并获得明确业务身份」最终验收通过。依据是正式 AC-1～AC-7、实施规格、开发证据、整改处置记录、四视角复审检查点及 D-015～D-022。
+2. **AI 建议及理由**：按安装版 BMAD 6.12.4 Build Step 5 标记实施规格完成，并同步 Sprint 状态。负责人明确要求 Story 1.1 从 `review` 到 `done`；Epic 1 尚未全部完成，必须保持 `in-progress`；未开始的 Story 保持 `backlog`。不再运行测试或评审，复用既有独立 Django 32/32、独立 Chrome 10/10、PostgreSQL 测试库隔离及四视角评审证据。
+3. **人类判断与依据**：负责人正式接受 CR-01～CR-14、U-01 全部关闭，接受正式 AC-1～AC-7 的验收证据及 CR-04 历史 runtime 证据和记录的残余风险；确认四视角独立评审无新增验收阻塞问题。负责人接受三项未编号 Medium 延期事项按项目级节点跟踪、九项 Low 建议继续保持非阻塞且未虚构关闭、第二台 Windows 复现留待后续集成验证。依据 FR-001／002、NFR-002、ADR-001／002／008、D-015～D-022 及已保存的真实测试和运行证据。Story 1.1 测试结果不用于实验 A。
+4. **结果**：按 Build Step 5 将 Story 1.1 实施规格 `status` 设为 `done`；将 `sprint-status.yaml` 中 Story 1.1 由 `review` 更新为 `done`，刷新 `last_updated`。Epic 1 保持 `in-progress`，Story 1.2 及其他未开始 Story 保持 `backlog`。更新 README 当前进度、整改处置记录和独立复审检查点的最终验收状态。未修改业务代码、数据库、正式 PRD、Architecture 或 epics 基线；未开发 Story 1.2；未 commit/push。
+5. **事后验证**：复用已完成的 32/32 Django 独立测试、10/10 Chrome 独立测试、测试库隔离验证和四视角复审记录，不重复执行。以 Git 差异检查确认本次文件范围仅为状态、验收与进度证据，执行 `git diff --check` 及敏感信息检查；确认实验 A 的 X/Y 条件、数据未被本 Story 结果替代。 [实施规格与 AC 清单](_bmad-output/implementation-artifacts/spec-1-1-preset-account-login.md#负责人最终验收与完成状态-2026-11-24-d-023) · [状态文件](_bmad-output/implementation-artifacts/sprint-status.yaml) · [整改处置记录](docs/team/story-1-1-review-disposition.md#负责人最终验收与状态推进2026-11-24-d-023) · [独立复审检查点](docs/team/story-1-1-independent-review-checkpoint-2026-11-24.md) · [课程要求基线](docs/course-requirements.md)

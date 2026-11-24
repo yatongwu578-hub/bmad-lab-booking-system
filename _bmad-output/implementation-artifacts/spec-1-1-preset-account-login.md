@@ -2,7 +2,7 @@
 title: 'Story 1.1 使用预置账号登录并获得明确业务身份'
 type: 'feature'
 created: '2026-11-21'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '685f358daa050cb28e1ee7672a2d55f20ef1b842'
@@ -331,13 +331,15 @@ D-015 的模型、授权来源和默认标志符合批准方案。D-016 的 17.1
 
 ### Review Findings
 
+以下为 2026-11-23 正式评审当时的原始发现与状态快照，保留用于追溯；其中的旧待办描述不代表当前处置。后续整改、输入边界独立复审及 D-022 负责人决定见本规格后续章节，并以最终处置表和验收清单为当前状态。
+
 两项凭据边界应在最终验收前处理。较短正常凭据和已证实的三个演示账号路径通过。后续若需处理真实账号，须另行授权。
 
 - [ ] [Review][Decision] **CR-02 残余 · 中 · 密码预置可接受网页登录无法提交的长度。** 合成清单经解析和哈希处理成功，常规 URL 编码表单会超出 Django 请求体上限，认证前即失败。建议确定预置与登录共用的有效上限，将失败放在写库前，保护已有哈希。也可由负责人明确限定受保护清单的支持范围，并记录校验和验证条件。 [预置校验](../../accounts/management/commands/seed_accounts.py#L32)
-- [ ] [Review][Decision] **中 · 新机的预建隔离库缺少首迁和权限准备说明。** README 与 R-03 记录要求但未提供从新 Windows 实例准备两库、三角色并完成隔离库首迁的可复现步骤。由负责人确认独立初始化授权或交接已验证的预建环境，再取第二台机器证据。 [README](../../README.md#L89) · [R-03 取证](../../docs/team/sprint-1-environment-preparation.md#L64)
+- [x] [Review][Defer] **中 · 新机的预建隔离库缺少首迁和权限准备说明。** README 与 R-03 记录要求但未提供从新 Windows 实例准备两库、三角色并完成隔离库首迁的可复现步骤。负责人按 D-022 将新机交接和第二台 Windows 复现保留为项目级集成验证；已完成机器的 AC-7 真实运行证据成立。本项不阻塞 Story 1.1。 [README](../../README.md#L89) · [R-03 取证](../../docs/team/sprint-1-environment-preparation.md#L64) · [延期记录](deferred-work.md)
 - [ ] [Review][Patch] **中 · 预置接受浏览器输入框装不下的 Unicode 用户名。** 合成用户名通过预置校验。使用相同 `maxlength=150` 本地控件时，Chrome 将 76 个码点、152 个 UTF-16 单元的输入截为 75 个码点。问题已存在于首迁前检查点，未在此次整改修复。对齐表单按 UTF-16 和后端按码点的限制，保持已有用户名语义，并验证真实浏览器输入。 [预置校验](../../accounts/management/commands/seed_accounts.py#L30) · [登录模板](../../accounts/templates/accounts/login.html#L13) · [HTML maxlength](https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#attr-fe-maxlength) · [字符串长度](https://infra.spec.whatwg.org/#string-length)
-- [ ] [Review][Patch] **中 · PowerShell 迁移失败会被后续命令覆盖。** 本轮替身证实连接检查失败仍执行下一行，连续执行迁移和授权块时失败迁移仍进入后续授权调用。保留现有负责人确认点，给相关命令补退出码中止。 [README](../../README.md#L38)
-- [ ] [Review][Patch] **中 · 测试运行器可接纳未封入回滚事务的数据库测试类。** 本轮合成确认指定数据库的 SimpleTestCase 可以进入套件。当前实库套件使用 TestCase，未观察到写入残留。收紧数据库测试类型约束，保留纯单元用例。 [运行器](../../lab_booking/test_runner.py#L14)
+- [x] [Review][Defer] **中 · PowerShell 迁移失败会被后续命令覆盖。** 本轮替身证实连接检查失败仍执行下一行，连续执行迁移和授权块时失败迁移仍进入后续授权调用。负责人按 D-022 接受当前 Story 初始化已成功、README 步骤分隔并保留负责人复核点的证据；下一次全新环境操作前应完善逐条 `$LASTEXITCODE` 中止检查。本项为项目级操作硬化，不阻塞已完成的 Story 1.1。 [README](../../README.md#L38) · [延期记录](deferred-work.md)
+- [x] [Review][Defer] **中 · 测试运行器可接纳未封入回滚事务的数据库测试类。** 本轮合成确认指定数据库的 SimpleTestCase 可以进入套件。当前 32 项实库套件使用回滚式 TestCase，且隔离库前后状态一致。负责人按 D-022 将收紧测试类型约束留给项目级测试工具链硬化；本项不否定本轮 AC 回归，不阻塞 Story 1.1。 [运行器](../../lab_booking/test_runner.py#L14) · [延期记录](deferred-work.md)
 - [ ] [Review][Patch] **低 · 旧分支未知迁移可逃过计划核验。** Django 5.2.19 会跳过图中未知的已执行迁移，空前进计划也不能发现它。当前隔离库有 16 条正常迁移。考虑核对已应用与当前迁移集合，并保留合并迁移语义。 [运行器](../../lab_booking/test_runner.py#L43)
 - [ ] [Review][Patch] **低 · 前后快照数据范围有限。** 看得到表清单、迁移、账号及会话数量。其他认证表内容和非事务性序列不在比较范围，补充证据范围说明与必要断言。 [快照](../../lab_booking/test_runner.py#L66)
 - [ ] [Review][Patch] **低 · 拒绝断言看不到 HTML 属性中的账号。** 账号检查使用 HTML 文本节点。当前拒绝模板未发现数据泄漏，补测可检测其他账号进入属性或隐藏字段，同时允许用户提交的用户名在登录页回显。 [拒绝断言](../../accounts/tests.py#L108)
@@ -400,3 +402,82 @@ CR-04 沿用第一轮已完成的 runtime 入口保护。本轮 Chrome 159.0.815
 - [x] 通过实际渲染表单及 URL 编码回归覆盖上述边界。保留原 AC-1～AC-7 测试，验证 150／151、UTF-16 边界、外围与内部空白、4096／4097、拒绝后数据与会话不变。仅使用 `test_lab_booking`，严禁连接、重建或修改 `lab_booking`。只有主会话有权执行获准的实库回归，实施子代理先交付代码与测试，不连接任何数据库，不安装或改写 Python 环境。
 
 移除两种输入的 HTML `maxlength` 和页面截断脚本，边界错误经 Django 字段显示。登录和预置统一使用 `UsernameField`、账号模型的默认字符验证器及 4096 码点密码字段。本轮 `accounts` 改动限于表单、模板、预置解析和测试。2026-11-24，原 Python 3.13.17 环境在普通 PowerShell 下通过 32 项 Django 测试与 6 个实际 Chrome 表单用例。第二台 Windows 及本轮业务库部署复现待取证，状态仍为 `in-review`。见[整改实测与 AC 追溯](story-1-1-dev-evidence.md#2026-11-24-输入边界最终整改)。
+
+### Review Findings
+
+#### 2026-11-24 Story 1.1 输入边界独立复审恢复
+
+按 BMAD 6.12.4 `bmad-code-review` full 模式恢复 Step 2，使用已保存的四文件差异（17,486 字节，SHA-256 `46509CF3793D92478472076D7F63EA5D4C0D7E98B0F29289BADBF4AAC643D5ED`）。四个启用视角均实际返回；`failed_layers` 为空。复核依据包括本规格 AC-1～AC-7、PRD、Architecture、`project-context.md`、D-015～D-021、整改记录和当前提交代码。
+
+### Findings triage
+
+本轮没有保留的 `decision-needed`、`patch` 或 `defer` 项。对输入边界差异未发现新的 Critical、High 或 Medium 问题。以下候选逐项核验后驳回：
+
+Blind Hunter 的五个候选和 Edge Case Hunter 的一个候选均在核验后驳回；Verification Gap Reviewer 未报告缺口；Acceptance Auditor 未报告验收差异。逐项裁决完成后，当前输入边界差异为 **0 decision-needed、0 patch、0 defer、6 rejected**。这不是对范围外旧评审行动项的关闭。
+
+### Independent checks carried forward
+
+不重复运行既有测试。复用独立 Django 回归 32/32、真实 Chrome 表单用例 10/10，以及仅连接 `127.0.0.1:5433/test_lab_booking`／`lab_booking_test` 的 PostgreSQL 17.12 隔离验证；测试库前后状态均为 9 张表、16 条迁移、0 个账号、0 条会话。检查点列明 10 个浏览器用例及其输入边界。以上仅为本次评审的既有证据，不声称本轮再次执行。
+
+### CR closure decisions
+
+| 编号 | 本次最终判断 | 依据／保留事项 |
+| --- | --- | --- |
+| CR-01 | 关闭 | 既有独立复审验证预建库运行器、实际目标和阻断维护库生命周期操作。 |
+| CR-02 | 关闭 | 本轮独立确认登录与预置共用 4096 码点字段校验；4096 可正常认证，4097 完整拒绝且不调用认证；沿用 32/32 和 10/10 独立证据。 |
+| CR-03 | 关闭 | 既有独立复审确认连接目标与冲突环境变量限制；本轮差异不触及此处。 |
+| CR-04 | **负责人接受证据与残余风险，关闭（D-022）** | 最新差异只改表单、模板、预置解析和测试，未改变 runtime、身份/角色、CSRF、会话或退出路径。D-019/开发证据中的 Windows runtime 三角色真实 Chrome 登录、身份展示、刷新、CSRF 和退出证据仍适用于这些路径；独立 32/32 Django 与 10/10 Chrome 证据覆盖本轮新增输入边界。负责人接受未在边界修改后重连业务库复测的残余风险，故不做业务库验证。 |
+| CR-05 | 关闭 | 既有独立替身确认预置失败后不启动服务；本轮差异不触及此处。 |
+| CR-06 | 关闭 | 既有独立复审核对拒绝矩阵分母及合法对照；本轮差异未削弱断言。 |
+| CR-07 | 关闭 | 既有独立复审验证退出目标、方法及 CSRF；本轮差异不触及此处。 |
+| CR-08 | 关闭 | 既有独立复审验证渲染表单和服务端旧会话删除；本轮差异不触及此处。 |
+| CR-09 | 关闭 | 既有独立复审验证 runtime 预置在读取清单／事务前拒绝；本轮差异不触及此处。 |
+| CR-10 | 关闭 | 既有独立复审验证原始重复 JSON 键脱敏拒绝；本轮差异不触及此处。 |
+| CR-11 | 关闭 | 既有独立复审验证断言失败不泄露 Cookie／会话标识；本轮差异不触及此处。 |
+| CR-12 | 关闭 | 本轮再次核对渲染登录表单上的用户名和密码错误拒绝及保留的 AC 回归。 |
+| CR-13 | 关闭 | 既有独立复审核对单事务目标校验及原五条授权；本轮差异不触及此处。 |
+| CR-14 | 关闭 | 既有独立复审核对三类存储角色与独立页面标签；本轮差异不触及此处。 |
+| U-01 | 关闭 | 本轮确认 150 码点合法用户名未被浏览器截断，登录与预置共享 Django 默认验证；151、NFKC 扩张、外围／内部空白和非法字符按正式规则处理。 |
+
+### AC、状态与负责人验收
+
+本轮没有发现 AC-1～AC-7 回归或新的 Critical／High／Medium 验收问题。AC-1／AC-2 的用户名与密码边界由当前差异和既有独立输入测试直接覆盖；AC-3～AC-7 由已通过的 32/32 回归和既有运行记录承接。CR-04 的真实 runtime 证据有效性及残余风险由负责人按 D-022 明确接受。
+
+此前正式评审中三项未编号 Medium 已由负责人按 D-022 决定延期至项目级集成／工具链节点，详见 [`deferred-work.md`](deferred-work.md)；均不阻塞本 Story。第二台 Windows 复现仍未完成，不能据此声称跨机验证通过。原评审中九项 Low 建议仍保留为非阻塞建议，没有被本次决定默认为关闭。D-022 时的结论是具备负责人最终验收条件；随后负责人于 D-023 正式批准验收，本次按 BMAD 6.12.4 Step 5 将规格状态更新为 `done`，并按负责人批准将 Sprint Story 1.1 更新为 `done`。Epic 1 仍为 `in-progress`，Story 1.2 及其他未开始 Story 保持 `backlog`。不开发 1.2、不提交或推送。
+
+### 最终验收核对清单（D-022）
+
+| 正式条件 | 当前证据／结论 |
+| --- | --- |
+| AC-1：三类预置身份可登录并显示正确身份 | D-019 真实 Windows runtime 三账号 Chrome 证据；独立回归与身份断言；本轮输入边界 10/10 Chrome 证据。 |
+| AC-2：无效凭据明确拒绝且不产生认证身份 | 独立 32/32 回归及 Chrome 实际表单拒绝；用户名 150/151、Unicode/NFKC、空白/非法字符及密码 4096/4097 边界。 |
+| AC-3：匿名、错误及禁用身份受限 | 已有 AC-3 自动化拒绝矩阵及 Django 全量回归；本轮无认证/权限路径改动。 |
+| AC-4：身份来自服务端账号，不接受客户端角色伪造 | 已有角色/身份断言及三角色 runtime 记录；本轮无权限或身份解析代码改动。 |
+| AC-5：CSRF 保护并可靠退出 | D-019 真实 Chrome 缺失/无效 CSRF 与退出、服务端会话删除记录；本轮相关路径未改。 |
+| AC-6：管理与注册入口关闭，共用登录入口 | 路由 404 自动断言及三角色共用登录证据；本轮无路由改动。 |
+| AC-7：批准 Windows/PostgreSQL runtime 与隔离测试可复现 | Python 3.13.17、Django 5.2.19、PostgreSQL 17.12 的既有 runtime/测试证据；本轮独立测试仅连 `test_lab_booking`，前后状态一致。第二台 Windows 留作后续集成，不虚称完成。 |
+| D-015：用户模型与业务角色 | `AbstractUser`、必填单一 `role`、三种固定角色及管理标志不作为业务身份依据均保持；边界改动未修改模型或授权逻辑。 |
+| D-016：Windows/PostgreSQL 环境与权限 | Python 3.13.17、Django 5.2.19、PostgreSQL 17.12／5433、库与角色隔离边界保持；独立测试仅使用 `test_lab_booking`。 |
+| D-017：Sprint 与团队范围 | 当前 Story 范围与两 Sprint 安排未改变；第二台 Windows 复现和三个 Medium 事项留在项目级后续节点。 |
+| D-018：批准的 Story 1.1 实施规格 | 冻结意图及正式 AC 未改变；本轮只按 D-021 完成输入边界整改及评审记录。 |
+| D-019：预置账号和退出验收 | 三类既有业务账号的 runtime 登录、身份、刷新、CSRF、退出和会话删除证据仍是 CR-04 的历史运行证据；负责人接受未重跑的残余风险。 |
+| D-020：独立评审整改范围 | CR-01～CR-14 最小整改边界及仅允许测试库的要求得到遵守；本轮新增 CR 处置未扩大业务范围。 |
+| D-021：输入边界整改授权 | 仅核对 150/151 码点用户名及 4096/4097 码点密码边界，使用既有 Python 3.13.17 项目环境证据，不更改需求或项目环境。 |
+| D-022：本轮负责人问题处置 | 仅记录 CR-04 风险接受、关闭授权、三个 Medium 延期和最终 AC 清单；未推进 Story 状态。 |
+| D-023：负责人最终验收批准 | 负责人明确批准 Story 1.1 最终验收；按安装版 Build Step 5 将规格标记 `done`，并依负责人指令同步 Sprint 状态。 |
+| 课程证据边界 | 第26/27/33页由需求到 AC、代码、独立测试、运行与真实状态记录追溯；第34页实验 A 的 X/Y 条件与数据未被本轮替代或改动；第36页人工决定、理由、风险、缓解及来源记入 D-022。 |
+
+## 负责人最终验收与完成状态（2026-11-24，D-023）
+
+负责人在本次会话正式批准 Story 1.1「使用预置账号登录并获得明确业务身份」最终验收通过，并接受 AC-1～AC-7 的已记录证据、CR-01～CR-14 与 U-01 关闭、四视角独立复审结果、32/32 Django 独立测试、10/10 Chrome 独立测试及 CR-04 的历史运行证据和残余风险。三项未编号 Medium 继续在 `deferred-work.md` 跟踪，九项 Low 继续保留为非阻塞建议，第二台 Windows 机器复现仍待后续集成验证。
+
+按正式 Build Step 5 将本规格 `status` 更新为 `done`。依据负责人明确要求，将 `sprint-status.yaml` 中 Story 1.1 从 `review` 更新为 `done`；Epic 1 保持 `in-progress`，Epic 1 其余 Stories、Story 1.2 和其他未开始 Story 状态保持 `backlog`。仅更新状态与验收记录；未重跑测试、访问数据库、修改业务代码、正式 PRD、Architecture、epics 基线或实验 A 数据。课程第 26、27、33、34、36 页对应证据链保持可追溯；Story 1.1 测试结果不计入实验 A。 [最终独立评审及证据](../../docs/team/story-1-1-independent-review-checkpoint-2026-11-24.md) · [开发证据](story-1-1-dev-evidence.md) · [负责人决定 D-023](../../decision-log.md#d-023-2026-11-24-story-11-负责人最终验收)
+
+#### Rejected
+
+- **false** — 预置删除用户名验证器调用会放过非法用户名。预置调用共享 `UsernameField.clean()`，依 Django 字段清理链执行 validator；字段显式包含 `User.username_validator`，且登录和预置均有非法用户名断言。 [共享表单](../../accounts/forms.py#L10) · [预置](../../accounts/management/commands/seed_accounts.py#L31) · [回归](../../accounts/tests.py#L215)
+- **false** — 非法用户名测试只覆盖预置、不覆盖登录。同一测试循环也提交渲染的登录表单，并断言字段错误、无会话及账号状态不变。 [回归](../../accounts/tests.py#L215)
+- **false** — 混合 Unicode 边界夹具字符错误。夹具为 U+20000 加全角 `Ａ`；NFKC 规范化为 U+20000 加 ASCII `A`，并断言码点和 UTF-16 单元数。 [回归](../../accounts/tests.py#L196)
+- **false** — 超长密码测试 patch 了错误的 `authenticate` 绑定。Django 5.2.19 `AuthenticationForm` 使用 `django.contrib.auth.forms` 模块级导入；测试 patch 此绑定，并对超限密码断言认证未调用。 [回归](../../accounts/tests.py#L243)
+- **false** — 4097 密码用例未覆盖 UTF-16／补充字符边界。自动化用例是 4096 个补充字符加一个字符，共 4097 码点／8193 UTF-16 单元；独立 Chrome 证据另覆盖 BMP 与补充字符两种编码的 4096／4097 边界。 [回归](../../accounts/tests.py#L243) · [独立复审检查点](../../docs/team/story-1-1-independent-review-checkpoint-2026-11-24.md)
+- **false** — 验证器硬编码在以后改变 `USERNAME_FIELD` 时可能失配。当前 `User` 继承 `AbstractUser` 且未覆盖其 `USERNAME_FIELD=username`；当前运行没有该坏结果的配置或调用路径。 [用户模型](../../accounts/models.py#L1) · [表单](../../accounts/forms.py#L8)
