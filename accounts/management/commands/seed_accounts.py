@@ -2,11 +2,11 @@ import json
 from pathlib import Path
 
 from django.conf import settings
-from django.contrib.auth.forms import UsernameField
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DatabaseError, transaction
 
+from accounts.forms import AccountAuthenticationForm
 from accounts.models import Role, User
 
 
@@ -27,8 +27,8 @@ def read_manifest(path):
     if not isinstance(rows, list):
         raise CommandError("预置清单必须是 JSON 数组。")
 
-    username_field = User._meta.get_field("username")
-    login_username = UsernameField(max_length=username_field.max_length)
+    login_username = AccountAuthenticationForm.base_fields["username"]
+    login_password = AccountAuthenticationForm.base_fields["password"]
     accounts = {}
     for index, row in enumerate(rows, start=1):
         if not isinstance(row, dict) or row.keys() != {"username", "role", "password"}:
@@ -38,7 +38,9 @@ def read_manifest(path):
             raise CommandError(f"预置清单第 {index} 项字段值无效。")
         try:
             username = login_username.clean(username)
-            username_field.run_validators(username)
+            login_password.clean(password)
+            if "\r" in password or "\n" in password:
+                raise ValidationError("密码须可通过浏览器单行输入。")
             password.encode("utf-8")
         except (ValidationError, UnicodeError):
             raise CommandError(f"预置清单第 {index} 项用户名或密码无效。") from None

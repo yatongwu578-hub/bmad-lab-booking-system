@@ -164,3 +164,29 @@
 3. **人工判断**：负责人在本次会话回复“批准并继续”，随后正式批准修订规格通过 Checkpoint 1，要求“现在开始执行Story 1.1开发”，并明确本会话结束于开发自测及 `review`。批准与明确开工指令在 2026-11-21 22:57（北京时间）记录，早于 Sprint 计划所列 11 月 22 日开始日。按本次指令记录 Story 1.1 的实际开工，正式 Sprint 日期和范围沿用 D-017。
 4. **结果**：[实施规格](_bmad-output/implementation-artifacts/spec-1-1-preset-account-login.md)和[状态文件](_bmad-output/implementation-artifacts/sprint-status.yaml)记录批准后的 `ready-for-dev` 节点。只授权本 Story，不自动提交或推送。实际数据库迁移目标与计划、预置目标与清单分别确认。
 5. **事后验证**：静态复审覆盖正式 AC-1～AC-7。实施、自测、独立代码评审、问题处置和负责人验收分别按实际结果取证。
+
+## D-019 2026-11-22 负责人批准 Story 1.1 业务预置和退出验收
+
+1. **触发**：Story 1.1 业务库首迁与 D-016 最小运行授权已执行，默认保护清单还未创建。依据为本次 Story 1.1 开发会话，首迁前检查点及实际执行见开发证据。
+2. **AI 建议及理由**：此前请负责人提供已批准清单，或明确授权生成学生、教师、业务管理员三类演示账号。需要可验证的本机凭据才能执行 D-015 和真实浏览器对照。
+3. **人类判断与依据**：负责人明确批准在 `lab_booking` 创建 `student_demo`、`teacher_demo` 和 `admin_demo`，分别对应 student、teacher 和 admin。要求本机独立随机密码、受保护交付、重跑保留同角色账号，三类账号实测登录及退出，以 AC-1～AC-7 和必要检查通过作为转入 `review` 的条件。本条是对具体演示账号和验收方式的批准，依据为 FR-001、FR-002、ADR-002 及 D-015／D-016。
+4. **结果**：预置与重跑完成，开发代码加入 CSRF 保护的退出入口并扩展既有测试方法。真实凭据文件保存在负责人本机。正式需求、架构和验收条款沿用原文。
+5. **事后验证**：业务库首次新增 3 个，重跑跳过 3 个，三类账号的哈希校验、角色和标志核对通过。Chrome 三类账号登录、退出与拒绝路径已实测。自动化重跑及状态以[开发证据](_bmad-output/implementation-artifacts/story-1-1-dev-evidence.md#2026-11-22-正式预置与-chrome-验收)的实际结果为准。
+
+## D-020 2026-11-23 负责人批准 Story 1.1 独立评审整改范围
+
+1. **触发**：BMAD 6.12.4 独立代码评审完成后，负责人审阅 CR-01～CR-14 及整改建议。本决定来源为负责人在本次会话明确发出的批准指令。
+2. **AI 建议**：按 CR 编号处理六项 Medium 和八项 Low，建立处置表后由独立 `bmad-build` 会话按批准范围实施，保持 AC、D-015～D-019 及 Architecture/project-context 约束。
+3. **人类判断与依据**：负责人批准 CR-01～CR-14 全部按最小范围整改或补充验证，不扩大业务范围。CR-01 必须仅连接 `test_lab_booking`，核对实际数据库、角色、主机、端口，不清空或重建 `lab_booking`。CR-03 完善连接配置来源和优先级，保持 D-016 的 PostgreSQL 17.12 业务目标、角色分离及最小权限。若需改变已批准连接约束、真实数据库权限或已有数据，另行申请批准。CR-13 仅修正 README 和做必要验证，不执行额外 GRANT，不授予业务角色 SUPERUSER、CREATEDB 或不必要 DDL。其余 CR 按已审阅方案最小修复或补测。正式 AC、PRD、Architecture、project-context 及 D-015～D-019 不变，不引入 Docker、SQLite、自助注册或新业务功能。该决定未声称其他成员共同表决。
+4. **结果**：批准建立 `docs/team/story-1-1-review-disposition.md` 并交独立 BMAD 6.12.4 `bmad-build` 会话实施。本会话仅记录决策和交接，不修改业务代码、不迁移数据库、不更改 Story 状态、不执行 commit/push。Story 1.1 保持 `review`，Story 1.2 保持 `backlog`。
+5. **事后验证**：整改尚未执行。后续依处置表核对代码和文档差异、测试结果、连接目标、前后数据库状态及敏感日志。测试连接必须仅指向 `test_lab_booking`。真实数据库权限、迁移策略或已有数据改变须先取得单独批准。负责人最终验收和 Git 证据待实际发生后补录。
+
+**整改后的事后验证（2026-11-23）**：独立 `bmad-build` 开发会话完成 CR-01～CR-14 自测，最终全量 26 项通过。已核验测试库目标及前后状态，业务库仅只读核对。Story 1.1 回到 `review`。该补记记录实际结果，人工验收及本轮 Git 提交待发生后再补。 [开发证据](_bmad-output/implementation-artifacts/story-1-1-dev-evidence.md#2026-11-23-独立评审整改与开发自测) · [逐项处置](docs/team/story-1-1-review-disposition.md#开发整改与自测结果)
+
+## D-021 2026-11-24 负责人限定 Story 1.1 输入边界整改
+
+1. **触发**。正式 BMAD 6.12.4 Step 4 复审复现登录页截断合法边界用户名和超限密码，最大密码测试亦未覆盖浏览器默认 URL 编码传输。 [Step 4 复审](_bmad-output/implementation-artifacts/spec-1-1-preset-account-login.md#2026-11-24-bmad-6124-渲染恢复后-step-4-复审)
+2. **AI 建议**。保留浏览器接收的原始输入，把用户名规范化、字符校验及密码上限交给 Django，用真实 URL 编码表单及隔离库复验。
+3. **人工判断**。负责人确认基础解释器路径存在，要求先区分 Codex 权限与 `.venv` 损坏，仅修复两处输入边界。要求保留 Django 默认用户名规则，确保合法 150 码点不会被截断，4097 码点密码明确拒绝，并以实际测试验证。只允许连接 `test_lab_booking`，随后进行独立 Code Review。Story 1.1 保持 `review`，1.2 保持 `backlog`，不自动提交或推送。依据为本轮负责人明确指令及 FR-001／002、ADR-001／002／008、D-015／016。
+4. **结果**。在表单、模板、预置解析和回归中落实原始输入及共用验证。保留正式 AC、冻结区和现有项目环境。 [整改处置](docs/team/story-1-1-review-disposition.md#step-4-输入边界整改2026-11-24)
+5. **事后验证**。普通 PowerShell 的原 `.venv` 运行 Python 3.13.17。系统、迁移一致性检查通过，隔离库 Django 32 项及实际 Chrome 6 个表单用例通过。本次未连接业务库。此记录依据负责人实际授权和已完成的测试，最终验收与 Git 提交待实际发生。 [开发证据](_bmad-output/implementation-artifacts/story-1-1-dev-evidence.md#2026-11-24-输入边界最终整改)

@@ -18,18 +18,27 @@ $env:LAB_BOOKING_SECRET_KEY = & $venvPython -c 'from django.core.management.util
 
 如密码文件保存在其他受保护目录，将 `PGPASSFILE` 指向其绝对路径。以上密钥只保留在当前 PowerShell 进程环境中，重新生成会使原有登录会话失效。重启时需要继续保留会话，可在受保护的本机环境中沿用原密钥。缺少数据库模式、密码文件或密钥时，Django 会报出对应配置项。
 
+`LAB_BOOKING_DB_MODE` 决定库和角色，连接固定为 `127.0.0.1:5433`，数据库密码只从 `PGPASSFILE` 获取。在运行下方命令前，先在当前 PowerShell 检查冲突环境变量。若存在冲突，在此终端移除提示的变量后重新执行。
+
+```powershell
+$pgConflicts = @('PGHOST', 'PGHOSTADDR', 'PGPORT', 'PGDATABASE', 'PGUSER',
+    'PGPASSWORD', 'PGSERVICE', 'PGSERVICEFILE', 'PGOPTIONS') |
+    Where-Object { Test-Path "Env:$_" }
+if ($pgConflicts) { throw "请先移除冲突的 PostgreSQL 环境变量：$($pgConflicts -join ', ')" }
+```
+
 | `LAB_BOOKING_DB_MODE` | 数据库 | PostgreSQL 角色 | 用途 |
 | --- | --- | --- | --- |
 | `migration` | `lab_booking` | `lab_booking_migrator` | 审核迁移计划、执行获准迁移及预置 |
 | `runtime` | `lab_booking` | `lab_booking_app` | 本地应用运行 |
 | `test` | `test_lab_booking` | `lab_booking_test` | 在预建的独立测试库运行测试 |
 
-先以迁移角色检查配置、版本、实际身份及迁移计划。核对连接返回 `lab_booking`、`lab_booking_migrator`、`5433` 和 `17.12`。负责人确认目标及计划后，执行 `migrate`。
+先以迁移角色检查配置、版本、实际身份及迁移计划。核对连接返回 `lab_booking`、`lab_booking_migrator`、`127.0.0.1`、`5433` 和 `17.12`。负责人确认目标及计划后，执行 `migrate`。Django 在每条新连接上先核验实际库、角色、地址、端口和版本，核验失败即关闭连接。
 
 ```powershell
 $env:LAB_BOOKING_DB_MODE = 'migration'
 $pgBin = 'C:\Program Files\PostgreSQL\17\bin'
-& "$pgBin\psql.exe" -X -w -h 127.0.0.1 -p 5433 -U lab_booking_migrator -d lab_booking -v ON_ERROR_STOP=1 -c 'SELECT current_database(), current_user, inet_server_port(), current_setting(''server_version'');'
+& "$pgBin\psql.exe" -X -w -h 127.0.0.1 -p 5433 -U lab_booking_migrator -d lab_booking -v ON_ERROR_STOP=1 -c 'SELECT current_database(), current_user, host(inet_server_addr()), inet_server_port(), current_setting(''server_version'');'
 & $venvPython manage.py check
 & $venvPython manage.py makemigrations --check --dry-run
 & $venvPython manage.py migrate --plan
@@ -39,14 +48,29 @@ $pgBin = 'C:\Program Files\PostgreSQL\17\bin'
 & $venvPython manage.py migrate
 ```
 
-迁移后由项目库对象所有者核对现有权限，并对运行角色执行所需授权。账号表的认证字段更新覆盖登录时间及 Django 的密码哈希升级，迁移记录只读供 `runserver` 启动检查，会话表支持会话维护。
+迁移后由项目库对象所有者核对现有权限，经负责人批准后才执行以下授权步骤。连接及授权置于同一 `psql` 会话和事务。目标不符或任一语句失败时整批回滚。账号表仅开放认证需要的读权限和两列更新权限，迁移记录供运行时只读检查，会话表支持登录和退出。测试角色只在隔离库执行测试。
 
-```sql
+```powershell
+@'
+DO $$
+BEGIN
+    IF current_database() IS DISTINCT FROM 'lab_booking'
+       OR current_user IS DISTINCT FROM 'lab_booking_migrator'
+       OR session_user IS DISTINCT FROM 'lab_booking_migrator'
+       OR host(inet_server_addr()) IS DISTINCT FROM '127.0.0.1'
+       OR inet_server_port() IS DISTINCT FROM 5433
+       OR current_setting('server_version_num') IS DISTINCT FROM '170012' THEN
+        RAISE EXCEPTION 'PostgreSQL target or role mismatch';
+    END IF;
+END;
+$$;
 GRANT USAGE ON SCHEMA public TO lab_booking_app;
 GRANT SELECT ON TABLE public.accounts_user TO lab_booking_app;
 GRANT UPDATE (last_login, password) ON TABLE public.accounts_user TO lab_booking_app;
 GRANT SELECT ON TABLE public.django_migrations TO lab_booking_app;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.django_session TO lab_booking_app;
+'@ | & "$pgBin\psql.exe" -X -w -h 127.0.0.1 -p 5433 -U lab_booking_migrator -d lab_booking -v ON_ERROR_STOP=1 --single-transaction -f -
+if ($LASTEXITCODE -ne 0) { throw '数据库授权失败，停止启动流程。' }
 ```
 
 迁移成功后，由负责人单独确认目标数据库及受保护的 UTF-8 JSON 清单，再执行预置。清单为数组，每项含 `username`、`role`、`password` 三个字符串字段。角色取 `student`、`teacher`、`admin`，账号按 Django 登录表单规则规范化。将真实清单放在仓库外、访问受限的本机目录，并把下例路径替换为实际路径。命令只报告计数或脱敏错误。
@@ -55,17 +79,18 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.django_session TO lab_booki
 $env:LAB_BOOKING_DB_MODE = 'migration'
 $manifestPath = Join-Path $env:LOCALAPPDATA 'LabBooking\Protected\accounts.json'
 & $venvPython manage.py seed_accounts --manifest $manifestPath
+if ($LASTEXITCODE -ne 0) { throw '预置账号失败，停止启动流程。' }
 $env:LAB_BOOKING_DB_MODE = 'runtime'
 & $venvPython manage.py runserver 127.0.0.1:8000 --noreload
 ```
 
-访问 `http://127.0.0.1:8000/login/`，使用获准预置账号登录后核对身份页的账号、角色和刷新结果。匿名访问 `/identity/` 应回到登录页，错误或缺失凭据应显示表单错误，`/admin/` 和 `/register/` 应返回 404。三种角色均使用同一登录地址。`runserver` 仅用于本地开发和演示。
+访问 `http://127.0.0.1:8000/login/`，使用获准预置账号登录后核对身份页的账号、角色和刷新结果。点击身份页的“退出登录”应回到登录页，再访问 `/identity/` 应引导登录。错误或缺失凭据应显示表单错误，`/admin/` 和 `/register/` 应返回 404。三种角色均使用同一登录地址。`runserver` 仅用于本地开发和演示。
 
-以独立测试角色运行 Story 1.1 的 PostgreSQL 测试。首次测试会在预建的隔离测试库应用迁移，先核对实际目标并按团队约定确认。
+使用已迁移的预建隔离库运行完整自动化测试。入口先核验连接与角色权限，检查无待迁移项且账号和会话为空。随后在单进程运行回滚式测试，并比较前后表清单、迁移记录、账号数和会话数。库不存在或核验失败时停止。此入口保留隔离库，不访问维护库，不执行建库、迁移、清库或删库。
 
 ```powershell
 $env:LAB_BOOKING_DB_MODE = 'test'
-& $venvPython manage.py test accounts --keepdb --parallel 1 -v 2
+& $venvPython manage.py test --keepdb --parallel 1 -v 2
 ```
 
 ## 2026-11-05 老师最新通知

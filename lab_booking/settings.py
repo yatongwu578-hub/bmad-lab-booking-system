@@ -3,6 +3,8 @@ from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 
+from .database_config import DATABASE_TARGETS, HOST, PORT, reject_connection_overrides
+
 
 def required_setting(name):
     value = os.environ.get(name)
@@ -11,15 +13,11 @@ def required_setting(name):
     return value
 
 
-DATABASE_TARGETS = {
-    "runtime": ("lab_booking", "lab_booking_app"),
-    "migration": ("lab_booking", "lab_booking_migrator"),
-    "test": ("test_lab_booking", "lab_booking_test"),
-}
 LAB_BOOKING_DB_MODE = required_setting("LAB_BOOKING_DB_MODE")
 if LAB_BOOKING_DB_MODE not in DATABASE_TARGETS:
     raise ImproperlyConfigured("LAB_BOOKING_DB_MODE 必须为 runtime、migration 或 test。")
 
+reject_connection_overrides()
 database_name, database_user = DATABASE_TARGETS[LAB_BOOKING_DB_MODE]
 passfile = Path(required_setting("PGPASSFILE"))
 if not passfile.is_absolute() or not passfile.is_file():
@@ -27,15 +25,16 @@ if not passfile.is_absolute() or not passfile.is_file():
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": "lab_booking.postgresql",
         "NAME": database_name,
         "USER": database_user,
-        "HOST": "127.0.0.1",
-        "PORT": "5433",
-        "OPTIONS": {"passfile": str(passfile)},
-        "TEST": {"NAME": "test_lab_booking"},
+        "HOST": HOST,
+        "PORT": PORT,
+        "OPTIONS": {"hostaddr": HOST, "passfile": str(passfile)},
+        "TEST": {"NAME": DATABASE_TARGETS["test"][0]},
     },
 }
+TEST_RUNNER = "lab_booking.test_runner.IsolatedPostgresRunner"
 
 SECRET_KEY = required_setting("LAB_BOOKING_SECRET_KEY")
 DEBUG = False
