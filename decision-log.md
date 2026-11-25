@@ -206,3 +206,34 @@
 3. **人类判断与依据**：负责人正式接受 CR-01～CR-14、U-01 全部关闭，接受正式 AC-1～AC-7 的验收证据及 CR-04 历史 runtime 证据和记录的残余风险；确认四视角独立评审无新增验收阻塞问题。负责人接受三项未编号 Medium 延期事项按项目级节点跟踪、九项 Low 建议继续保持非阻塞且未虚构关闭、第二台 Windows 复现留待后续集成验证。依据 FR-001／002、NFR-002、ADR-001／002／008、D-015～D-022 及已保存的真实测试和运行证据。Story 1.1 测试结果不用于实验 A。
 4. **结果**：按 Build Step 5 将 Story 1.1 实施规格 `status` 设为 `done`；将 `sprint-status.yaml` 中 Story 1.1 由 `review` 更新为 `done`，刷新 `last_updated`。Epic 1 保持 `in-progress`，Story 1.2 及其他未开始 Story 保持 `backlog`。更新 README 当前进度、整改处置记录和独立复审检查点的最终验收状态。未修改业务代码、数据库、正式 PRD、Architecture 或 epics 基线；未开发 Story 1.2；未 commit/push。
 5. **事后验证**：复用已完成的 32/32 Django 独立测试、10/10 Chrome 独立测试、测试库隔离验证和四视角复审记录，不重复执行。以 Git 差异检查确认本次文件范围仅为状态、验收与进度证据，执行 `git diff --check` 及敏感信息检查；确认实验 A 的 X/Y 条件、数据未被本 Story 结果替代。 [实施规格与 AC 清单](_bmad-output/implementation-artifacts/spec-1-1-preset-account-login.md#负责人最终验收与完成状态-2026-11-24-d-023) · [状态文件](_bmad-output/implementation-artifacts/sprint-status.yaml) · [整改处置记录](docs/team/story-1-1-review-disposition.md#负责人最终验收与状态推进2026-11-24-d-023) · [独立复审检查点](docs/team/story-1-1-independent-review-checkpoint-2026-11-24.md) · [课程要求基线](docs/course-requirements.md)
+
+## D-024 2026-11-25 负责人批准显式 Read Committed
+
+1. **触发**。BMAD 6.12.4 Build Step 2 准备 Story 1.2 的 Checkpoint 1。Sprint 计划要求在本 Story 进入 ready 前确认 ADR-003／AD-3 的隔离级别建议。 [Sprint 计划](_bmad-output/planning-artifacts/sprint-plan.md)
+2. **AI 建议及风险**。建议由 Django PostgreSQL `OPTIONS` 统一设置 `IsolationLevel.READ_COMMITTED`，避免部署环境或角色默认值漂移改变事务语义。备选是继续依赖默认值并逐模式核查，改动较小，但检查之间仍有漂移可能。显式配置会影响三个模式的所有新应用连接，配置有误可能阻止连接。仅看到隔离级别正确也无法验证编号竞争结果，仍需执行 AC-6。
+3. **人工判断与依据**。项目负责人在本次对话明确批准方案 1。runtime、migration、test 使用同一 Django 连接级设置，PostgreSQL 服务器级、数据库级和角色级设置保持原样。负责人同时明确后续由三位组员共同参与 Codex 开发、检查与验收，按实际参与和人工决定留证。本条只记录本次负责人决定。
+4. **结果**。已将批准的设置和验证要求纳入 Story 1.2 实施规格。规格仍为草稿，Sprint 状态仍为 `backlog`，设置在规格批准后的开发阶段实施。 [实施规格](_bmad-output/implementation-artifacts/spec-1-2-create-equipment.md)
+5. **验证方式与当前证据**。变更前三个 Django 模式分别以 `lab_booking_app`、`lab_booking_migrator` 连接 `lab_booking`，以 `lab_booking_test` 连接 `test_lab_booking`。实际目标均为 PostgreSQL 17.12、`127.0.0.1:5433`，只读事务中 `SHOW default_transaction_isolation` 和 `SHOW transaction_isolation` 均为 `read committed`。实施后以新连接逐模式核对库、角色、版本和事务内 `SHOW transaction_isolation`，业务库核对保持只读。AC-6／AC-7 在隔离测试库另行取得实际证据。实施后验证尚未发生。
+
+## D-025 2026-11-25 负责人批准 Story 1.2 独立评审处置
+
+1. **触发**。BMAD 6.12.4 full 独立评审的 Step 4 人工检查点。四视角裁决留下 R1～R11。独立测试 38/38 并通过 AC-6，真实故障注入复现 AC-7 提交结果误报，独立页面验证复现 AC-1、AC-3 边界缺陷。 [首轮独立证据](_bmad-output/implementation-artifacts/story-1-2-independent-review.md)
+2. **AI 建议及理由**。推荐方案 2，保留行动项并由原开发会话返工。优先修复 AC-1、AC-3、AC-7，随 AC-7 收紧预查和最外层事务边界。已有可复跑的独立证据覆盖当前 AC-6、权限、CSRF 与字段一致性，可在记录残余风险后延期测试工具及常规断言加固。
+3. **人类判断与依据**。项目负责人在本次会话选择方案 2。批准 R1～R3 必修、R4～R5 随 AC-7 最小整改，R6～R11 在不影响正式 AC、安全性和数据一致性的前提下延期，并要求逐号保留原因、风险和后续节点。判断依据为正式 AC-1～AC-7、FR-016／FR-002、ADR-002／003／008、PC-002／008／011／014 及独立测试和故障注入。本条记录负责人决定。
+4. **结果**。实施规格与 Sprint 跟踪同步为 `in-progress`。记录 5 项待整改、6 项延期、0 项修复、0 项驳回，并生成给原开发会话的一次性任务。Story 1.3 保持 `backlog`。本会话只处理评审文档与状态。 [逐项处置](_bmad-output/implementation-artifacts/story-1-2-review-disposition.md) · [延期台账](_bmad-output/implementation-artifacts/deferred-work.md) · [一次性整改任务](_bmad-output/implementation-artifacts/story-1-2-remediation-handoff.md)
+5. **事后验证**。本次静态对照 R1～R11、延期台账与 Story 状态，保留既有独立 Django 38/38、AC-6 真实并发及 AC-7 注入的实际失败结果，无新增运行结果。整改后须以隔离测试库复测并交独立复评，负责人最终验收仍待进行。实验 A 条件及首轮证据原样保留。 [实施规格](_bmad-output/implementation-artifacts/spec-1-2-create-equipment.md#review-findings) · [Sprint 状态](_bmad-output/implementation-artifacts/sprint-status.yaml)
+## D-026 2026-11-25 负责人关闭 R1～R5 并批准 Story 1.2 业务库验证
+
+1. **触发**。Story 1.2 完成 BMAD 6.12.4 针对性独立复审。AC-1～AC-7 在隔离库通过，Django 45/45，Story 1.1 为 32/32，真实故障注入区分确认失败与提交未知。 [独立复审](_bmad-output/implementation-artifacts/story-1-2-independent-recheck.md)
+2. **AI 建议及理由**。依据独立结果建议关闭 R1～R5，单独批准业务库迁移与运行验证。当前新增路径使用六列 INSERT 和 `RETURNING id`，最小授权候选为对应 INSERT 和 SELECT(id)。真实故障注入及并发压力继续留在隔离库。
+3. **人类判断与依据**。负责人接受独立复审结论，正式关闭 R1～R5，R6～R11 按 D-025 延期。批准在 `127.0.0.1:5433` 的 PostgreSQL 17.12 `lab_booking` 中，以原迁移角色核对和备份后，仅应用 `equipment.0001_initial`，执行最小授权并用三类现有预置账号验证。批准保留一条明确标识课程演示用途的设备档案。超出范围即停止。依据 FR-016／FR-002、ADR-002／003／008、D-024／025 及正式 AC。
+4. **结果**。受保护备份完成。唯一迁移成功，迁移历史 16 → 17；实际授予设备六列 INSERT 和 SELECT(id)，有效权限已核对。Chrome 验证三角色，管理员 201 新增 `EQ-DEMO-S12-20261125`，同号明确重复。正式 PRD、Architecture、epics、实验 A 和延期处置沿用原记录。 [实施规格](_bmad-output/implementation-artifacts/spec-1-2-create-equipment.md#review-findings) · [业务库证据](_bmad-output/implementation-artifacts/story-1-2-runtime-evidence.md)
+5. **事后验证**。独立连接复核设备资料、可用状态和唯一记录，三类账号退出后会话数恢复为零。此次复用已有独立 45/45，无需重跑。三位组员共同操作与审阅。第二台 Windows 机器仍待复现。Story 1.2 仍为 `review`，最终验收尚待负责人批准。
+
+## D-027 2026-11-25 Story 1.2 负责人最终验收
+
+1. **触发**。项目负责人在最终验收会话正式批准 Story 1.2。前置证据来自整改后独立复审与 D-026 授权后的业务库运行核验。 [独立复审](_bmad-output/implementation-artifacts/story-1-2-independent-recheck.md) · [业务库核验](_bmad-output/implementation-artifacts/story-1-2-runtime-evidence.md)
+2. **AI 建议**。独立复审建议接受隔离环境中的 AC-1～AC-7 验证并关闭 R1～R5，保留 D-025 延期项，业务库变更和最终状态等待负责人分步批准。 [复审裁决](_bmad-output/implementation-artifacts/story-1-2-independent-recheck.md) · [处置经过](_bmad-output/implementation-artifacts/story-1-2-review-disposition.md)
+3. **人类判断与依据**。负责人正式接受最终交付，依据 FR-016／FR-002、ADR-002／003／008 所对应的正式 AC-1～AC-7、Django 独立 45/45（Story 1.1 为 32/32）、真实 PostgreSQL 并发与事务故障证据，以及 D-026 已完成的迁移、最小授权和实际运行核验。确认 R1～R5 已关闭、R6～R11 继续延期。团队体验按已有操作记录留证。
+4. **结果**。按 Build Step 5 完成规格归档，再依据本次人工验收将 Sprint 的 Story 1.2 从 `review` 推进为 `done`。Epic 1 保持 `in-progress`，Story 1.3 及其他未开始 Story 保持 `backlog`。更新 README、评审处置、延期跟踪及最终验收记录。提交和推送待负责人授权。 [最终验收](_bmad-output/implementation-artifacts/story-1-2-final-acceptance.md) · [Sprint 状态](_bmad-output/implementation-artifacts/sprint-status.yaml)
+5. **事后核对**。复用已有效的独立和运行验证。第二台 Windows 待复现，Story 1.2 的测试数据不计入实验 A。 [延期台账](_bmad-output/implementation-artifacts/deferred-work.md)

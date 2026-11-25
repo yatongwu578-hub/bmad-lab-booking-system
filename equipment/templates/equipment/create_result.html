@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-Hans">
+<meta charset="utf-8">
+{% if equipment %}
+<title>新增成功</title>
+<h1>设备已新增</h1>
+<dl>
+  <dt>设备编号</dt><dd>{{ equipment.number }}</dd>
+  <dt>名称</dt><dd>{{ equipment.name }}</dd>
+  <dt>类别</dt><dd>{{ equipment.category }}</dd>
+  <dt>位置</dt><dd>{{ equipment.location }}</dd>
+  <dt>说明</dt><dd>{{ equipment.description }}</dd>
+  <dt>状态</dt><dd>{{ equipment.get_status_display }}</dd>
+</dl>
+{% elif unknown %}
+<title>结果待核查</title>
+<h1>提交结果待核查</h1>
+<p>目前无法确认本次提交是否持久化。请先核查设备记录。</p>
+{% else %}
+<title>新增失败</title>
+<h1>设备新增失败</h1>
+<p>本次提交未保存设备档案。</p>
+{% endif %}
+</html>

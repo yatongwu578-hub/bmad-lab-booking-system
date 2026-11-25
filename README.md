@@ -4,7 +4,7 @@
 
 ## Windows 本地启动
 
-Story 1.1 提供统一的 `/login/` 和只读的 `/identity/`。使用 Python 3.13.17（64 位）、[固定依赖](requirements.txt)及独立的 PostgreSQL 17.12 实例 `127.0.0.1:5433`。环境准备记录列出两库、三个角色和受保护凭据文件的设置。 [Sprint 1 环境准备](docs/team/sprint-1-environment-preparation.md)
+Story 1.1 提供统一的 `/login/` 和只读的 `/identity/`。Story 1.2 提供管理员新增入口 `/equipment/new/`。使用 Python 3.13.17（64 位）、[固定依赖](requirements.txt)及独立的 PostgreSQL 17.12 实例 `127.0.0.1:5433`。环境准备记录列出两库、三个角色和受保护凭据文件的设置。 [Sprint 1 环境准备](docs/team/sprint-1-environment-preparation.md)
 
 在仓库根目录打开 PowerShell。Python 3.13.17 已安装但启动器不可用时，可用该版本的 `python.exe` 完整路径执行 `-m venv`。
 
@@ -48,7 +48,7 @@ $pgBin = 'C:\Program Files\PostgreSQL\17\bin'
 & $venvPython manage.py migrate
 ```
 
-迁移后由项目库对象所有者核对现有权限，经负责人批准后才执行以下授权步骤。连接及授权置于同一 `psql` 会话和事务。目标不符或任一语句失败时整批回滚。账号表仅开放认证需要的读权限和两列更新权限，迁移记录供运行时只读检查，会话表支持登录和退出。测试角色只在隔离库执行测试。
+迁移后由项目库对象所有者核对现有权限，经负责人批准后才执行以下授权步骤。连接及授权置于同一 `psql` 会话和事务。目标不符或任一语句失败时整批回滚。账号表仅开放认证需要的读权限和两列更新权限，迁移记录供运行时只读检查，会话表支持登录和退出。测试角色只在隔离库执行测试。设备新增仅开放指定列的 INSERT 与主键返回所需的 SELECT。 [Story 1.2 授权实测](_bmad-output/implementation-artifacts/story-1-2-runtime-evidence.md#实际授权)
 
 ```powershell
 @'
@@ -69,6 +69,8 @@ GRANT SELECT ON TABLE public.accounts_user TO lab_booking_app;
 GRANT UPDATE (last_login, password) ON TABLE public.accounts_user TO lab_booking_app;
 GRANT SELECT ON TABLE public.django_migrations TO lab_booking_app;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.django_session TO lab_booking_app;
+GRANT INSERT (number, name, category, location, description, status), SELECT (id)
+ON TABLE public.equipment_equipment TO lab_booking_app;
 '@ | & "$pgBin\psql.exe" -X -w -h 127.0.0.1 -p 5433 -U lab_booking_migrator -d lab_booking -v ON_ERROR_STOP=1 --single-transaction -f -
 if ($LASTEXITCODE -ne 0) { throw '数据库授权失败，停止启动流程。' }
 ```
@@ -86,6 +88,8 @@ $env:LAB_BOOKING_DB_MODE = 'runtime'
 
 访问 `http://127.0.0.1:8000/login/`，使用获准预置账号登录后核对身份页的账号、角色和刷新结果。点击身份页的“退出登录”应回到登录页，再访问 `/identity/` 应引导登录。错误或缺失凭据应显示表单错误，`/admin/` 和 `/register/` 应返回 404。三种角色均使用同一登录地址。`runserver` 仅用于本地开发和演示。
 
+管理员登录后访问 `http://127.0.0.1:8000/equipment/new/`，新增后核对成功页与「可用」状态。同号重提会提示编号已存在。学生和教师访问该入口返回 403。D-026 验证过的本机业务库已完成设备迁移与授权，可按运行证据中的本机启动步骤直接运行。 [业务库运行证据](_bmad-output/implementation-artifacts/story-1-2-runtime-evidence.md)
+
 使用已迁移的预建隔离库运行完整自动化测试。入口先核验连接与角色权限，检查无待迁移项且账号和会话为空。随后在单进程运行回滚式测试，并比较前后表清单、迁移记录、账号数和会话数。库不存在或核验失败时停止。此入口保留隔离库，不访问维护库，不执行建库、迁移、清库或删库。
 
 ```powershell
@@ -101,11 +105,11 @@ $env:LAB_BOOKING_DB_MODE = 'test'
 
 ## Sprint 规划与审核处置（2026-11-21）
 
-实施就绪结论为[CONCERNS](_bmad-output/planning-artifacts/implementation-readiness.md)，负责人已接受并有条件允许规划，未改为PASS。安装版BMAD 6.12.4已生成[sprint-status.yaml](_bmad-output/implementation-artifacts/sprint-status.yaml)，3个Epic及13条Story全部backlog，epics正文Story仍draft；3个回顾项为模板optional，不免除课程回顾。格式校验不是软件测试。
+实施就绪结论为[CONCERNS](_bmad-output/planning-artifacts/implementation-readiness.md)，负责人已接受并有条件允许规划，未改为PASS。安装版BMAD 6.12.4已生成[sprint-status.yaml](_bmad-output/implementation-artifacts/sprint-status.yaml)，初始化时3个Epic及13条Story均为backlog，epics正文Story仍draft；3个回顾项为模板optional，不免除课程回顾。格式校验不是软件测试。
 
 罗思婕、周何馨于 2026-11-19 完成业务与质量审核。吴亚彤于 2026-11-21 批准两轮范围和逐项处置，随后确认排期并正式批准 Sprint 1 启动。Sprint 1 为 11 月 22 日至 26 日，保留 1.1～1.4、2.1、2.2、2.3、2.5。Sprint 2 为 11 月 27 日至 29 日，保留 2.4、2.6、2.7、2.8、3.1。2.1 首次验收保留 NFR-001 的 20 个独立授权请求 × 10 轮，实验 A 的 2.6／2.7 保留为候选。R-01、R-03 沿用批准和验收证据，R-04、Read Committed 与 T-01～T-04 按既定节点落实。 [Sprint 启动交接](_bmad-output/planning-artifacts/sprint-plan.md#9-sprint-1-启动确认与-story-11-交接) · [D-017](decision-log.md#d-017-2026-11-21-负责人正式批准-sprint-1-启动)
 
-正式开发一条 Story 一个独立 bmad-build 会话，代码实现后新开会话执行 bmad-code-review。真实测试、问题处置及负责人验收满足后才能标为 done。实验 Y 的一句需求干净对照路径须实验前确认。Story 1.1 已于 2026-11-24 经负责人最终验收并标记 done；Epic 1 仍为 in-progress，Story 1.2 及其他未开始 Story 保持 backlog。状态以 [Sprint 跟踪文件](_bmad-output/implementation-artifacts/sprint-status.yaml) 为准，验收与评审证据见 [D-023](decision-log.md#d-023-2026-11-24-story-11-负责人最终验收)。
+正式开发一条 Story 一个独立 bmad-build 会话，代码实现后新开会话执行 bmad-code-review。真实测试、问题处置及负责人验收满足后才能标为 done。实验 Y 的一句需求干净对照路径须实验前确认。Story 1.1 和 1.2 已分别于 2026-11-24、2026-11-25 经负责人最终验收并标记 `done`。Epic 1 保持 `in-progress`，Story 1.3 及其他未开始 Story 保持 `backlog`。 [Sprint 跟踪](_bmad-output/implementation-artifacts/sprint-status.yaml) · [Story 1.1 验收](decision-log.md#d-023-2026-11-24-story-11-负责人最终验收) · [Story 1.2 验收](_bmad-output/implementation-artifacts/story-1-2-final-acceptance.md)
 
 ## 项目与当前进度
 
@@ -123,9 +127,9 @@ $env:LAB_BOOKING_DB_MODE = 'test'
 | M1内部核验 | 文档审查及负责人定稿确认已完成，可进入M2架构；无需等待老师批准 |
 | M2第一轮 Architecture | [课程版architecture.md](_bmad-output/planning-artifacts/architecture.md)、[原生ARCHITECTURE-SPINE.md](_bmad-output/planning-artifacts/architecture/architecture-bmad-lab-booking-system-2026-11-05/ARCHITECTURE-SPINE.md)已final；8条ADR/AD一一对应；[总结](docs/team/m2-architecture-summary.md)及[审核处理记录](docs/team/m2-architecture-review-disposition.md) |
 | M2第二轮 project-context | [独立文档](_bmad-output/planning-artifacts/project-context.md)已final，2026-11-11负责人正式批准；五部分结构、PC-001～PC-014共14条约束保留；[02eec258a3ac](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/02eec258a3ac768fe68753914fa77ac994620197)仅为草稿提交，正式定稿修改尚未提交或推送 |
-| M2 Epic/Story | [定稿](_bmad-output/planning-artifacts/epics.md)文档final，保留3 Epic/13 Story的批准基线；故事设计稿状态与实施状态分开记录，当前实施状态以 [Sprint 跟踪文件](_bmad-output/implementation-artifacts/sprint-status.yaml) 为准（Story 1.1 已 done，其余未开始Story为backlog）；[组员原文](docs/team/m2-epics-requirements-review.md)、[质量原文](docs/team/m2-epics-quality-review.md)及[处置记录](docs/team/m2-epics-review-disposition.md)；[Step-04报告](_bmad-output/planning-artifacts/epics-step-04-validation.md)保留历次验证，第三次复核零开放发现，负责人已批准并完成[C]；见报告第11节 |
+| M2 Epic/Story | [定稿](_bmad-output/planning-artifacts/epics.md)文档final，保留3 Epic/13 Story的批准基线；故事设计稿状态与实施状态分开记录，当前实施状态以 [Sprint 跟踪文件](_bmad-output/implementation-artifacts/sprint-status.yaml) 为准（Story 1.1 和 1.2 已 done，其他未开始 Story 为 backlog）；[组员原文](docs/team/m2-epics-requirements-review.md)、[质量原文](docs/team/m2-epics-quality-review.md)及[处置记录](docs/team/m2-epics-review-disposition.md)；[Step-04报告](_bmad-output/planning-artifacts/epics-step-04-validation.md)保留历次验证，第三次复核零开放发现，负责人已批准并完成[C]；见报告第11节 |
 | M2 后续就绪及 Sprint 计划 | CONCERNS 保留，两轮日期及 8／5 范围已确认。Sprint 1 启动已获批准，首条 Story 按实际开发状态推进。 [Sprint 1 启动交接](_bmad-output/planning-artifacts/sprint-plan.md#9-sprint-1-启动确认与-story-11-交接) |
-| M3、M4及业务代码、运行测试、实验和复盘 | Story 1.1 已完成负责人最终验收（32/32 Django、10/10 独立 Chrome、四视角独立复审及 AC-1～AC-7 证据）；三项 Medium 项目级延期、九项 Low 非阻塞建议及第二台 Windows 复现保留跟踪。Epic 1 仍 in-progress，Story 1.2 等仍 backlog。实验 A 和复盘后续开展，Story 1.1 测试不计入实验 A。 [完成规格](_bmad-output/implementation-artifacts/spec-1-1-preset-account-login.md) · [验收记录](docs/team/story-1-1-review-disposition.md#负责人最终验收与状态推进2026-11-24-d-023) |
+| Sprint 1 实现与验收 | Story 1.1 及 1.2 已完成负责人最终验收。Story 1.2 正式 AC-1～AC-7 独立通过，Django 45/45（含 Story 1.1 的 32/32），AC-6 真实并发、AC-7 事务故障及 D-026 业务库迁移、最小权限和三角色运行验证均有证据。R6～R11 和第二台 Windows 复现继续跟踪。两条 Story 的验收测试均不计入实验 A。 [Story 1.1 证据](docs/team/story-1-1-review-disposition.md#负责人最终验收与状态推进2026-11-24-d-023) · [Story 1.2 证据](_bmad-output/implementation-artifacts/story-1-2-final-acceptance.md) · [延期台账](_bmad-output/implementation-artifacts/deferred-work.md) |
 
 课程原规划为4周、2个Sprint；M1～M4现为内部里程碑，核心考察BMAD、敏捷过程、人类判断和真实证据。每次新BMAD工作流前先读[AGENTS.md](AGENTS.md)及[课程要求基线](docs/course-requirements.md)；命令以已安装[bmad-help](.agents/skills/bmad-help/SKILL.md)为准，独立工作流使用新会话。未取消的课程产物、实验A及BMAD内部就绪检查不因默认流程裁剪而省略。
 
@@ -234,16 +238,16 @@ bmad-lab-booking-system/
 | 阶段/要求 | 当前证据及待办 |
 | --- | --- |
 | M1 | 两轮Product Brief和PRD及内部审核、负责人确认已完成，第二轮定稿已提交main，可进入M2架构 |
-| M2 | Architecture及8条ADR、[project-context](_bmad-output/planning-artifacts/project-context.md)及14条PC已定稿；Epic/Story文档已final，3 Epic/13 Story的Story状态仍draft，组员5项意见已按负责人决定修改，见[本轮汇总](docs/team/m2-epics-summary.md)。第三次Step-04复核已获负责人批准并完成Finalize；后续就绪检查及sprint-status.yaml尚未开始，不表示M2整体完成 |
-| M3 | 核心Demo、Sprint 1状态及实现/评审/测试证据待开展；实验B已取消，不等待老师变更 |
-| M4 | Sprint 2、必做实验A及结果和局限、根目录retrospective.md、源码/测试、启动说明、10分钟录屏及最终版本证据均待完成 |
-| 人机决策 | [D-001～D-014 共 14 条真实决策](decision-log.md)。D-013 为条件接受，D-014 为真实审核后的正式范围批准，按批准类统计。课程累计至少 15 条的要求随真实决定继续积累。 |
-| FR追溯 | 18条FR已有ADR/PC及Story/AC和待执行验证场景落点；尚无真实Test运行证据末端，不宣称完整链路已验证 |
-| NFR | 已有2条可测NFR；实际测试证据尚未产生，不能据文档审查宣称测试通过 |
-| Architecture及project-context后续待办 | R-03 本机环境和数据库连接已验证。R-04、Read Committed、T-01～T-04 按原节点落实，应用迁移和第二台机器复现随后取证。 [project-context 第 4 节](_bmad-output/planning-artifacts/project-context.md#4-deferred处理及后续确认节点) |
+| M2 | Architecture及8条ADR、[project-context](_bmad-output/planning-artifacts/project-context.md)及14条PC已定稿；Epic/Story文档已final，3 Epic/13 Story的Story状态仍draft，组员5项意见已按负责人决定修改，见[本轮汇总](docs/team/m2-epics-summary.md)。第三次Step-04复核已获负责人批准并完成Finalize。随后完成就绪检查及 Sprint 计划，CONCERNS 经负责人有条件接受。 [就绪证据](_bmad-output/planning-artifacts/implementation-readiness.md) |
+| M3 | Sprint 1 已启动，Story 1.1 和 1.2 已验收。其他故事、完整核心 Demo 继续按 Sprint 计划推进。实验 B 已取消。 [Sprint 状态](_bmad-output/implementation-artifacts/sprint-status.yaml) |
+| M4 | Sprint 2、必做实验 A、根目录 retrospective.md、剩余源码和测试、第二台 Windows 复现、10 分钟录屏及最终版本证据待完成。 |
+| 人机决策 | 根目录日志已记录 D-001～D-027，Story 1.2 对应 D-024～D-027。课程要求的否决或实质修改按原始人工判断核对。 [决策日志](decision-log.md) |
+| FR追溯 | 18 条 FR 已映射至 ADR／PC 与 Story／AC。Story 1.2 的 FR-016／FR-002 已链接到独立测试和业务库证据。 [追溯与验收](_bmad-output/implementation-artifacts/story-1-2-final-acceptance.md) |
+| NFR | 已有两条可测 NFR。Story 1.2 提供 NFR-002 的设备新增入口证据，NFR-001 的预约并发验收仍按原计划取证。 [正式 PRD](_bmad-output/planning-artifacts/PRD.md) |
+| Architecture 及 project-context 后续待办 | R-03 已完成本机环境核验，D-024 的 Read Committed 和 D-026 的设备迁移、授权及业务库运行已留证。第二台 Windows 复现仍待执行，其他待办按既定节点推进。 [运行证据](_bmad-output/implementation-artifacts/story-1-2-runtime-evidence.md) · [延期台账](_bmad-output/implementation-artifacts/deferred-work.md) |
 
 ## AI使用声明与证据限制
 
-Codex协助完成简报与PRD的讨论、草稿、意见映射、审查、结构文字整理、Finalize及本次课程证据整理。吴亚彤实际作出并传达人工决定、审核批准；罗思婕和周何馨提供原始审核记录。Finalize使用了独立AI审查子代理，其结果不冒充组员意见或老师验收。
+Codex协助完成简报与PRD的讨论、草稿、意见映射、审查、结构文字整理、Finalize及本次课程证据整理。吴亚彤实际作出并传达人工决定、审核批准；罗思婕和周何馨提供原始审核记录。Finalize使用了独立AI审查子代理，其结果不冒充组员意见或老师验收。 Story 1.2 中 Codex 协助实施、自测、独立评审及证据整理，负责人实际批准 D-024～D-027。 [Story 1.2 验收记录](_bmad-output/implementation-artifacts/story-1-2-final-acceptance.md)
 
 课程 PPT 原页未在仓库发现，依据[课程基线](docs/course-requirements.md)及团队审核材料记录的第 27 页口径。2026-11-05 通知由团队转述，未另附通知原件。历史文档及过去记录保留当时事实。R-03 本机环境验证已验收，Sprint 1 启动已批准。后续继续保存实际工具与模型、会话和 Git 证据、每条 NFR 的运行测试及实验 A 数据。

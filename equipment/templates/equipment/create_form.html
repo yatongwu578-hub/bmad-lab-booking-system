@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="zh-Hans">
+<meta charset="utf-8">
+<title>新增设备</title>
+<h1>新增具体设备档案</h1>
+<form method="post">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  <label>设备编号 {{ form.number }}{{ form.number.errors }}</label>
+  <label>名称 {{ form.name }}{{ form.name.errors }}</label>
+  <label>类别 {{ form.category }}{{ form.category.errors }}</label>
+  <label>位置 {{ form.location }}{{ form.location.errors }}</label>
+  <label>说明 {{ form.description }}{{ form.description.errors }}</label>
+  <p>初始状态：{{ initial_status }}</p>
+  <button type="submit">新增设备</button>
+</form>
+</html>

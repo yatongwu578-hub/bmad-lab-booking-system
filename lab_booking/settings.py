@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
+from psycopg import IsolationLevel
 
 from .database_config import DATABASE_TARGETS, HOST, PORT, reject_connection_overrides
 
@@ -30,7 +31,11 @@ DATABASES = {
         "USER": database_user,
         "HOST": HOST,
         "PORT": PORT,
-        "OPTIONS": {"hostaddr": HOST, "passfile": str(passfile)},
+        "OPTIONS": {
+            "hostaddr": HOST,
+            "passfile": str(passfile),
+            "isolation_level": IsolationLevel.READ_COMMITTED,
+        },
         "TEST": {"NAME": DATABASE_TARGETS["test"][0]},
     },
 }
@@ -45,6 +50,7 @@ INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.sessions",
     "accounts",
+    "equipment",
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
