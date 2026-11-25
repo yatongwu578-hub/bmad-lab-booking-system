@@ -1,0 +1,8 @@
+{% extends "equipment/catalog_base.html" %}
+
+{% block title %}设备不存在{% endblock %}
+{% block heading %}设备不存在{% endblock %}
+{% block content %}
+    <p>未找到对应的设备档案。</p>
+    <p><a href="{% url 'equipment-catalog' %}">返回设备目录</a></p>
+{% endblock %}

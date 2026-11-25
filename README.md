@@ -90,6 +90,15 @@ $env:LAB_BOOKING_DB_MODE = 'runtime'
 
 管理员登录后访问 `http://127.0.0.1:8000/equipment/new/`，新增后核对成功页与「可用」状态。同号重提会提示编号已存在。学生和教师访问该入口返回 403。D-026 验证过的本机业务库已完成设备迁移与授权，可按运行证据中的本机启动步骤直接运行。 [业务库运行证据](_bmad-output/implementation-artifacts/story-1-2-runtime-evidence.md)
 
+学生、教师或业务管理员登录后，从「我的身份」点击「查看设备目录」，也可直接访问 `http://127.0.0.1:8000/equipment/`。点击设备编号进入 `/equipment/<主键>/` 查看对应设备。目录按设备编号排序。无设备时提示「暂无设备」，标识不存在返回 404。设备「可用」不是指定时段可预约的承诺。
+
+Story 1.3 不新增迁移。本机 `127.0.0.1:5433/lab_booking` 已按 D-030 完成以下增量六列读取授权和三角色 Chrome 验证，保留已有 `SELECT(id)` 与六列插入权限，无表级 SELECT、额外写权限、序列权限或转授权。本机无需重复授权。其他环境须在负责人批准后核对目标、表归属和现有权限，再由迁移角色在事务内执行并验证。 [授权与运行记录](_bmad-output/implementation-artifacts/story-1-3-runtime-evidence.md)
+
+```sql
+GRANT SELECT (number, name, category, location, description, status)
+ON TABLE public.equipment_equipment TO lab_booking_app;
+```
+
 使用已迁移的预建隔离库运行完整自动化测试。入口先核验连接与角色权限，检查无待迁移项且账号和会话为空。随后在单进程运行回滚式测试，并比较前后表清单、迁移记录、账号数和会话数。库不存在或核验失败时停止。此入口保留隔离库，不访问维护库，不执行建库、迁移、清库或删库。
 
 ```powershell
@@ -109,7 +118,7 @@ $env:LAB_BOOKING_DB_MODE = 'test'
 
 罗思婕、周何馨于 2026-11-19 完成业务与质量审核。吴亚彤于 2026-11-21 批准两轮范围和逐项处置，随后确认排期并正式批准 Sprint 1 启动。Sprint 1 为 11 月 22 日至 26 日，保留 1.1～1.4、2.1、2.2、2.3、2.5。Sprint 2 为 11 月 27 日至 29 日，保留 2.4、2.6、2.7、2.8、3.1。2.1 首次验收保留 NFR-001 的 20 个独立授权请求 × 10 轮，实验 A 的 2.6／2.7 保留为候选。R-01、R-03 沿用批准和验收证据，R-04、Read Committed 与 T-01～T-04 按既定节点落实。 [Sprint 启动交接](_bmad-output/planning-artifacts/sprint-plan.md#9-sprint-1-启动确认与-story-11-交接) · [D-017](decision-log.md#d-017-2026-11-21-负责人正式批准-sprint-1-启动)
 
-正式开发一条 Story 一个独立 bmad-build 会话，代码实现后新开会话执行 bmad-code-review。真实测试、问题处置及负责人验收满足后才能标为 done。实验 Y 的一句需求干净对照路径须实验前确认。Story 1.1 和 1.2 已分别于 2026-11-24、2026-11-25 经负责人最终验收并标记 `done`。Epic 1 保持 `in-progress`，Story 1.3 及其他未开始 Story 保持 `backlog`。 [Sprint 跟踪](_bmad-output/implementation-artifacts/sprint-status.yaml) · [Story 1.1 验收](decision-log.md#d-023-2026-11-24-story-11-负责人最终验收) · [Story 1.2 验收](_bmad-output/implementation-artifacts/story-1-2-final-acceptance.md)
+正式开发一条 Story 一个独立 bmad-build 会话，代码实现后新开会话执行 bmad-code-review。真实测试、问题处置及负责人验收满足后才能标为 done。实验 Y 的一句需求干净对照路径须实验前确认。Story 1.1 和 1.2 已分别于 2026-11-24、2026-11-25 经负责人最终验收并标记 `done`。Epic 1 保持 `in-progress`。Story 1.3 已由负责人最终验收并标记 `done`，独立复审、R1 关闭及业务库运行均已留证。Story 1.4 及其他未开始 Story 保持 `backlog`。 [Sprint 跟踪](_bmad-output/implementation-artifacts/sprint-status.yaml) · [Story 1.1 验收](decision-log.md#d-023-2026-11-24-story-11-负责人最终验收) · [Story 1.2 验收](_bmad-output/implementation-artifacts/story-1-2-final-acceptance.md) · [Story 1.3 验收](_bmad-output/implementation-artifacts/story-1-3-final-acceptance.md)
 
 ## 项目与当前进度
 
@@ -129,7 +138,7 @@ $env:LAB_BOOKING_DB_MODE = 'test'
 | M2第二轮 project-context | [独立文档](_bmad-output/planning-artifacts/project-context.md)已final，2026-11-11负责人正式批准；五部分结构、PC-001～PC-014共14条约束保留；[02eec258a3ac](https://github.com/yatongwu578-hub/bmad-lab-booking-system/commit/02eec258a3ac768fe68753914fa77ac994620197)仅为草稿提交，正式定稿修改尚未提交或推送 |
 | M2 Epic/Story | [定稿](_bmad-output/planning-artifacts/epics.md)文档final，保留3 Epic/13 Story的批准基线；故事设计稿状态与实施状态分开记录，当前实施状态以 [Sprint 跟踪文件](_bmad-output/implementation-artifacts/sprint-status.yaml) 为准（Story 1.1 和 1.2 已 done，其他未开始 Story 为 backlog）；[组员原文](docs/team/m2-epics-requirements-review.md)、[质量原文](docs/team/m2-epics-quality-review.md)及[处置记录](docs/team/m2-epics-review-disposition.md)；[Step-04报告](_bmad-output/planning-artifacts/epics-step-04-validation.md)保留历次验证，第三次复核零开放发现，负责人已批准并完成[C]；见报告第11节 |
 | M2 后续就绪及 Sprint 计划 | CONCERNS 保留，两轮日期及 8／5 范围已确认。Sprint 1 启动已获批准，首条 Story 按实际开发状态推进。 [Sprint 1 启动交接](_bmad-output/planning-artifacts/sprint-plan.md#9-sprint-1-启动确认与-story-11-交接) |
-| Sprint 1 实现与验收 | Story 1.1 及 1.2 已完成负责人最终验收。Story 1.2 正式 AC-1～AC-7 独立通过，Django 45/45（含 Story 1.1 的 32/32），AC-6 真实并发、AC-7 事务故障及 D-026 业务库迁移、最小权限和三角色运行验证均有证据。R6～R11 和第二台 Windows 复现继续跟踪。两条 Story 的验收测试均不计入实验 A。 [Story 1.1 证据](docs/team/story-1-1-review-disposition.md#负责人最终验收与状态推进2026-11-24-d-023) · [Story 1.2 证据](_bmad-output/implementation-artifacts/story-1-2-final-acceptance.md) · [延期台账](_bmad-output/implementation-artifacts/deferred-work.md) |
+| Sprint 1 实现与验收 | Story 1.1～1.3 已完成负责人最终验收。Story 1.2 正式 AC-1～AC-7 独立通过，Django 45/45（含 Story 1.1 的 32/32），AC-6 真实并发、AC-7 事务故障及 D-026 业务库迁移、最小权限和三角色运行验证均有证据。Story 1.3 正式 AC-1～AC-6 满足，独立 55/55 无跳过，R1 已关闭，正式库六列读取授权及三角色运行取证完成。既有延期和第二台 Windows 复现继续跟踪。这些验收不计入实验 A。 [Story 1.1 证据](docs/team/story-1-1-review-disposition.md#负责人最终验收与状态推进2026-11-24-d-023) · [Story 1.2 证据](_bmad-output/implementation-artifacts/story-1-2-final-acceptance.md) · [Story 1.3 验收](_bmad-output/implementation-artifacts/story-1-3-final-acceptance.md) · [延期台账](_bmad-output/implementation-artifacts/deferred-work.md) |
 
 课程原规划为4周、2个Sprint；M1～M4现为内部里程碑，核心考察BMAD、敏捷过程、人类判断和真实证据。每次新BMAD工作流前先读[AGENTS.md](AGENTS.md)及[课程要求基线](docs/course-requirements.md)；命令以已安装[bmad-help](.agents/skills/bmad-help/SKILL.md)为准，独立工作流使用新会话。未取消的课程产物、实验A及BMAD内部就绪检查不因默认流程裁剪而省略。
 

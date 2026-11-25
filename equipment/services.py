@@ -1,3 +1,4 @@
+from django.core.exceptions import PermissionDenied
 from django.db import Error, transaction
 
 from accounts.models import Role
@@ -15,6 +16,33 @@ class EquipmentCreationFailed(Exception):
 
 class EquipmentCreationUnknown(Exception):
     pass
+
+
+CATALOG_FIELDS = ("number", "name", "category", "location", "status")
+
+
+def _require_catalog_reader(user):
+    if not user.is_authenticated or not user.is_active or user.role not in Role.values:
+        raise PermissionDenied
+
+
+def _add_status_label(row):
+    return {**row, "status_label": EquipmentStatus(row["status"]).label}
+
+
+def list_equipment(user):
+    _require_catalog_reader(user)
+    rows = Equipment.objects.order_by("number").values("id", *CATALOG_FIELDS)
+    return [_add_status_label(row) for row in rows]
+
+
+def get_equipment_detail(user, pk):
+    _require_catalog_reader(user)
+    try:
+        row = Equipment.objects.values(*CATALOG_FIELDS, "description").get(pk=pk)
+    except Equipment.DoesNotExist:
+        return None
+    return _add_status_label(row)
 
 
 def _is_equipment_number_conflict(error):

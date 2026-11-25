@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock %} · 实验室设备预约</title>
+</head>
+<body>
+    <main>
+        <h1>{% block heading %}{% endblock %}</h1>
+        <p>当前身份：{{ account.username }}（{{ account.get_role_display }}）</p>
+        <p>这里显示的是设备当前状态，不是预约状态。「可用」不代表指定时段可预约，也不保证预约成功。</p>
+        {% block content %}{% endblock %}
+        <p><a href="{% url 'identity' %}">返回我的身份</a></p>
+    </main>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{% extends "equipment/catalog_base.html" %}
+
+{% block title %}设备详情{% endblock %}
+{% block heading %}设备详情{% endblock %}
+{% block content %}
+    <dl>
+        <dt>设备编号</dt><dd>{{ equipment.number }}</dd>
+        <dt>名称</dt><dd>{{ equipment.name }}</dd>
+        <dt>类别</dt><dd>{{ equipment.category }}</dd>
+        <dt>位置</dt><dd>{{ equipment.location }}</dd>
+        <dt>说明</dt><dd id="equipment-description" style="white-space: pre-wrap">{{ equipment.description|default:"暂无说明" }}</dd>
+        <dt>当前状态</dt><dd>{{ equipment.status_label }}</dd>
+    </dl>
+    <p><a href="{% url 'equipment-catalog' %}">返回设备目录</a></p>
+{% endblock %}

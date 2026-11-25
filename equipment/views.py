@@ -1,8 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseForbidden
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_safe
 
 from accounts.models import Role
 
@@ -13,7 +14,41 @@ from .services import (
     EquipmentCreationUnknown,
     EquipmentNumberConflict,
     create_equipment,
+    get_equipment_detail,
+    list_equipment,
 )
+
+
+@never_cache
+@require_safe
+@login_required
+def equipment_catalog(request):
+    try:
+        equipment_items = list_equipment(request.user)
+    except PermissionDenied:
+        return HttpResponseForbidden("无权查看设备资料。")
+    return render(
+        request,
+        "equipment/catalog.html",
+        {"account": request.user, "equipment_items": equipment_items},
+    )
+
+
+@never_cache
+@require_safe
+@login_required
+def equipment_detail(request, pk):
+    try:
+        equipment = get_equipment_detail(request.user, pk)
+    except PermissionDenied:
+        return HttpResponseForbidden("无权查看设备资料。")
+    if equipment is None:
+        return render(request, "equipment/not_found.html", {"account": request.user}, status=404)
+    return render(
+        request,
+        "equipment/detail.html",
+        {"account": request.user, "equipment": equipment},
+    )
 
 
 def require_equipment_admin(user):

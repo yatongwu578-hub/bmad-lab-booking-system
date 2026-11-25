@@ -237,3 +237,39 @@
 3. **人类判断与依据**。负责人正式接受最终交付，依据 FR-016／FR-002、ADR-002／003／008 所对应的正式 AC-1～AC-7、Django 独立 45/45（Story 1.1 为 32/32）、真实 PostgreSQL 并发与事务故障证据，以及 D-026 已完成的迁移、最小授权和实际运行核验。确认 R1～R5 已关闭、R6～R11 继续延期。团队体验按已有操作记录留证。
 4. **结果**。按 Build Step 5 完成规格归档，再依据本次人工验收将 Sprint 的 Story 1.2 从 `review` 推进为 `done`。Epic 1 保持 `in-progress`，Story 1.3 及其他未开始 Story 保持 `backlog`。更新 README、评审处置、延期跟踪及最终验收记录。提交和推送待负责人授权。 [最终验收](_bmad-output/implementation-artifacts/story-1-2-final-acceptance.md) · [Sprint 状态](_bmad-output/implementation-artifacts/sprint-status.yaml)
 5. **事后核对**。复用已有效的独立和运行验证。第二台 Windows 待复现，Story 1.2 的测试数据不计入实验 A。 [延期台账](_bmad-output/implementation-artifacts/deferred-work.md)
+
+## D-028 2026-11-25 负责人批准 Story 1.3 实施规格
+
+1. **触发**。BMAD 6.12.4 `bmad-build` 的 Checkpoint 1。完成 1.1、1.2 前置及正式 AC 核对后，提交 Story 1.3 规格请负责人决定。 [实施规格](_bmad-output/implementation-artifacts/spec-1-3-view-equipment-catalog.md)
+2. **AI 建议及理由**。建议批准并继续。现有模型和登录路径已满足基本依赖，依 FR-003／002、ADR-001／002／003 实施普通只读查询，无需迁移。正式库只需补六列 SELECT，另获授权后才能执行。
+3. **人类判断与依据**。负责人在本会话对 Checkpoint 1 回复「批准并继续」。批准对象是保持正式六条 AC 的实施规格，未批准正式库授权或最终验收，未另述比较理由。不视为三人表决或否决／实质修改。
+4. **结果**。仅新增目录、详情和对应回归；实现后按要求停在 `review`，未开始 1.4，未改变已批准的 Sprint 范围或实验 A 条件，未提交或推送。 [Sprint 状态](_bmad-output/implementation-artifacts/sprint-status.yaml)
+5. **事后验证**。隔离库原套件 45/45，新增后全量 54/54。正式六条 AC 均有开发自测证据，业务角色授权、独立评审及最终验收仍待后续。 [开发证据](_bmad-output/implementation-artifacts/story-1-3-dev-evidence.md)
+
+## D-029 2026-11-25 负责人批准 Story 1.3 独立评审处置
+
+1. **触发**。BMAD 6.12.4 `full` 独立评审 Step 4。团队收到四视角裁决与首轮证据。R1 涉及 AC-2 多行说明可见完整性，独立隔离回归因受限解释器未运行。 [首轮独立评审](_bmad-output/implementation-artifacts/story-1-3-independent-review.md)
+2. **AI 建议及理由**。保留行动项，交原 Build 会话最小修正说明显示。用 CSS `white-space: pre-wrap` 保留分行与连续空白，不触及业务读写或现有授权。Low 项是当前实现未失效时的覆盖增强，记录风险与触发节点，不把正式库验证混入隔离回归。
+3. **人类判断与依据**。项目负责人实际选择方案 2。批准 R1 必修，指定保留 Django 自动转义、不使用 `safe` 或 `mark_safe`。批准其余八项 Low 仅在不影响正式 AC、安全和数据一致性的前提下延期，保留原 R2/R8 和三项驳回的裁决。依据为正式 AC-2、FR-003／002、ADR-001／002／003、PC-008／011 和评审证据。负责人要求 R1 修复后合并进行独立测试，不将开发 54/54 认作独立结果。本条只记录负责人的实际决定，不代填三位组员的个人决定。
+4. **结果**。1 项待整改、10 项延期跟踪、3 条原始发现驳回、0 项修复。按 Step 4 规定整改目标为 `in-progress`，规格、延期台账和 Sprint 跟踪的实写结果以处置记录为准。原 Build 会话的 R1 交接已保存。本轮不修改业务代码、不访问业务库、不执行授权、不开发 Story 1.4、不标 `done`、不暂存、提交或推送。 [逐项处置](_bmad-output/implementation-artifacts/story-1-3-review-disposition.md) · [整改交接](_bmad-output/implementation-artifacts/story-1-3-remediation-handoff.md) · [Sprint 状态](_bmad-output/implementation-artifacts/sprint-status.yaml)
+5. **事后验证**。截至本次决定，独立 Django 实际执行 0 项，开发证据 54/54 保持原口径。待 R1 修复后由独立评审会话在原 Python 3.13.17 的隔离库统一复跑，保存实际分母和退出码，复核 AC-1～AC-6、R1 展示及转义、T-03、Story 1.1／1.2 回归。正式业务库授权、运行验证与最终验收均未获本次批准。实验 A 条件与数据不变。
+
+   **2026-11-25 落实补记**。原 Build 续接已批准的 R1，补录规格与延期台账，仅修说明展示并保留自动转义。隔离开发自测 55/55，含 Chrome 可见分行、空格和字面文本验证。Sprint 回到 `review`，正式库未访问，独立复审与最终验收仍待完成。本补记是实施结果，不是新增人类决定。 [整改证据](_bmad-output/implementation-artifacts/story-1-3-dev-evidence.md#2026-11-25-r1-整改与开发自测)
+
+   **2026-11-25 独立复审补记**。实际重新执行隔离库回归 55/55 无跳过，Chrome 说明渲染、正式六条 AC 和本入口 T-03 均有本轮独立证据。技术判断建议关闭 R1，尚未记录负责人关闭决定、正式库授权或最终验收。此补记只完成 D-029 的事后取证，不新增人类决策，不计入实验 A。 [独立复审](_bmad-output/implementation-artifacts/story-1-3-independent-recheck.md)
+
+## D-030 2026-11-25 负责人关闭 R1 并批准 Story 1.3 业务库验证
+
+1. **触发**。BMAD 6.12.4 Story 1.3 R1 独立复审完成，原 Python 3.13.17 在隔离库通过 55/55，无跳过，Chrome 验证了正式 AC-2 的多行说明和自动转义。 [独立复审](_bmad-output/implementation-artifacts/story-1-3-independent-recheck.md)
+2. **AI 建议及理由**。建议关闭 R1。目录和详情实际查询需在原 `SELECT(id)` 之外补六列 SELECT，隔离角色不能替代业务运行角色验证。建议用单事务核查和授权，再用既有三类账号、既有演示档案验证。依据 FR-003／FR-002、ADR-001／002／003、正式 AC 和既有 D-026 ACL。 [授权方案](_bmad-output/implementation-artifacts/story-1-3-independent-recheck.md#4-正式库最小-select-与运行验证方案仅核对)
+3. **人类判断与依据**。项目负责人明确接受复审结论，正式批准关闭 R1 并保留此前延期决定。仅批准 `127.0.0.1:5433/lab_booking` 17.12 上六列读取授权、同事务前后核验及三角色真实 Chrome 验证。不得迁移、修改设备、扩大授权或重跑已有有效测试，不批准最终验收、下一 Story 或 Git 提交。三位组员共同查看和审阅，不分派个人任务或代填个人意见。
+4. **结果**。规格登记 R1 已关闭，授权批次退出 0，`lab_booking_app` 有效设备 SELECT 由主键扩大到七列，原 INSERT 不变，无新写入或 DDL 权限。三角色浏览器批次退出 0。本机运行服务保留供团队查看，Sprint 保持 `review`，Story 1.4 保持 `backlog`。 [运行证据](_bmad-output/implementation-artifacts/story-1-3-runtime-evidence.md)
+5. **事后验证**。运行角色独立只读快照前后各 1 台设备、17 条迁移、1 条既有会话，设备全字段摘要相同。三角色实际从目录点击及直达正确详情，404、匿名和退出后拦截均通过。实验 A 不变，最终验收待负责人另行决定。 [原始授权与运行输出](_bmad-output/implementation-artifacts/story-1-3-runtime-output.txt)
+
+## D-031 2026-11-25 Story 1.3 负责人最终验收
+
+1. **触发**。R1 已由 D-030 正式关闭并完成批准的业务库最低读取授权和真实 Chrome 运行验证，Story 1.3 等待负责人最终验收。 [D-030 运行证据](_bmad-output/implementation-artifacts/story-1-3-runtime-evidence.md)
+2. **AI 建议及理由**。独立复审结论为 R1 可关闭、正式六条 AC 在隔离环境满足，无新增验收阻塞。独立 55/55 与 D-030 的本机运行证据支持进入最终验收，不能相互替代。 [独立复审](_bmad-output/implementation-artifacts/story-1-3-independent-recheck.md)
+3. **人类判断与依据**。负责人明确批准 Story 1.3 最终验收，接受 AC-1～AC-6、独立 55/55 无跳过、D-030 的 R1 关闭和六列授权、三角色 Chrome 以及只读和设备前后一致证据。确认此前延期和第二台 Windows 复现继续跟踪，并授权检查通过后提交和推送本 Story。不代填其他组员意见。
+4. **结果**。按 BMAD 6.12.4 Build Step 5 将规格归档为 `done`，按负责人最终验收同步 Sprint，Epic 1 保持 `in-progress`，Story 1.4 及其他未开始 Story 保持 `backlog`。更新验收记录、README 和评审处置，保留先前真实证据。 [最终验收](_bmad-output/implementation-artifacts/story-1-3-final-acceptance.md) · [Sprint 跟踪](_bmad-output/implementation-artifacts/sprint-status.yaml)
+5. **事后核对**。沿用独立 55/55 与 D-030 真实运行结果，未重跑测试或访问数据库。既有实验 A 条件不变，本 Story 结果不计入实验 A，第二台 Windows 复现尚未发生。 [延期台账](_bmad-output/implementation-artifacts/deferred-work.md)
