@@ -1,0 +1,21 @@
+{
+  "kind": "offline assertion contract, two constructed positive controls, no Django, Chrome or database runtime",
+  "negative_controls_rejected": 15,
+  "cases": [
+    "P02 legacy caller-label only",
+    "P03 legacy SQL unbound",
+    "P02 wrong user_id",
+    "P02 wrong role",
+    "P02 wrong is_active",
+    "P02 wrong is_authenticated",
+    "P02 wrong path",
+    "P03 bound fixed id expanded",
+    "P03 bound account substituted",
+    "P03 wrong device lock",
+    "P03 bound update targets new row",
+    "P03 fixed SELECT after decision",
+    "P03 second clock",
+    "P03 nonmatching expiry t_decision",
+    "P03 expiry projection substituted for fixed row"
+  ]
+}

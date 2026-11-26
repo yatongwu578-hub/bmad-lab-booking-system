@@ -1,0 +1,140 @@
+{
+  "scope": "offline acceptance: original output only; no native runtime/test, migration, grant or database connection",
+  "runtime_runs": [
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214802-149-fcc085362719",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc"
+  ],
+  "migration": {
+    "exit": 0,
+    "operations": [
+      "Applying reservations.0001_initial... OK",
+      "Applying audit.0001_initial... OK"
+    ],
+    "outcome": "confirmed by Django and readback"
+  },
+  "failed_stage_sqlstate": "22023",
+  "recovery": "read-only pristine",
+  "acl_count_triples_rows_planned_explicit": {
+    "resume-preflight": [
+      76,
+      26,
+      0
+    ],
+    "before": [
+      76,
+      26,
+      0
+    ],
+    "after-commit": [
+      76,
+      26,
+      26
+    ],
+    "independent-runtime-role": [
+      76,
+      26,
+      26
+    ],
+    "recovery": [
+      76,
+      26,
+      0
+    ]
+  },
+  "runtime": {
+    "applicant_id": 2,
+    "catalog": "http://127.0.0.1:8001/equipment/",
+    "device": "EQ-DEMO-S12-20261125",
+    "device_id": 1,
+    "history_delta": 0,
+    "live_chrome": "Chrome/159.0.8154.34",
+    "login": "http://127.0.0.1:8001/login/",
+    "own_result": "http://127.0.0.1:8001/reservations/1/result/",
+    "reservation_entry": "http://127.0.0.1:8001/equipment/1/reserve/",
+    "reservation_id": 1,
+    "slot": {
+      "end_at": "2026-11-27T11:00",
+      "start_at": "2026-11-27T10:00"
+    },
+    "status": "pending",
+    "verified": [
+      "student new and own",
+      "teacher conflict and no foreign read",
+      "admin no entry or write"
+    ]
+  },
+  "sources_verified": 75,
+  "central_deferred_sections_matched_exactly": 3,
+  "original_artifact_sha256": {
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/backup-proof.jsonl": "6598F22D0AE07A5EA5740A9EB656DB1D1EDF45763C8117FA82E277E602D957E0",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/backup-protection.stderr.txt": "018966BF53CB60E3BE45739D0B615E36EC0CD64FB2DC331E24320CE44F76DDFF",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/backup-protection.stdout.txt": "E81DF5206850D022E9F5B33CF78853C93F85948B6D9886E8755CB0B6AC9538B9",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/backup-toc.stderr.txt": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/backup-toc.stdout.txt": "BCA525A39A17E7160933DBE0831A31DB58F1F135E2B6B222ACEF37C7A1B64709",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/backup.stderr.txt": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/backup.stdout.txt": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/django-migrate.stdout.txt": "AC67BFC501EFE90D43362CA79C50005FB952F6AD0F54D2836CD1BB3756C6F4F2",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/failure-diagnostics.jsonl": "5E358B51B706842C129E2B18CC1BD8EB76675F76D5A9BFD66CDDF69EE47ED9A7",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/failure.jsonl": "80C3664811DEDBFB1158045D33C730BCDA9A96548A8B49132AA515FC6309E91A",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/failure.txt": "D1A18386333593CBD83E5A1F75A6F3640A45296DB7540A986B2D42328F6E68BC",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/identity.jsonl": "A4401E0254381842528EC6EFB4DA9ADFA541FDB41A3D6EA02DE3AD85A28B97F9",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/migration-intent.json": "2B19D2C12DFFC20F0EE2A7CA810FA8F1820B853743585A261ACB1B2BF88B82B8",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/migration-plan.jsonl": "8D542A2D7023A6F4512B6146C5372271FFF9680577BA5A948E1C3896AD4711C7",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/migration-result.jsonl": "DBAC21FA937755BE0637B999E0ED3CADE42235A6AFA0E743D75798DFC1DBCE13",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/native-exits.jsonl": "C549AC96B6FBF83BAA29462DBB755FA419FF85A8F26BE8C3E95E91F5A74F0F41",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/pg_dump-version.log": "B866E06C8C78E81C123A2B6AF1137E94C2D34791E2A7B5F651DB4C5D0A22B445",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/pg_restore-version.log": "4872114B28DE28B092A8D9AE8E5B3C1A9812A4DFFF6C0F423A79C090D732FBB1",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/production-database.log": "DC4729381EDC733A5322FFB3BE30129DB105A5D2C4E87B93EFB4EEC5E94A7132",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/psql-version.log": "383C39ABE8E877567DB4BE18DA6D49E1E69B044A267035E716BFC2F6BAAD14AC",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/python-version.log": "36B4E3BD04433AC127CBDBDBF9BE5C72B076D056FE204AB4A00D705BF48062B0",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/reviewed-inputs.json": "4743893D5C08F1B588CF7B85513D15064D58E8179F9453677CA12190F2B7457E",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/schema.jsonl": "5540006989A3AB8DD09FA7D806B96F355F9F07C575622AADCBDDA20A94C79D4E",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/service-before.json": "330B30B9CDE78F063700ACA78920F4EF815282932D9B47B8E60EF1BF9189EA64",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/stages.txt": "D340A1DC3C79703CD52A146C4999B0D3B9CDD0AEBF333BFD740EF28570D0E916",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214802-149-fcc085362719/acl-probe.jsonl": "E9A889E7FD060F1B2ABC37A88F52BD4CF37784675EA4DCA46F5E8BBB9B2324E1",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214802-149-fcc085362719/acl.jsonl": "A6C8460F544BF75AD4E4D2E94FDDE10FD5AC0AF9BA4ADFEC4A176005421DCA48",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214802-149-fcc085362719/identity.jsonl": "8F9093F64877C9FF814C44C0971768CB4398F69518E842F83D828ACB9F235330",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214802-149-fcc085362719/python-version.log": "36B4E3BD04433AC127CBDBDBF9BE5C72B076D056FE204AB4A00D705BF48062B0",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214802-149-fcc085362719/recovery-source.json": "4317802C9FA13B1DF9CA91B79C47E55ED2C9BC561CEB869492AE0316467206A1",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214802-149-fcc085362719/recovery-state.jsonl": "CEC6BDE055C3E2D67A7E533E75346A86897A8FC67360B64A9B7051091E41F9CF",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214802-149-fcc085362719/recovery-summary.json": "C8D968941CC2F2E588DC07CE3311A93BE6D761599FB8EC97E636E1EE2A3696B5",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214802-149-fcc085362719/recovery.log": "6DDEFA5691FA8BBB696B9A1F8187F07545A41D53472500D4DA4D7700E10E80CA",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214802-149-fcc085362719/reviewed-inputs.json": "B4A36C350150F38CD6B4DF792A35B7547DC9ADE173096B9F130F76FD1F348DF6",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214802-149-fcc085362719/schema.jsonl": "F98BED7CBFC28D427617913326D445428C4FA5E402E6F4DF1D19E123364F7363",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214802-149-fcc085362719/stages.txt": "153B31C8107562FD03BDC1248202A55129FEB7F720C059C69AF1516270534A36",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/acl-probe.jsonl": "9BEA51A768003461964B22DBA282B108823445E04D8B17DB6EA5664836C1DF81",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/acl.jsonl": "DAC96AE351D0FD35D1A11361823E4A22620218408DD66A86D30925C16665F295",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/backup-reused.jsonl": "B830BD91497D1BDE44E992A9050E23C2090D26D5823179F8B239F7B291FF7BCD",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/backup-toc-recovery.stderr.txt": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/backup-toc-recovery.stdout.txt": "BCA525A39A17E7160933DBE0831A31DB58F1F135E2B6B222ACEF37C7A1B64709",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/chrome-cases.jsonl": "CBA9F100DABC5592DF3CBBD6ACB33942EDB8513E3CA0D95A0FE9DD8F4DDD028A",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/chrome-documents.jsonl": "BF05427A2E23E9FF40585457FD1768926622EF19FAF81698B654A22F79324826",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/chrome-preflight.jsonl": "7A9477CAABD9E90171B552AD5FA0A2257C25B8387C4350673090D570E7AAC3D4",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/demo-db.jsonl": "59DC24615310AEA580820E1F4B5208C1EFE39C8D67848D10C6C9311F1ED75F5D",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/demo-preflight.jsonl": "995A23914FA028A31058B1F966CDC72FA83C1C806DFEACC0C1ABDEC47F8932B7",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/grant-intent.json": "CF396C4C9B5957A2E1454C298B6F3E8FE4FC7CE2D391332512FAB1AF55441F9E",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/grant-result.jsonl": "2C05A987E3E357BE4E24BC065F336AE1A25BE58368914E6E9EE06B8AB32D3134",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/grant-transaction.sql": "B34A5E6F061211B594473FF3A8B0B0EF67C7802F980C1061D040F8DCBB274160",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/grant.stderr.txt": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/grant.stdout.txt": "80744A2613163EC2D0066AECC13041F2AF59B6C7E27C36BEE2F8D9BFC6948FC2",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/identity.jsonl": "86A65DE6617E108E152D8ED93A9C3AAEF58E132A7DE9D41B23582E6D20CA9D0D",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/native-exits.jsonl": "798AAEC204E15B1EC597B31B45D092772F1FF60C64DA77C677E5B52D73160509",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/pg_dump-version.log": "B866E06C8C78E81C123A2B6AF1137E94C2D34791E2A7B5F651DB4C5D0A22B445",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/pg_restore-version.log": "4872114B28DE28B092A8D9AE8E5B3C1A9812A4DFFF6C0F423A79C090D732FBB1",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/production-chrome.log": "02ABCA6F4C40A988DDF519C66743BF227935726E5B2E1CAC928FBF7DF3FA5955",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/production-database.log": "540C9D4FCAD02E4BBEF01E6553DDD68FABCFBF72ED3CC29ECB20DD06D71A9A05",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/psql-version.log": "383C39ABE8E877567DB4BE18DA6D49E1E69B044A267035E716BFC2F6BAAD14AC",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/python-version.log": "36B4E3BD04433AC127CBDBDBF9BE5C72B076D056FE204AB4A00D705BF48062B0",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/ready-for-browser.json": "C5444DC06388023D6652611FDC6C521A1150341B501347D35E1F0900E8D63D42",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/reservation-intent.json": "B043D76FD91D694296D8CFD2B4F3CD8D5A9E2A20079C7E57435CDA48513BFD79",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/resume-source.json": "84E4C876FA5EBB4A6149B431AE4634B76C427991EED81B57FE9948CE94D5C0D1",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/reviewed-inputs.json": "B4A36C350150F38CD6B4DF792A35B7547DC9ADE173096B9F130F76FD1F348DF6",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/runtime-result.json": "1BEBCFECF40EFAAD8FA8080C38730C5A3B3FB0BB3F1B2B10095546394ECBC3BD",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/schema.jsonl": "B5C0937BFFF287F053402043E8E1CD0D53F760B00103C21E79DF5CCECAFEFC43",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/server.stdout.txt": "B94D2D4EFDFEFF777CE7D5C4B8D4269CF1A768CEED40D8392CA2890A0B122877",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/service-after.json": "863566152FCA9302539BC088F729289C0E29B7F96D8D896A799075F5A6EB462F",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/service-before.json": "330B30B9CDE78F063700ACA78920F4EF815282932D9B47B8E60EF1BF9189EA64",
+    "_bmad-output/implementation-artifacts/story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/stages.txt": "B11C7166B792E2B410E527BB39E56AFBB4CA0F6FCB53A3E0C690B15C632490B4"
+  }
+}

@@ -1,0 +1,15 @@
+{
+    "executed_at":  "2026-11-26T21:18:27.9017428+08:00",
+    "exit_code":  1,
+    "before_sha256":  "884398F5361B49FBB334E0AE11E548D7C56E4A4CFF1ECF893924A1B9FE9F55B7",
+    "after_sha256":  "884398F5361B49FBB334E0AE11E548D7C56E4A4CFF1ECF893924A1B9FE9F55B7",
+    "merged":  false,
+    "log":  [
+                "F:\\softwork\\SE-Management\\bmad-lab-booking-system\\_bmad-output\\implementation-artifacts\\story-2-1-targeted-independent-",
+                "recheck\\merge-story-2-1-deferred.ps1 : Exception calling \"Open\" with \"4\" argument(s): \"Access to the path \u0027F:\\softwork\\",
+                "SE-Management\\bmad-lab-booking-system\\_bmad-output\\implementation-artifacts\\deferred-work.md\u0027 is denied.\"",
+                "    + CategoryInfo          : NotSpecified: (:) [merge-story-2-1-deferred.ps1], MethodInvocationException",
+                "    + FullyQualifiedErrorId : UnauthorizedAccessException,merge-story-2-1-deferred.ps1",
+                " "
+            ]
+}

@@ -1,0 +1,1 @@
+﻿python manage.py test --keepdb --parallel 1 -v 2

@@ -1,0 +1,11 @@
+﻿Stage preflight failed (exit 1). Evidence: F:\softwork\SE-Management\bmad-lab-booking-system\_bmad-output\implementatio
+n-artifacts\story-2-1-run-20261126-172209-204-8be77a0f
+At F:\softwork\SE-Management\bmad-lab-booking-system\_bmad-output\implementation-artifacts\verify-story-2-1.ps1:61 char
+:24
++ ... de -ne 0) { throw "Stage $Name failed (exit $Code). Evidence: $storyO ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Stage preflight...09-204-8be77a0f:String) [], RuntimeException
+    + FullyQualifiedErrorId : Stage preflight failed (exit 1). Evidence: F:\softwork\SE-Management\bmad-lab-booking-sy 
+   stem\_bmad-output\implementation-artifacts\story-2-1-run-20261126-172209-204-8be77a0f
+ 
+

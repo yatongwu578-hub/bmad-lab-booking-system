@@ -1,0 +1,9 @@
+python.exe : did not find executable at 'C:\Users\15860\AppData\Local\Programs\Python\Python313\python.exe': ?????
+At F:\softwork\SE-Management\bmad-lab-booking-system\_bmad-output\implementation-artifacts\preflight-story-2-1.ps1:15 c
+har:17
++ $storyVersion = & $storyPython --version
++                 ~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (did not find ex...hon.exe': ?????:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+

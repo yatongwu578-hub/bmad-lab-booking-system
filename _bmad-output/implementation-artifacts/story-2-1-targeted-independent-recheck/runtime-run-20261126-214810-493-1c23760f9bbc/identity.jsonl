@@ -1,0 +1,3 @@
+{"db": "lab_booking", "elevated": false, "host": "127.0.0.1", "isolation": "read committed", "login": "lab_booking_migrator", "port": 5433, "role": "lab_booking_migrator", "schema_name": "public", "search_path": ["public"], "version": "170012"}
+{"db": "lab_booking", "elevated": false, "host": "127.0.0.1", "isolation": "read committed", "login": "lab_booking_app", "port": 5433, "role": "lab_booking_app", "schema_name": "public", "search_path": ["public"], "version": "170012"}
+{"db": "lab_booking", "elevated": false, "host": "127.0.0.1", "isolation": "read committed", "login": "lab_booking_migrator", "port": 5433, "role": "lab_booking_migrator", "schema_name": "public", "search_path": ["public"], "version": "170012"}

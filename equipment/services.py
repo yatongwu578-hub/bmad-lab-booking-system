@@ -2,6 +2,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import Error, transaction
 
 from accounts.models import Role, User
+from lab_booking.transactions import transaction_rejected
 
 from .models import Equipment, EquipmentStatus
 
@@ -58,6 +59,14 @@ def get_equipment_detail(user, pk):
     return _add_status_label(row)
 
 
+def lock_equipment(pk):
+    """Lock only this device by primary key inside the caller's transaction."""
+    try:
+        return Equipment.objects.filter(pk=pk).select_for_update().values_list("pk", flat=True).get()
+    except Equipment.DoesNotExist:
+        return None
+
+
 def _is_equipment_number_conflict(error):
     cause = error.__cause__
     diagnostic = getattr(cause, "diag", None)
@@ -93,15 +102,10 @@ def create_equipment(user, values):
     except Error as error:
         if _is_equipment_number_conflict(error):
             raise EquipmentNumberConflict from None
-        if ready_to_commit and not _transaction_rejected(error):
+        if ready_to_commit and not transaction_rejected(error):
             raise EquipmentCreationUnknown from None
         raise EquipmentCreationFailed from None
     return equipment
-
-
-def _transaction_rejected(error):
-    sqlstate = getattr(error.__cause__, "sqlstate", None) or ""
-    return sqlstate.startswith("23") or sqlstate in {"40001", "40002", "40P01"}
 
 
 def _textarea_newlines(value):
@@ -120,10 +124,7 @@ def edit_equipment(user, pk, values):
         if not connection.in_atomic_block and not connection.get_autocommit():
             raise RuntimeError("编辑设备要求由服务管理最外层事务。")
         with transaction.atomic(durable=True):
-            target = Equipment.objects.filter(pk=pk)
-            try:
-                target.select_for_update().values_list("pk", flat=True).get()
-            except Equipment.DoesNotExist:
+            if lock_equipment(pk) is None:
                 return False
             # The request's cached user can be stale after waiting for the device lock.
             try:
@@ -133,7 +134,7 @@ def edit_equipment(user, pk, values):
             if not active or role != Role.ADMIN:
                 raise PermissionDenied
             # Read the current row in a separate Read Committed statement after acquiring its lock.
-            current = target.values("id", *CATALOG_FIELDS, "description").get()
+            current = Equipment.objects.values("id", *CATALOG_FIELDS, "description").get(pk=pk)
             updates = {field: values[field] for field in EQUIPMENT_EDIT_FIELDS}
             # Browsers submit textarea line endings as CRLF even when the original text used LF.
             if _textarea_newlines(updates["description"]) == _textarea_newlines(current["description"]):
@@ -143,7 +144,7 @@ def edit_equipment(user, pk, values):
                 raise EquipmentEditFailed
             ready_to_commit = True
     except Error as error:
-        if ready_to_commit and not _transaction_rejected(error):
+        if ready_to_commit and not transaction_rejected(error):
             raise EquipmentEditUnknown from None
         raise EquipmentEditFailed from None
     return True

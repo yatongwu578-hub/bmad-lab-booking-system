@@ -1,0 +1,5 @@
+Operations to perform:
+  Apply all migrations: accounts, audit, auth, contenttypes, equipment, reservations, sessions
+Running migrations:
+  Applying reservations.0001_initial... OK
+  Applying audit.0001_initial... OK

@@ -1,0 +1,1 @@
+﻿python manage.py verify_reservation_transactions --group permissions --evidence F:\softwork\SE-Management\bmad-lab-booking-system\_bmad-output\implementation-artifacts\story-2-1-run-20261126-171347-146-27af94f2\permissions.jsonl

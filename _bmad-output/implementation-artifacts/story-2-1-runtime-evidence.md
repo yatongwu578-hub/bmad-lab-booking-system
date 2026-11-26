@@ -1,0 +1,13 @@
+# Story 2.1 正式运行证据
+
+已通过 D-041 的正式库验证，并在 D-042 按原始材料只读复核；本结论不来自重新迁移、重授或正式测试重跑。所有下列原始阶段时间为北京时间。目标为 PostgreSQL 17.12 `127.0.0.1:5433/lab_booking`。 [机器核验与原始文件 SHA-256](story-2-1-targeted-independent-recheck/d042-production-acceptance-crosscheck.json)
+
+| 时间 | 实际阶段、结果和核对 |
+| --- | --- |
+| 21:36 | 受保护备份成功并经 TOC 验证。仅预约、审计两项前向迁移按依赖顺序成功，登记与对象经读回确认。ACL 节点报 22023 停止，无 GRANT intent、Chrome 或预约意图。 [阶段](story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/stages.txt) · [迁移](story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/django-migrate.stdout.txt) · [SQLSTATE](story-2-1-targeted-independent-recheck/runtime-run-20261126-213638-448-312206ec440e/failure-diagnostics.jsonl) |
+| 修复 | 同版 PostgreSQL 独立重现零维空 ACL 数组错误。部署工具改为不把空／NULL ACL 送给 `aclexplode`。只改部署工具，75 份业务认证输入不漂移。原 SQL 和更正 SQL 各自保留；同版复现错误文字不冒充生产 stderr。 [诊断、修复与恢复设计](story-2-1-targeted-independent-recheck/d041-production-handoff.md#2026-11-26-实际故障与定向恢复) |
+| 21:48:02 | 只读回执 exit 0，迁移登记和表对象已存在，ACL 76 项、26 个规划列权限、实际 0，批准设备可用、预约 0、有合法未来整点。 [只读阶段](story-2-1-targeted-independent-recheck/runtime-run-20261126-214802-149-fcc085362719/stages.txt) · [状态](story-2-1-targeted-independent-recheck/runtime-run-20261126-214802-149-fcc085362719/recovery-summary.json) |
+| 21:48:10–14 | 续跑重新比对原保护备份与 TOC，未再运行迁移。三条已批准 GRANT 在单事务执行，psql exit 0、明确断言标记。提交后与独立应用角色读回均为 76 项、目标与实际均 26，显式 ACL 及受限权限校验一致。没有重复授权或范围扩张。 [续跑链](story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/resume-source.json) · [GRANT](story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/grant.stdout.txt) · [ACL 前后和应用角色实际回读](story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/acl.jsonl) |
+| 21:48:15–23 | 身份确认后重启 D-037 旧服务，仅监听本机 8001，新启动器 PID 43416、监听 PID 38704。已核对原解释器、runtime 模式和代码散列。Chrome 159 三角色和数据库独立回读均通过。预约 1，北京时间 2026-11-27 10:00–11:00，待审，目标设备 1，初始和最终历史均为空，拒绝不增加预约。 [阶段](story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/stages.txt) · [角色与 HTTP](story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/chrome-cases.jsonl) · [独立数据库](story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/demo-db.jsonl) · [运行结果](story-2-1-targeted-independent-recheck/runtime-run-20261126-214810-493-1c23760f9bbc/runtime-result.json) |
+
+正式 Chrome 批次结束后发生的团队真实体验另记。只保留限定时段去除查询串的 HTTP 摘录和之后那次 201 的佐证。不将持续变化的服务访问流、Epic 1 的旧 stderr、锁文件、备份实体、凭据或虚拟环境纳入发布。正式批次之后的响应不冒充本批独立数据库回读。 [脱敏记录](story-2-1-targeted-independent-recheck/d042-production-http-acceptance-redacted.json) · [最终验收](story-2-1-final-acceptance.md)

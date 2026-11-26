@@ -1,0 +1,5 @@
+﻿phase=remaining
+original=F:\softwork\SE-Management\bmad-lab-booking-system\_bmad-output\implementation-artifacts\story-2-1-run-20261126-171347-146-27af94f2
+interleavings=F:\softwork\SE-Management\bmad-lab-booking-system\_bmad-output\implementation-artifacts\story-2-1-recheck-2ee949f8d8014388a2d9792c86a4978c\story-2-1-run-20261126-173530-191-df47c547
+reused=migrate-isolated,check,migration-drift,regression,permissions
+baseline_sha256=5DF4D59616196EA9BC2604E46B584A1281CAD313151634F0C5F4DB0035A34272

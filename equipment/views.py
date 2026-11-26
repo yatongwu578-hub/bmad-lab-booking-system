@@ -5,6 +5,8 @@ from django.shortcuts import redirect, render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_http_methods, require_safe
 
+from accounts.policies import can_reserve
+
 from .forms import EquipmentCreateForm, EquipmentEditForm
 from .models import EquipmentStatus
 from .services import (
@@ -52,6 +54,7 @@ def equipment_detail(request, pk):
         {
             "account": request.user, "equipment": equipment,
             "edit_pk": pk if is_equipment_admin(request.user) else None,
+            "reserve_pk": pk if can_reserve(request.user) else None,
         },
     )
 

@@ -1,0 +1,158 @@
+{
+  "run": "story-2-1-remediation-run-20261126-205236-052-255e13d05b24",
+  "completed": "2026-11-26T20:53:44.0975079+08:00",
+  "evidence_revision": "D-040",
+  "targeted_run": {
+    "Django": "91/91, 0 skipped",
+    "navigation": "1/1 student and teacher",
+    "Chrome": "Chrome/159.0.8154.34",
+    "P01_http": [
+      200,
+      200,
+      400,
+      201,
+      200
+    ],
+    "P01_reservation": "205",
+    "P02_denials": "13/13",
+    "P02_target": 206,
+    "P02_state_fingerprint": "005ba513d9d80807a1c22bef04a204ae4b6bdfbb0559c7f4dda4ec50e0ca2074",
+    "P02_owner_history": 92,
+    "P02_actual_authenticated_peer": {
+      "user_id": 787,
+      "role": "student",
+      "is_active": true,
+      "is_authenticated": true,
+      "method": "GET",
+      "path": "/reservations/206/result/"
+    },
+    "P02_actual_authenticated_owner": {
+      "user_id": 784,
+      "role": "student",
+      "is_active": true,
+      "is_authenticated": true,
+      "method": "GET",
+      "path": "/reservations/206/result/"
+    },
+    "interleavings": "15/15",
+    "P03_target": 233,
+    "P03_same_owner": 234,
+    "P03_other_owner": 235,
+    "P03_history": 100,
+    "P03_backend_pids": {
+      "observer_pid": 43568,
+      "blocked_pid": 1288,
+      "blocker_pid": 28048
+    },
+    "P03_driver_bindings": [
+      {
+        "sql_index": 0,
+        "kind": "candidate",
+        "params": [
+          789,
+          233
+        ]
+      },
+      {
+        "sql_index": 1,
+        "kind": "lock",
+        "params": [
+          512
+        ]
+      },
+      {
+        "sql_index": 2,
+        "kind": "account",
+        "params": [
+          789
+        ]
+      },
+      {
+        "sql_index": 3,
+        "kind": "fixed",
+        "params": [
+          789,
+          233,
+          512
+        ]
+      },
+      {
+        "sql_index": 4,
+        "kind": "decision",
+        "params": []
+      },
+      {
+        "sql_index": 5,
+        "kind": "due",
+        "params": [
+          789,
+          233,
+          512,
+          "2026-11-26 12:53:40.950710+00:00",
+          "pending"
+        ]
+      },
+      {
+        "sql_index": 6,
+        "kind": "update",
+        "params": [
+          "expired",
+          789,
+          233,
+          512,
+          "2026-11-26 12:53:40.950710+00:00",
+          "pending",
+          233
+        ]
+      }
+    ]
+  },
+  "reused_historical": {
+    "NFR_001": "10/10, 200 responses",
+    "faults": "5/5",
+    "Beijing_boundary": "2026-11-26T18:00:00+08:00"
+  },
+  "tested_files": 75,
+  "historic_raw_files_checked": 99,
+  "database_baseline_digest": "5DF4D59616196EA9BC2604E46B584A1281CAD313151634F0C5F4DB0035A34272",
+  "evidence_file_digests": {
+    "after-db.command.txt": "7A58AF851EA479A63E1BFCF9C94486D1965084074B17B0102C81F1D2EA93F44C",
+    "after-db.jsonl": "5DF4D59616196EA9BC2604E46B584A1281CAD313151634F0C5F4DB0035A34272",
+    "after-db.stderr.txt": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+    "after-db.stdout.txt": "7956D9A122CE48598F81163A64B833652B9AACCD42F3278290D92DCF0BD776F1",
+    "after.sha256": "4A6EF690D72AEACF4D7844455081C68D2C7B3399395D7F9D4B7A2C9185DD5F4A",
+    "before-db.command.txt": "98275E3EE1EA9C59E13798BAA52AC084B5D4FA3F368075FB1E3E3CEBA544672B",
+    "before-db.jsonl": "5DF4D59616196EA9BC2604E46B584A1281CAD313151634F0C5F4DB0035A34272",
+    "before-db.stderr.txt": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+    "before-db.stdout.txt": "7956D9A122CE48598F81163A64B833652B9AACCD42F3278290D92DCF0BD776F1",
+    "before.sha256": "4A6EF690D72AEACF4D7844455081C68D2C7B3399395D7F9D4B7A2C9185DD5F4A",
+    "browser-correction.command.txt": "F8E42D02240EB4501F5CAD2D0C0766C5C55AB415156233DA34BBB6555F291C8A",
+    "browser-correction.jsonl": "D028D72DEEF5AE64B932A79A07681EA7531A256E64B45D557892079A11F2D5B5",
+    "browser-correction.stderr.txt": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+    "browser-correction.stdout.txt": "1617BEDF41828E902F6E4AD6A2A14AF5E837AC4932D92E163ACC01CBBC4E74EB",
+    "check.command.txt": "BF4141D8E4D6ABEC0F25DD5AF418F3B837799D565519B1422E48F60902148AC5",
+    "check.stderr.txt": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+    "check.stdout.txt": "F87CEB15410BDE28FF826CE26228E0576558258FA64D145847921A593A61EE63",
+    "historical-evidence.json": "5F9C7EDA1933A520370C273C3A4FFAE311DEAA4DE7531E0D9A5EADF1DE299AAE",
+    "interleavings.command.txt": "160DF694EEA251BE92B5B145CD31FA30942D55960193998D65F9CFDB7126A474",
+    "interleavings.jsonl": "8918B89460CDE60916E861B6BDD50A3C7CA0961FA20BEE9EA243853A612BA42E",
+    "interleavings.stderr.txt": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+    "interleavings.stdout.txt": "C300A77E62A3808E9034A713AA4B910D940A11B5591C7B2F9B328D7C11AB9DF3",
+    "migration-drift.command.txt": "C9345ED17706D378F887775DBE4317232FBEB7D2DDE735D4A148404ECE075E14",
+    "migration-drift.stderr.txt": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+    "migration-drift.stdout.txt": "93E6E2D5BE3C054ADD80C0F19101608803F7CA8A7DF1FA41F76BBB9A1F570F4A",
+    "navigation.command.txt": "96AC31B1B292D9C6131AC4B090CE97510A7A9A3CF9E37E22CBB252669205E633",
+    "navigation.stderr.txt": "6BC46EC1EBEF50D7E4EDB91838B602C9064169A2F2D4A5DCB674844882B1180C",
+    "navigation.stdout.txt": "EF4A724390CCAFC25128A1E88E43CCFC4A1C7A043FF8562F5157B2FD11688B04",
+    "permissions.command.txt": "6F1C6EB773A46B5CE9A8F76ABE666ABEBBF9AB10FDD560BADC57D8234A4A3260",
+    "permissions.jsonl": "66BFBF4C3FDF42C6D16FAA3DD8D3D9D8543B1136C58AFD522FF9BA49172D9C2C",
+    "permissions.stderr.txt": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+    "permissions.stdout.txt": "C41969EAC628173D9873F18B99826907115A322909D8928BA135B625684854AE",
+    "preflight.txt": "874E8DB16B5B7FE5601B0D6570FA11D46D64B9DECB8DA4E8F4E055E775C6F5B4",
+    "regression.command.txt": "637A407F8C349BC836EE5ECEFA6BC6C557AC29895C164BD8B969975B07B9DEF0",
+    "regression.stderr.txt": "B01B00BC427DC2DF55B9A62DF6EED019E13837196DCB387355B6FCCA42BBEF32",
+    "regression.stdout.txt": "83AF6928CACD7CC9788F68FF5F320B64958E963C0BA15DD0E33A54A38E4FEB09",
+    "stages.txt": "536D063199BF7CCF1F109CAC87935B1F936C742F8E7DC1355095C201638F1FF6",
+    "summary.json": "7A4BB0D09A758AB112835209BEE8482B8A95720E6E86EB35DFA13AA841FB01F6"
+  }
+}

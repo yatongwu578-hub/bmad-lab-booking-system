@@ -1,0 +1,6 @@
+2026-11-26T21:36:39.2255959+08:00 python-version exit=0
+2026-11-26T21:36:39.4543916+08:00 pg_restore-version exit=0
+2026-11-26T21:36:39.5134800+08:00 pg_dump-version exit=0
+2026-11-26T21:36:39.5824856+08:00 psql-version exit=0
+2026-11-26T21:36:42.7261229+08:00 production-database exit=1
+2026-11-26T21:36:42.7344817+08:00 run-stopped exit=1; do not replay any write

@@ -1,0 +1,10 @@
+{"case": "version", "origin": "http://127.0.0.1:8001", "product": "Chrome/159.0.8154.34"}
+{"authenticated": true, "case": "identity", "http": 200, "role": "student"}
+{"case": "navigation", "detail": "/equipment/1/", "form_link": true, "role": "student"}
+{"case": "student", "form": "/equipment/1/reserve/", "own_read": 200, "post": 201, "result": "/reservations/1/result/"}
+{"authenticated": true, "case": "identity", "http": 200, "role": "teacher"}
+{"case": "navigation", "detail": "/equipment/1/", "form_link": true, "role": "teacher"}
+{"absent_control": 404, "case": "teacher", "foreign_read": 404, "no_leak": true, "no_write": true, "post": 409}
+{"authenticated": true, "case": "identity", "http": 200, "role": "admin"}
+{"case": "navigation", "detail": "/equipment/1/", "form_link": false, "role": "admin"}
+{"case": "admin", "foreign_read": 403, "form_link": false, "get": 403, "no_write": true, "post": 403}

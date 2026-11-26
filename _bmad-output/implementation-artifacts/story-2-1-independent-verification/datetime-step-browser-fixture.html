@@ -1,0 +1,18 @@
+<!doctype html>
+<meta charset="utf-8">
+<form id="fresh"><input id="blank" type="datetime-local" step="3600" required></form>
+<form id="bound"><input id="retry" type="datetime-local" step="3600" value="2026-11-28T10:30" required></form>
+<pre id="result"></pre>
+<script>
+const fresh = document.querySelector('#blank'), retry = document.querySelector('#retry');
+const initial = retry.validity.stepMismatch;
+fresh.value = retry.value = '2026-11-28T10:00';
+const result = {
+  initialBoundHalfHourStepMismatch: initial,
+  freshWholeHourValid: fresh.checkValidity(),
+  correctedBoundWholeHourValid: retry.checkValidity(),
+  correctedBoundStepMismatch: retry.validity.stepMismatch,
+  correctedValue: retry.value
+};
+document.getElementById('result').textContent = JSON.stringify(result);
+</script>

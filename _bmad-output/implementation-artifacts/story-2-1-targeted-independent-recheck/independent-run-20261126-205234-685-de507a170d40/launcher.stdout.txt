@@ -1,0 +1,11 @@
+Story 2.1 remediation output: F:\softwork\SE-Management\bmad-lab-booking-system\_bmad-output\implementation-artifacts\story-2-1-remediation-run-20261126-205236-052-255e13d05b24
+Running before-db
+Running check
+Running migration-drift
+Running regression
+Running navigation
+Running browser-correction
+Running permissions
+Running interleavings
+Running after-db
+STORY21_REMEDIATION_OK F:\softwork\SE-Management\bmad-lab-booking-system\_bmad-output\implementation-artifacts\story-2-1-remediation-run-20261126-205236-052-255e13d05b24

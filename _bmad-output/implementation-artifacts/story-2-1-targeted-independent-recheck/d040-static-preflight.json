@@ -1,0 +1,13 @@
+{
+    "manifestDryRun":  {
+                           "result":  "same-current-tree two passes, no test runtime",
+                           "inputFileCount":  75,
+                           "sha256":  "4A6EF690D72AEACF4D7844455081C68D2C7B3399395D7F9D4B7A2C9185DD5F4A"
+                       },
+    "powershellParse":  "2 scripts pass",
+    "launcherSha256":  "885014C61C690A959B00222CD4293B35A605B348179B4F3DDED2B9FFAC579200",
+    "auditorSha256":  "8DA622C75BF661C0A1DCA145803945BDCB73902C42AF5204B30968F0873F0F32",
+    "wrapperSha256":  "9A5667B063147E5F252E66C1AB5C4354BD76525F71B40295A7C4592F5999007F",
+    "managementProbeSha256":  "1AE129E802721B7822CA5EC5D8FEF21E0274E49968809EF03C04F991AC7CF972",
+    "actualIndependentRuns":  0
+}

@@ -1,0 +1,102 @@
+;
+; Archive created at 2026-11-26 21:36:41
+;     dbname: lab_booking
+;     TOC Entries: 92
+;     Compression: gzip
+;     Dump Version: 1.16-0
+;     Format: CUSTOM
+;     Integer: 4 bytes
+;     Offset: 8 bytes
+;     Dumped from database version: 17.12
+;     Dumped by pg_dump version: 17.12
+;
+;
+; Selected TOC Entries:
+;
+5013; 0 0 ACL - SCHEMA public pg_database_owner
+228; 1259 24639 TABLE public accounts_user lab_booking_migrator
+5014; 0 0 ACL public TABLE accounts_user lab_booking_migrator
+5015; 0 0 ACL public COLUMN accounts_user.password lab_booking_migrator
+5016; 0 0 ACL public COLUMN accounts_user.last_login lab_booking_migrator
+230; 1259 24650 TABLE public accounts_user_groups lab_booking_migrator
+229; 1259 24649 SEQUENCE public accounts_user_groups_id_seq lab_booking_migrator
+227; 1259 24638 SEQUENCE public accounts_user_id_seq lab_booking_migrator
+232; 1259 24656 TABLE public accounts_user_user_permissions lab_booking_migrator
+231; 1259 24655 SEQUENCE public accounts_user_user_permissions_id_seq lab_booking_migrator
+224; 1259 24599 TABLE public auth_group lab_booking_migrator
+223; 1259 24598 SEQUENCE public auth_group_id_seq lab_booking_migrator
+226; 1259 24607 TABLE public auth_group_permissions lab_booking_migrator
+225; 1259 24606 SEQUENCE public auth_group_permissions_id_seq lab_booking_migrator
+222; 1259 24593 TABLE public auth_permission lab_booking_migrator
+221; 1259 24592 SEQUENCE public auth_permission_id_seq lab_booking_migrator
+220; 1259 24585 TABLE public django_content_type lab_booking_migrator
+219; 1259 24584 SEQUENCE public django_content_type_id_seq lab_booking_migrator
+218; 1259 24577 TABLE public django_migrations lab_booking_migrator
+5017; 0 0 ACL public TABLE django_migrations lab_booking_migrator
+217; 1259 24576 SEQUENCE public django_migrations_id_seq lab_booking_migrator
+233; 1259 24690 TABLE public django_session lab_booking_migrator
+5018; 0 0 ACL public TABLE django_session lab_booking_migrator
+235; 1259 32780 TABLE public equipment_equipment lab_booking_migrator
+5019; 0 0 ACL public COLUMN equipment_equipment.id lab_booking_migrator
+5020; 0 0 ACL public COLUMN equipment_equipment.number lab_booking_migrator
+5021; 0 0 ACL public COLUMN equipment_equipment.name lab_booking_migrator
+5022; 0 0 ACL public COLUMN equipment_equipment.category lab_booking_migrator
+5023; 0 0 ACL public COLUMN equipment_equipment.location lab_booking_migrator
+5024; 0 0 ACL public COLUMN equipment_equipment.description lab_booking_migrator
+5025; 0 0 ACL public COLUMN equipment_equipment.status lab_booking_migrator
+234; 1259 32779 SEQUENCE public equipment_equipment_id_seq lab_booking_migrator
+4998; 0 24639 TABLE DATA public accounts_user lab_booking_migrator
+5000; 0 24650 TABLE DATA public accounts_user_groups lab_booking_migrator
+5002; 0 24656 TABLE DATA public accounts_user_user_permissions lab_booking_migrator
+4994; 0 24599 TABLE DATA public auth_group lab_booking_migrator
+4996; 0 24607 TABLE DATA public auth_group_permissions lab_booking_migrator
+4992; 0 24593 TABLE DATA public auth_permission lab_booking_migrator
+4990; 0 24585 TABLE DATA public django_content_type lab_booking_migrator
+4988; 0 24577 TABLE DATA public django_migrations lab_booking_migrator
+5003; 0 24690 TABLE DATA public django_session lab_booking_migrator
+5005; 0 32780 TABLE DATA public equipment_equipment lab_booking_migrator
+5026; 0 0 SEQUENCE SET public accounts_user_groups_id_seq lab_booking_migrator
+5027; 0 0 SEQUENCE SET public accounts_user_id_seq lab_booking_migrator
+5028; 0 0 SEQUENCE SET public accounts_user_user_permissions_id_seq lab_booking_migrator
+5029; 0 0 SEQUENCE SET public auth_group_id_seq lab_booking_migrator
+5030; 0 0 SEQUENCE SET public auth_group_permissions_id_seq lab_booking_migrator
+5031; 0 0 SEQUENCE SET public auth_permission_id_seq lab_booking_migrator
+5032; 0 0 SEQUENCE SET public django_content_type_id_seq lab_booking_migrator
+5033; 0 0 SEQUENCE SET public django_migrations_id_seq lab_booking_migrator
+5034; 0 0 SEQUENCE SET public equipment_equipment_id_seq lab_booking_migrator
+4817; 2606 24654 CONSTRAINT public accounts_user_groups accounts_user_groups_pkey lab_booking_migrator
+4820; 2606 24663 CONSTRAINT public accounts_user_groups accounts_user_groups_user_id_group_id_59c0b32f_uniq lab_booking_migrator
+4811; 2606 24646 CONSTRAINT public accounts_user accounts_user_pkey lab_booking_migrator
+4822; 2606 24677 CONSTRAINT public accounts_user_user_permissions accounts_user_user_permi_user_id_permission_id_2ab516c2_uniq lab_booking_migrator
+4825; 2606 24660 CONSTRAINT public accounts_user_user_permissions accounts_user_user_permissions_pkey lab_booking_migrator
+4814; 2606 24648 CONSTRAINT public accounts_user accounts_user_username_key lab_booking_migrator
+4801; 2606 24636 CONSTRAINT public auth_group auth_group_name_key lab_booking_migrator
+4806; 2606 24622 CONSTRAINT public auth_group_permissions auth_group_permissions_group_id_permission_id_0cd325b0_uniq lab_booking_migrator
+4809; 2606 24611 CONSTRAINT public auth_group_permissions auth_group_permissions_pkey lab_booking_migrator
+4803; 2606 24603 CONSTRAINT public auth_group auth_group_pkey lab_booking_migrator
+4796; 2606 24613 CONSTRAINT public auth_permission auth_permission_content_type_id_codename_01ab375a_uniq lab_booking_migrator
+4798; 2606 24597 CONSTRAINT public auth_permission auth_permission_pkey lab_booking_migrator
+4791; 2606 24591 CONSTRAINT public django_content_type django_content_type_app_label_model_76bd3d3b_uniq lab_booking_migrator
+4793; 2606 24589 CONSTRAINT public django_content_type django_content_type_pkey lab_booking_migrator
+4789; 2606 24583 CONSTRAINT public django_migrations django_migrations_pkey lab_booking_migrator
+4829; 2606 24696 CONSTRAINT public django_session django_session_pkey lab_booking_migrator
+4832; 2606 32787 CONSTRAINT public equipment_equipment equipment_equipment_pkey lab_booking_migrator
+4834; 2606 32789 CONSTRAINT public equipment_equipment equipment_number_unique lab_booking_migrator
+4815; 1259 24675 INDEX public accounts_user_groups_group_id_bd11a704 lab_booking_migrator
+4818; 1259 24674 INDEX public accounts_user_groups_user_id_52b62117 lab_booking_migrator
+4823; 1259 24689 INDEX public accounts_user_user_permissions_permission_id_113bb443 lab_booking_migrator
+4826; 1259 24688 INDEX public accounts_user_user_permissions_user_id_e4f0a161 lab_booking_migrator
+4812; 1259 24661 INDEX public accounts_user_username_6088629e_like lab_booking_migrator
+4799; 1259 24637 INDEX public auth_group_name_a6ea08ec_like lab_booking_migrator
+4804; 1259 24633 INDEX public auth_group_permissions_group_id_b120cbf9 lab_booking_migrator
+4807; 1259 24634 INDEX public auth_group_permissions_permission_id_84c5c92e lab_booking_migrator
+4794; 1259 24619 INDEX public auth_permission_content_type_id_2f476e4b lab_booking_migrator
+4827; 1259 24698 INDEX public django_session_expire_date_a5c62663 lab_booking_migrator
+4830; 1259 24697 INDEX public django_session_session_key_c0390e0f_like lab_booking_migrator
+4838; 2606 24669 FK CONSTRAINT public accounts_user_groups accounts_user_groups_group_id_bd11a704_fk_auth_group_id lab_booking_migrator
+4839; 2606 24664 FK CONSTRAINT public accounts_user_groups accounts_user_groups_user_id_52b62117_fk_accounts_user_id lab_booking_migrator
+4840; 2606 24683 FK CONSTRAINT public accounts_user_user_permissions accounts_user_user_p_permission_id_113bb443_fk_auth_perm lab_booking_migrator
+4841; 2606 24678 FK CONSTRAINT public accounts_user_user_permissions accounts_user_user_p_user_id_e4f0a161_fk_accounts_ lab_booking_migrator
+4836; 2606 24628 FK CONSTRAINT public auth_group_permissions auth_group_permissio_permission_id_84c5c92e_fk_auth_perm lab_booking_migrator
+4837; 2606 24623 FK CONSTRAINT public auth_group_permissions auth_group_permissions_group_id_b120cbf9_fk_auth_group_id lab_booking_migrator
+4835; 2606 24614 FK CONSTRAINT public auth_permission auth_permission_content_type_id_2f476e4b_fk_django_co lab_booking_migrator

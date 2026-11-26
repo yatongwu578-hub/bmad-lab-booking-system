@@ -1,0 +1,11 @@
+[41836:39612:1126/182049.554:ERROR:chrome\installer\util\google_update_settings_win.cc:272] Failed opening key Software\Google\Update\ClientStateMedium\{8A69D345-D564-463c-AFF1-A69D9E530F96} to set usagestats; result: 5
+[41836:42688:1126/182049.735:ERROR:content\browser\gpu\gpu_process_host.cc:1034] GPU process exited unexpectedly: exit_code=-1073741790
+[41836:39612:1126/182049.745:ERROR:components\viz\host\persistent_cache_sandboxed_file_factory.cc:157] Failed to open persistent cache files in directory "C:\Users\15860\AppData\Local\Temp\story21-review-chrome-2fee5ffa0b8b43b9b2df608c4eb05a6d\GPUPersistentCache\DawnGraphiteCache\6NHORK7GWQAOMNXN2NTMJYMP3WZ3XA66", error: 0: 另一个程序正在使用此文件，进程无法访问。 (0x20)
+[41836:42688:1126/182049.797:ERROR:content\browser\gpu\gpu_process_host.cc:1034] GPU process exited unexpectedly: exit_code=-1073741790
+[41836:42688:1126/182049.829:ERROR:content\browser\gpu\gpu_process_host.cc:1034] GPU process exited unexpectedly: exit_code=-1073741790
+[41836:34928:1126/182049.831:ERROR:components\viz\host\persistent_cache_sandboxed_file_factory.cc:157] Failed to open persistent cache files in directory "C:\Users\15860\AppData\Local\Temp\story21-review-chrome-2fee5ffa0b8b43b9b2df608c4eb05a6d\GPUPersistentCache\DawnGraphiteCache\6NHORK7GWQAOMNXN2NTMJYMP3WZ3XA66", error: 0: 另一个程序正在使用此文件，进程无法访问。 (0x20)
+[41836:42688:1126/182049.859:ERROR:content\browser\gpu\gpu_process_host.cc:1034] GPU process exited unexpectedly: exit_code=-1073741790
+[41836:42688:1126/182049.879:ERROR:content\browser\gpu\gpu_process_host.cc:1034] GPU process exited unexpectedly: exit_code=-1073741790
+[41836:39612:1126/182049.881:ERROR:components\viz\host\persistent_cache_sandboxed_file_factory.cc:157] Failed to open persistent cache files in directory "C:\Users\15860\AppData\Local\Temp\story21-review-chrome-2fee5ffa0b8b43b9b2df608c4eb05a6d\GPUPersistentCache\DawnGraphiteCache\6NHORK7GWQAOMNXN2NTMJYMP3WZ3XA66", error: 0: 另一个程序正在使用此文件，进程无法访问。 (0x20)
+[41836:42688:1126/182049.901:ERROR:content\browser\gpu\gpu_process_host.cc:1034] GPU process exited unexpectedly: exit_code=-1073741790
+[41836:42688:1126/182049.902:FATAL:content\browser\gpu\gpu_data_manager_impl_private.cc:387] GPU process isn't usable. Goodbye.

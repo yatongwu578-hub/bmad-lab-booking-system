@@ -1,0 +1,7 @@
+Found 1 test(s).
+已核验并保留 127.0.0.1:5433/test_lab_booking，角色 lab_booking_test，PostgreSQL 17.12。
+测试前：12 张表、19 条迁移、0 个账号、0 条会话。
+System check identified no issues (0 silenced).
+STORY21_NAVIGATION student /equipment/ /equipment/431/ /equipment/431/reserve/ /reservations/131/result/
+STORY21_NAVIGATION teacher /equipment/ /equipment/432/ /equipment/432/reserve/ /reservations/132/result/
+测试后：12 张表、19 条迁移、0 个账号、0 条会话。

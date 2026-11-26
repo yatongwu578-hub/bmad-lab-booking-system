@@ -1,0 +1,24 @@
+{
+    "purpose":  "independent D-040 targeted retest",
+    "evidence_revision":  "D-040",
+    "started":  "2026-11-26T20:52:34.5685551+08:00",
+    "target":  "127.0.0.1:5433/test_lab_booking",
+    "baseline":  "e196aba098771a31eb203be4270b460d5e0aab42",
+    "review_diff_sha256":  "FD6CE7161481C4899B6DB6DEE26B4A13D17756914D7DDB18B3E1DB298F625727",
+    "child_launcher_sha256":  "885014C61C690A959B00222CD4293B35A605B348179B4F3DDED2B9FFAC579200",
+    "auditor_sha256":  "8DA622C75BF661C0A1DCA145803945BDCB73902C42AF5204B30968F0873F0F32",
+    "wrapper_sha256":  "9A5667B063147E5F252E66C1AB5C4354BD76525F71B40295A7C4592F5999007F",
+    "reused":  [
+                   "nfr001-standard",
+                   "faults",
+                   "time-boundaries"
+               ],
+    "fresh":  [
+                  "regression-91",
+                  "navigation",
+                  "browser-correction",
+                  "permissions",
+                  "interleavings"
+              ],
+    "child_metadata_note":  "D-040 enables actual request principal and I7 driver bindings; fresh and archived evidence remain separate."
+}

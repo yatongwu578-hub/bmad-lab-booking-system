@@ -1,0 +1,24 @@
+{
+  "method": "Offline second pass over developer archive; no server or DB contacted",
+  "P02": {
+    "denied_business_sql_dml": [
+      0,
+      0
+    ],
+    "same_role_target": 134,
+    "owner_correct_target_twice": true,
+    "owner_business_dml_then_repeat": [
+      2,
+      0
+    ],
+    "authenticated_principal_logged": false
+  },
+  "P03": {
+    "untouched_device_equal": true,
+    "original_target_only_status_changed": true,
+    "unchanged_terminal_exact_row": true,
+    "added_candidate_fields_preserved": true,
+    "lock_time_reread_between_account_recheck_and_clock": true,
+    "parameter_binding_logged": false
+  }
+}

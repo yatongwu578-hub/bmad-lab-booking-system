@@ -1,0 +1,1 @@
+"F:\softwork\SE-Management\bmad-lab-booking-system\.venv\Scripts\python.exe" "manage.py" "verify_reservation_transactions" "--group" "interleavings" "--evidence" "F:\softwork\SE-Management\bmad-lab-booking-system\_bmad-output\implementation-artifacts\story-2-1-remediation-run-20261126-205236-052-255e13d05b24\interleavings.jsonl" "--traceback"

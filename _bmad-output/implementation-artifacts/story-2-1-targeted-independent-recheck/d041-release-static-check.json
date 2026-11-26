@@ -1,0 +1,12 @@
+{
+  "python_ast": "passed",
+  "generated_transaction": "textually checked; not sent to PostgreSQL",
+  "only_grants": 3,
+  "guard_blocks_with_forced_error": 3,
+  "role_acl_table_width": "76 / 26, pre/post",
+  "schema_normalization_controls": "2 offline",
+  "grant_file_sha256": "0F096AF2C9C1B823EE059EC6BD187B3C1FE80AAFD7D1951CFC8F06014697FF08",
+  "helper_sha256": "34CB1274CE7D6582DD26AE79CA2F32CF2A21027E324B551D8E2E426C01213675",
+  "runtime_started": false,
+  "postgres_connected": false
+}

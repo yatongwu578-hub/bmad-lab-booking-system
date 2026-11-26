@@ -1,0 +1,1 @@
+{"both_migrated": true, "registration_and_objects": [[{"app": "audit", "name": "0001_initial"}, {"app": "reservations", "name": "0001_initial"}], [{"relname": "audit_operationhistory"}, {"relname": "reservations_reservation"}]]}

@@ -1,0 +1,8 @@
+{
+    "at":  "2026-11-26T21:20:41.2980543+08:00",
+    "listen_port":  8001,
+    "observed_listener":  18648,
+    "action":  "read only; no HTTP or service changes",
+    "identity_verified":  false,
+    "error":  "Cannot establish process identity."
+}

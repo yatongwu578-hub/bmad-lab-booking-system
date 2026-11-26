@@ -1,0 +1,3 @@
+{"check": "effective column matrix", "stage": "read-only-recovery"}
+{"check": "explicit catalog ACL", "stage": "read-only-recovery"}
+{"check": "effective table and delegation ACL", "stage": "read-only-recovery"}

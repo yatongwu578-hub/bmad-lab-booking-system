@@ -1,0 +1,6 @@
+test_student_teacher_follow_rendered_links_and_submit (review_navigation.IndependentNavigationReview.test_student_teacher_follow_rendered_links_and_submit) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 1.817s
+
+OK

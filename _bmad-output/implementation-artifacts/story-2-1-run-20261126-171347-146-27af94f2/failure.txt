@@ -1,0 +1,10 @@
+﻿Stage interleavings failed (exit 1). Evidence: F:\softwork\SE-Management\bmad-lab-booking-system\_bmad-output\implementation-artifacts\story-2-1-run-20261126
+-171347-146-27af94f2
+所在位置 F:\softwork\SE-Management\bmad-lab-booking-system\_bmad-output\implementation-artifacts\verify-story-2-1.ps1:51 字符: 24
++ ... de -ne 0) { throw "Stage $Name failed (exit $Code). Evidence: $storyO ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Stage interleav...47-146-27af94f2:String) [], RuntimeException
+    + FullyQualifiedErrorId : Stage interleavings failed (exit 1). Evidence: F:\softwork\SE-Management\bmad-lab-booking-system\_bmad-output\implementation-a 
+   rtifacts\story-2-1-run-20261126-171347-146-27af94f2
+ 
+

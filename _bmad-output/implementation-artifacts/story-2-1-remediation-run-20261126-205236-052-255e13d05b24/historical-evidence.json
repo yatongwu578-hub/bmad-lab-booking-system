@@ -1,0 +1,17 @@
+{
+    "time-boundaries":  {
+                            "path":  "F:\\softwork\\SE-Management\\bmad-lab-booking-system\\_bmad-output\\implementation-artifacts\\story-2-1-recheck-2ee949f8d8014388a2d9792c86a4978c\\story-2-1-run-20261126-173610-155-37026c15\\time-boundaries.jsonl",
+                            "sha256":  "BCCB5AFA5B7F2AC96F8B0454F0A69EA6E4A1CA157A95E84946DCD5CF4C308C9E",
+                            "records":  4
+                        },
+    "faults":  {
+                   "path":  "F:\\softwork\\SE-Management\\bmad-lab-booking-system\\_bmad-output\\implementation-artifacts\\story-2-1-recheck-2ee949f8d8014388a2d9792c86a4978c\\story-2-1-run-20261126-173610-155-37026c15\\faults.jsonl",
+                   "sha256":  "FC59FC3DC9B32531A4E02FE0DB7D03100B615E93ECF6C56935A3AA96503C2FD2",
+                   "records":  5
+               },
+    "nfr001-standard":  {
+                            "path":  "F:\\softwork\\SE-Management\\bmad-lab-booking-system\\_bmad-output\\implementation-artifacts\\story-2-1-recheck-2ee949f8d8014388a2d9792c86a4978c\\story-2-1-run-20261126-173610-155-37026c15\\nfr001-standard.jsonl",
+                            "sha256":  "3364EDF809D5F11C2E865C6608636C6A80FA16736D16C74CA4E1C759D9A7AEC1",
+                            "records":  10
+                        }
+}

@@ -1,0 +1,1 @@
+﻿python manage.py verify_reservation_transactions --group nfr001-standard --evidence F:\softwork\SE-Management\bmad-lab-booking-system\_bmad-output\implementation-artifacts\story-2-1-recheck-2ee949f8d8014388a2d9792c86a4978c\story-2-1-run-20261126-173610-155-37026c15\nfr001-standard.jsonl --traceback

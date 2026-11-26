@@ -1,0 +1,1 @@
+"F:\softwork\SE-Management\bmad-lab-booking-system\.venv\Scripts\python.exe" "manage.py" "test" "--keepdb" "--parallel" "1" "-v" "2"

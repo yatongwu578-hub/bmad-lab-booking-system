@@ -1,0 +1,9 @@
+{
+  "source": "offline textual crosscheck of archived Django sqlmigrate outputs and proposed SQL, no SQL executed",
+  "grant_statements": 3,
+  "in_scope_columns": 19,
+  "acl_matrix_rows": 76,
+  "effective_expected_true": 26,
+  "audit_target_fks_and_check": true,
+  "plan_sha256": "84F8FBD83282F4CB39A618C18BCB8D65EADC953C449879D6B9324A4777D19A4A"
+}

@@ -1,0 +1,12 @@
+{"check": "effective column matrix", "stage": "resume-preflight"}
+{"check": "explicit catalog ACL", "stage": "resume-preflight"}
+{"check": "effective table and delegation ACL", "stage": "resume-preflight"}
+{"check": "effective column matrix", "stage": "before"}
+{"check": "explicit catalog ACL", "stage": "before"}
+{"check": "effective table and delegation ACL", "stage": "before"}
+{"check": "effective column matrix", "stage": "after-commit"}
+{"check": "explicit catalog ACL", "stage": "after-commit"}
+{"check": "effective table and delegation ACL", "stage": "after-commit"}
+{"check": "effective column matrix", "stage": "independent-runtime-role"}
+{"check": "explicit catalog ACL", "stage": "independent-runtime-role"}
+{"check": "effective table and delegation ACL", "stage": "independent-runtime-role"}

@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>预约结果 · 实验室设备预约</title></head>
+<body><main>
+    {% if error %}
+        <h1>预约结果</h1>
+        <p role="alert">{{ error }}</p>
+    {% else %}
+        <h1>{% if created %}预约申请提交成功{% else %}我的预约结果{% endif %}</h1>
+        <dl>
+            <dt>记录编号</dt><dd>{{ record.id|stringformat:"d" }}</dd>
+            <dt>设备</dt><dd>{{ record.equipment__number }} · {{ record.equipment__name }}</dd>
+            <dt>时段（北京时间）</dt><dd>{{ record.start_text }} 至 {{ record.end_text }}</dd>
+            <dt>{% if created %}提交时状态{% else %}当前状态{% endif %}</dt><dd>{{ record.status_label }}</dd>
+        </dl>
+        {% if created %}<p><a href="{% url 'reservation-result' record.id %}">查看本人预约结果</a></p>{% endif %}
+    {% endif %}
+</main></body>
+</html>

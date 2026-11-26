@@ -1,0 +1,1 @@
+{"acl": "exact", "authorized_account_ids": {"admin": 1, "student": 2, "teacher": 3}, "backup": "original protected archive verified", "device": {"id": 1, "number": "EQ-DEMO-S12-20261125", "status": "available"}, "migrations": [["reservations", "0001_initial"], ["audit", "0001_initial"]], "scope": "lab_booking"}

@@ -103,6 +103,15 @@ Story 1.4 已通过负责人最终验收，状态为 `done`。独立复验及 D-
 
 Story 1.4 不新增迁移。D-032 仅批准实施及隔离自测，后续 D-035 才另行批准并完成本机正式库四列 `UPDATE (name, category, location, description)`。未增加表级 UPDATE、DELETE 或其他权限，原读取和新增权限不变。恢复阶段仅核验现有 ACL，没有重复授权。 [开发证据](_bmad-output/implementation-artifacts/story-1-4-dev-evidence.md) · [D-035 事后验证](decision-log.md#d-035-2026-11-26-负责人关闭-story-14-四项发现并批准正式库验证)
 
+### Story 2.1 · 设备预约申请（已验收）
+
+Story 2.1 已按 D-042 最终验收，状态为 `done`。本机验证地址为 `http://127.0.0.1:8001/login/`。学生、教师登录后从「设备目录 → 具体设备 → 申请预约」进入，演示设备的申请路径为 `/equipment/1/reserve/`。申请成功立即形成待审核占用，确认页可进入该条本人结果。管理员不能提交预约。本人全部预约和管理员预约管理分别由 Story 2.3、2.5 提供，并非此版本入口。
+
+本机正式库已按 D-041 应用 `reservations.0001_initial` 和 `audit.0001_initial`，并核验运行角色最小列 ACL，包括预约查询、插入、仅 `status` 更新，以及审计允许列插入和 `SELECT(id)`。恢复续跑不重复迁移。不要在已验证环境重放发布或演示预约。重新启动已验证的本地服务时，先核对 8001 监听归属，使用原 .venv 与 `LAB_BOOKING_DB_MODE=runtime`，不终止未知进程。 [最终验收](_bmad-output/implementation-artifacts/story-2-1-final-acceptance.md) · [正式迁移、授权与运行证据](_bmad-output/implementation-artifacts/story-2-1-runtime-evidence.md)
+
+
+### 隔离库自动化测试
+
 使用已迁移的预建隔离库运行完整自动化测试。入口先核验连接与角色权限，检查无待迁移项且账号和会话为空。随后在单进程运行回滚式测试，并比较前后表清单、迁移记录、账号数和会话数。库不存在或核验失败时停止。此入口保留隔离库，不访问维护库，不执行建库、迁移、清库或删库。
 
 ```powershell
@@ -122,7 +131,7 @@ $env:LAB_BOOKING_DB_MODE = 'test'
 
 罗思婕、周何馨于 2026-11-19 完成业务与质量审核。吴亚彤于 2026-11-21 批准两轮范围和逐项处置，随后确认排期并正式批准 Sprint 1 启动。Sprint 1 为 11 月 22 日至 26 日，保留 1.1～1.4、2.1、2.2、2.3、2.5。Sprint 2 为 11 月 27 日至 29 日，保留 2.4、2.6、2.7、2.8、3.1。2.1 首次验收保留 NFR-001 的 20 个独立授权请求 × 10 轮，实验 A 的 2.6／2.7 保留为候选。R-01、R-03 沿用批准和验收证据，R-04、Read Committed 与 T-01～T-04 按既定节点落实。 [Sprint 启动交接](_bmad-output/planning-artifacts/sprint-plan.md#9-sprint-1-启动确认与-story-11-交接) · [D-017](decision-log.md#d-017-2026-11-21-负责人正式批准-sprint-1-启动)
 
-正式开发一条 Story 一个独立 bmad-build 会话，代码实现后新开会话执行 bmad-code-review。真实测试、问题处置及负责人验收满足后才能标为 done。实验 Y 的一句需求干净对照路径须实验前确认。Story 1.1～1.4 已经负责人最终验收。Epic 1 登录、设备新增、目录详情和编辑增量完成，并已按证据回顾收尾。Sprint 1 未全部完成，Story 2.1 及其余未开始 Story 保持 `backlog`。 [Sprint 跟踪](_bmad-output/implementation-artifacts/sprint-status.yaml) · [Story 1.4 验收](_bmad-output/implementation-artifacts/story-1-4-final-acceptance.md) · [Epic 1 回顾](_bmad-output/implementation-artifacts/epic-1-retro-2026-11-26.md) · [项目回顾索引](retrospective.md)
+正式开发一条 Story 一个独立 bmad-build 会话，代码实现后新开会话执行 bmad-code-review。真实测试、问题处置及负责人验收满足后才能标为 done。实验 Y 的一句需求干净对照路径须实验前确认。Story 1.1～1.4 已经负责人最终验收。Epic 1 登录、设备新增、目录详情和编辑增量完成，并已按证据回顾收尾。Story 2.1 已通过最终验收。Epic 2 为 `in-progress`，2.2 及其他未开始 Story 为 `backlog`，Sprint 1 未全部完成。 [Sprint 跟踪](_bmad-output/implementation-artifacts/sprint-status.yaml) · [Story 1.4 验收](_bmad-output/implementation-artifacts/story-1-4-final-acceptance.md) · [Epic 1 回顾](_bmad-output/implementation-artifacts/epic-1-retro-2026-11-26.md) · [项目回顾索引](retrospective.md)
 
 ## 项目与当前进度
 

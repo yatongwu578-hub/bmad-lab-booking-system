@@ -1,0 +1,41 @@
+{
+    "timestamp":  "2026-11-26T19:45:37.0593539+08:00",
+    "baseline":  "e196aba098771a31eb203be4270b460d5e0aab42",
+    "raw_logs_preserved":  99,
+    "source_or_test_input_hashes_preserved":  72,
+    "independent_runs":  0,
+    "writes":  [
+                   {
+                       "file":  "spec-2-1-submit-reservation.md",
+                       "sha_before":  "F1C6D12B935CBFA7CC8FB54A5DED8775432824B335B432A88E2EE86FF730ECB5",
+                       "sha_after":  "0C09C7558EC37EBA893CF4A62E859522EC60A4ABB07411956BBD3B9E9F64A9E5",
+                       "state":  "written",
+                       "error":  null,
+                       "pending":  null
+                   },
+                   {
+                       "file":  "sprint-status.yaml",
+                       "sha_before":  "DD9EA0E20B84CF895C8BEE22DA60C084898EC47D293C00FBE856A747C0E6B6E3",
+                       "sha_after":  "F50835A1CA0369A10C42D7D62870B0C9F86F262E73ACF392D70139F6076BF39A",
+                       "state":  "written",
+                       "error":  null,
+                       "pending":  null
+                   },
+                   {
+                       "file":  "decision-log.md",
+                       "sha_before":  "C9607994400FF7522EAF396D5C6610184FBC97117F724CCD4522C4E7AA22AFDA",
+                       "sha_after":  "763C4B8FD47B49C16EE4860859F936E661546F253A1C34DFE444A1F6EA8600DB",
+                       "state":  "written",
+                       "error":  null,
+                       "pending":  null
+                   },
+                   {
+                       "file":  "deferred-work.md",
+                       "sha_before":  "884398F5361B49FBB334E0AE11E548D7C56E4A4CFF1ECF893924A1B9FE9F55B7",
+                       "sha_after":  "884398F5361B49FBB334E0AE11E548D7C56E4A4CFF1ECF893924A1B9FE9F55B7",
+                       "state":  "pending",
+                       "error":  "对路径“F:\\softwork\\SE-Management\\bmad-lab-booking-system\\_bmad-output\\implementation-artifacts\\deferred-work.md”的访问被拒绝。",
+                       "pending":  "story-2-1-deferred-work-appendix.md"
+                   }
+               ]
+}

@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "accounts",
     "equipment",
+    "reservations",
+    "audit",
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

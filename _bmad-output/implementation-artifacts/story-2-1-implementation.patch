@@ -1,0 +1,2164 @@
+diff --git a/accounts/policies.py b/accounts/policies.py
+new file mode 100644
+index 0000000..bf79bb4
+--- /dev/null
++++ b/accounts/policies.py
+@@ -0,0 +1,8 @@
++from .models import Role
++
++
++RESERVATION_ROLES = (Role.STUDENT, Role.TEACHER)
++
++
++def can_reserve(user):
++    return user.is_authenticated and user.is_active and user.role in RESERVATION_ROLES
+diff --git a/equipment/services.py b/equipment/services.py
+index bd80b42..c46f76e 100644
+--- a/equipment/services.py
++++ b/equipment/services.py
+@@ -2,6 +2,7 @@ from django.core.exceptions import PermissionDenied
+ from django.db import Error, transaction
+ 
+ from accounts.models import Role, User
++from lab_booking.transactions import transaction_rejected
+ 
+ from .models import Equipment, EquipmentStatus
+ 
+@@ -58,6 +59,14 @@ def get_equipment_detail(user, pk):
+     return _add_status_label(row)
+ 
+ 
++def lock_equipment(pk):
++    """Lock only this device by primary key inside the caller's transaction."""
++    try:
++        return Equipment.objects.filter(pk=pk).select_for_update().values_list("pk", flat=True).get()
++    except Equipment.DoesNotExist:
++        return None
++
++
+ def _is_equipment_number_conflict(error):
+     cause = error.__cause__
+     diagnostic = getattr(cause, "diag", None)
+@@ -93,17 +102,12 @@ def create_equipment(user, values):
+     except Error as error:
+         if _is_equipment_number_conflict(error):
+             raise EquipmentNumberConflict from None
+-        if ready_to_commit and not _transaction_rejected(error):
++        if ready_to_commit and not transaction_rejected(error):
+             raise EquipmentCreationUnknown from None
+         raise EquipmentCreationFailed from None
+     return equipment
+ 
+ 
+-def _transaction_rejected(error):
+-    sqlstate = getattr(error.__cause__, "sqlstate", None) or ""
+-    return sqlstate.startswith("23") or sqlstate in {"40001", "40002", "40P01"}
+-
+-
+ def _textarea_newlines(value):
+     return value.replace("\r\n", "\n").replace("\r", "\n")
+ 
+@@ -120,10 +124,7 @@ def edit_equipment(user, pk, values):
+         if not connection.in_atomic_block and not connection.get_autocommit():
+             raise RuntimeError("编辑设备要求由服务管理最外层事务。")
+         with transaction.atomic(durable=True):
+-            target = Equipment.objects.filter(pk=pk)
+-            try:
+-                target.select_for_update().values_list("pk", flat=True).get()
+-            except Equipment.DoesNotExist:
++            if lock_equipment(pk) is None:
+                 return False
+             # The request's cached user can be stale after waiting for the device lock.
+             try:
+@@ -133,7 +134,7 @@ def edit_equipment(user, pk, values):
+             if not active or role != Role.ADMIN:
+                 raise PermissionDenied
+             # Read the current row in a separate Read Committed statement after acquiring its lock.
+-            current = target.values("id", *CATALOG_FIELDS, "description").get()
++            current = Equipment.objects.values("id", *CATALOG_FIELDS, "description").get(pk=pk)
+             updates = {field: values[field] for field in EQUIPMENT_EDIT_FIELDS}
+             # Browsers submit textarea line endings as CRLF even when the original text used LF.
+             if _textarea_newlines(updates["description"]) == _textarea_newlines(current["description"]):
+@@ -143,7 +144,7 @@ def edit_equipment(user, pk, values):
+                 raise EquipmentEditFailed
+             ready_to_commit = True
+     except Error as error:
+-        if ready_to_commit and not _transaction_rejected(error):
++        if ready_to_commit and not transaction_rejected(error):
+             raise EquipmentEditUnknown from None
+         raise EquipmentEditFailed from None
+     return True
+diff --git a/equipment/views.py b/equipment/views.py
+index 4def353..dd23a40 100644
+--- a/equipment/views.py
++++ b/equipment/views.py
+@@ -5,6 +5,8 @@ from django.shortcuts import redirect, render
+ from django.views.decorators.cache import never_cache
+ from django.views.decorators.http import require_http_methods, require_safe
+ 
++from accounts.policies import can_reserve
++
+ from .forms import EquipmentCreateForm, EquipmentEditForm
+ from .models import EquipmentStatus
+ from .services import (
+@@ -52,6 +54,7 @@ def equipment_detail(request, pk):
+         {
+             "account": request.user, "equipment": equipment,
+             "edit_pk": pk if is_equipment_admin(request.user) else None,
++            "reserve_pk": pk if can_reserve(request.user) else None,
+         },
+     )
+ 
+diff --git a/equipment/templates/equipment/detail.html b/equipment/templates/equipment/detail.html
+index 853a6da..58e1a15 100644
+--- a/equipment/templates/equipment/detail.html
++++ b/equipment/templates/equipment/detail.html
+@@ -14,5 +14,8 @@
+     {% if edit_pk is not None %}
+         <p><a href="{% url 'equipment-edit' edit_pk %}">编辑设备基础信息</a></p>
+     {% endif %}
++    {% if reserve_pk is not None %}
++        <p><a href="{% url 'reservation-submit' reserve_pk %}">申请预约</a></p>
++    {% endif %}
+     <p><a href="{% url 'equipment-catalog' %}">返回设备目录</a></p>
+ {% endblock %}
+diff --git a/lab_booking/settings.py b/lab_booking/settings.py
+index 6aebe03..3ed2245 100644
+--- a/lab_booking/settings.py
++++ b/lab_booking/settings.py
+@@ -51,6 +51,8 @@ INSTALLED_APPS = [
+     "django.contrib.sessions",
+     "accounts",
+     "equipment",
++    "reservations",
++    "audit",
+ ]
+ MIDDLEWARE = [
+     "django.middleware.security.SecurityMiddleware",
+diff --git a/lab_booking/urls.py b/lab_booking/urls.py
+index 71907a8..4af9a22 100644
+--- a/lab_booking/urls.py
++++ b/lab_booking/urls.py
+@@ -4,6 +4,7 @@ from django.urls import path
+ from accounts.forms import AccountAuthenticationForm
+ from accounts.views import AccountLogoutView, identity
+ from equipment.urls import urlpatterns as equipment_urlpatterns
++from reservations.urls import urlpatterns as reservation_urlpatterns
+ 
+ 
+ urlpatterns = [
+@@ -17,4 +18,4 @@ urlpatterns = [
+     ),
+     path("logout/", AccountLogoutView.as_view(), name="logout"),
+     path("identity/", identity, name="identity"),
+-] + equipment_urlpatterns
++] + equipment_urlpatterns + reservation_urlpatterns
+diff --git a/lab_booking/transactions.py b/lab_booking/transactions.py
+new file mode 100644
+index 0000000..c3c8b37
+--- /dev/null
++++ b/lab_booking/transactions.py
+@@ -0,0 +1,4 @@
++def transaction_rejected(error, *, additional_sqlstates=()):
++    """Only classify a COMMIT error as failed when PostgreSQL confirms rejection."""
++    sqlstate = getattr(error.__cause__, "sqlstate", None) or ""
++    return sqlstate.startswith("23") or sqlstate in {"40001", "40002", "40P01"} or sqlstate in additional_sqlstates
+diff --git a/_bmad-output/implementation-artifacts/verify-story-2-1.ps1 b/_bmad-output/implementation-artifacts/verify-story-2-1.ps1
+new file mode 100644
+index 0000000..072156d
+--- /dev/null
++++ b/_bmad-output/implementation-artifacts/verify-story-2-1.ps1
+@@ -0,0 +1,168 @@
++[CmdletBinding()]
++param(
++    [string]$Passfile,
++    [string]$Chrome,
++    [string]$OutputRoot,
++    [string]$Psql = 'C:\Program Files\PostgreSQL\17\bin\psql.exe'
++)
++
++$ErrorActionPreference = 'Stop'
++$storyRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
++$storyPython = Join-Path $storyRoot '.venv/Scripts/python.exe'
++$storyPreflight = Join-Path $PSScriptRoot 'preflight-story-2-1.ps1'
++$storyStamp = Get-Date -Format 'yyyyMMdd-HHmmss-fff'
++if (-not $OutputRoot) { $OutputRoot = $PSScriptRoot }
++$storyOut = Join-Path $OutputRoot "story-2-1-run-$storyStamp-$([guid]::NewGuid().ToString('N').Substring(0, 8))"
++$null = New-Item -ItemType Directory -Path $storyOut
++$storyOut = (Resolve-Path -LiteralPath $storyOut).Path
++Write-Host "Story 2.1 evidence: $storyOut"
++
++if (-not $Passfile) { $Passfile = $env:PGPASSFILE }
++if (-not $Passfile) { $Passfile = Join-Path $env:LOCALAPPDATA 'LabBooking/PostgreSQL17/pgpass.conf' }
++if (-not $Chrome) { $Chrome = $env:LAB_BOOKING_R1_CHROME }
++if (-not $Chrome) { $Chrome = Join-Path $env:ProgramFiles 'Google/Chrome/Application/chrome.exe' }
++$storyEnvironment = @('LAB_BOOKING_DB_MODE','LAB_BOOKING_R1_CHROME','LAB_BOOKING_SECRET_KEY',
++    'DJANGO_SETTINGS_MODULE','PGPASSFILE','PYTHONIOENCODING','PYTHONDONTWRITEBYTECODE')
++$storyPrevious = @{}
++foreach ($storyName in $storyEnvironment) {
++    $storyPrevious[$storyName] = [Environment]::GetEnvironmentVariable($storyName, 'Process')
++}
++$storyInputs = @('manage.py', 'requirements.txt')
++foreach ($storyDir in @('accounts','equipment','lab_booking','audit','reservations')) {
++    $storyInputs += Get-ChildItem -LiteralPath (Join-Path $storyRoot $storyDir) -File -Recurse |
++        Where-Object { $_.Extension -in '.py', '.html' } |
++        ForEach-Object { $_.FullName.Substring($storyRoot.Length + 1).Replace('\','/') }
++}
++$storyInputs += @('_bmad-output/implementation-artifacts/spec-2-1-submit-reservation.md',
++    '_bmad-output/implementation-artifacts/story-2-1-checkpoint-1.md',
++    '_bmad-output/planning-artifacts/epics.md',
++    '_bmad-output/implementation-artifacts/preflight-story-2-1.ps1',
++    '_bmad-output/implementation-artifacts/verify-story-2-1.ps1')
++
++function Save-StoryHashes([string]$Name) {
++    $storyInputs | Sort-Object -Unique | ForEach-Object {
++        $storyDigest = Get-FileHash -LiteralPath (Join-Path $storyRoot $_) -Algorithm SHA256
++        "$($storyDigest.Hash)  $_"
++    } | Set-Content -LiteralPath (Join-Path $storyOut "$Name.sha256") -Encoding UTF8
++}
++
++function Write-StoryStage([string]$Name, [int]$Code) {
++    "$(Get-Date -Format o) $Name exit=$Code" | Add-Content -LiteralPath (Join-Path $storyOut 'stages.txt') -Encoding UTF8
++    if ($Code -ne 0) { throw "Stage $Name failed (exit $Code). Evidence: $storyOut" }
++}
++
++function Run-StoryPython([string]$Name, [string[]]$StoryArguments, [string]$ExactLine) {
++    Write-Host "Running $Name"
++    ('python ' + ($StoryArguments -join ' ')) | Set-Content -LiteralPath (Join-Path $storyOut "$Name.command.txt") -Encoding UTF8
++    $storyStdout = Join-Path $storyOut "$Name.stdout.txt"
++    $storyStderr = Join-Path $storyOut "$Name.stderr.txt"
++    $storyQuoted = ($StoryArguments | ForEach-Object { '"' + $_ + '"' }) -join ' '
++    $storyProcess = Start-Process -FilePath $storyPython -ArgumentList $storyQuoted -WorkingDirectory $storyRoot -Wait -PassThru -WindowStyle Hidden `
++        -RedirectStandardOutput $storyStdout -RedirectStandardError $storyStderr
++    Write-StoryStage $Name $storyProcess.ExitCode
++    if ($ExactLine) {
++        $storyLines = @(Get-Content -LiteralPath $storyStdout,$storyStderr -Encoding UTF8)
++        if (@($storyLines | Where-Object { $_ -ceq $ExactLine }).Count -ne 1) {
++            throw "Stage $Name did not provide exact success line '$ExactLine'."
++        }
++    }
++}
++
++function Invoke-StoryProbe([string]$Group, [string]$EvidenceName) {
++    $storyEvidencePath = Join-Path $storyOut "$EvidenceName.jsonl"
++    Run-StoryPython $EvidenceName @('manage.py','verify_reservation_transactions',
++        '--group',$Group,'--evidence',$storyEvidencePath) "STORY21_PROBE_OK $Group"
++}
++
++Push-Location -LiteralPath $storyRoot
++try {
++    Save-StoryHashes 'before'
++    foreach ($storyScript in @($PSCommandPath,$storyPreflight)) {
++        $storyTokens = $null
++        $storyParseErrors = $null
++        $null = [System.Management.Automation.Language.Parser]::ParseFile($storyScript, [ref]$storyTokens, [ref]$storyParseErrors)
++        if ($storyParseErrors.Count) { throw ($storyParseErrors -join [Environment]::NewLine) }
++    }
++    Write-StoryStage 'powershell-parse' 0
++    try {
++        & $storyPreflight -Passfile $Passfile -Chrome $Chrome -Psql $Psql -ProbeIsolatedDatabase 2>&1 |
++            Tee-Object -FilePath (Join-Path $storyOut 'preflight.txt') | Write-Host
++        if (@(Get-Content -LiteralPath (Join-Path $storyOut 'preflight.txt') | Where-Object { $_ -ceq 'STORY21_PREFLIGHT_OK' }).Count -ne 1) {
++            throw 'Preflight did not confirm the guarded test database.'
++        }
++    } catch {
++        $_ | Out-String | Add-Content -LiteralPath (Join-Path $storyOut 'preflight.txt')
++        Write-StoryStage 'preflight' 1
++    }
++    Write-StoryStage 'preflight' 0
++    $env:PGPASSFILE = $Passfile
++    $env:LAB_BOOKING_R1_CHROME = $Chrome
++    $env:LAB_BOOKING_DB_MODE = 'test'
++    $env:DJANGO_SETTINGS_MODULE = 'lab_booking.settings'
++    $env:PYTHONIOENCODING = 'utf-8'
++    $env:PYTHONDONTWRITEBYTECODE = '1'
++    $env:LAB_BOOKING_SECRET_KEY = [guid]::NewGuid().ToString('N') + [guid]::NewGuid().ToString('N')
++
++    Invoke-StoryProbe 'pre-migrate' 'migration-before'
++    Run-StoryPython 'plan' @('manage.py','showmigrations','--plan')
++    $storyUnapplied = @(Get-Content -LiteralPath (Join-Path $storyOut 'plan.stdout.txt') -Encoding UTF8 |
++        Where-Object { $_ -match '^\[ \]' } | ForEach-Object { ($_ -split '\s+')[2] })
++    if (@($storyUnapplied | Where-Object { $_ -cnotin @('reservations.0001_initial','audit.0001_initial') }).Count) {
++        throw "Test database has unapplied migrations outside Story 2.1. See plan.stdout.txt."
++    }
++    Run-StoryPython 'reservation-sql' @('manage.py','sqlmigrate','reservations','0001')
++    Run-StoryPython 'audit-sql' @('manage.py','sqlmigrate','audit','0001')
++    # No old named target: the guarded plan allows only the two forward initial migrations.
++    Run-StoryPython 'migrate-isolated' @('manage.py','migrate','--noinput')
++    Invoke-StoryProbe 'baseline' 'regression-before'
++    $storyMigrationBefore = Get-Content -LiteralPath (Join-Path $storyOut 'migration-before.jsonl') -Raw -Encoding UTF8 | ConvertFrom-Json
++    $storyMigrationAfter = Get-Content -LiteralPath (Join-Path $storyOut 'regression-before.jsonl') -Raw -Encoding UTF8 | ConvertFrom-Json
++    foreach ($storyProperty in $storyMigrationBefore.rows.PSObject.Properties) {
++        $storyCurrent = $storyMigrationAfter.rows.PSObject.Properties[$storyProperty.Name]
++        if (-not $storyCurrent -or $storyCurrent.Value.count -ne $storyProperty.Value.count -or
++            $storyCurrent.Value.sha256 -cne $storyProperty.Value.sha256) {
++            throw "Migration changed existing rows in $($storyProperty.Name)."
++        }
++    }
++    Run-StoryPython 'check' @('manage.py','check') 'System check identified no issues (0 silenced).'
++    Run-StoryPython 'migration-drift' @('manage.py','makemigrations','--check','--dry-run') 'No changes detected'
++
++    Run-StoryPython 'regression' @('manage.py','test','--keepdb','--parallel','1','-v','2') 'OK'
++    Invoke-StoryProbe 'baseline' 'regression-after'
++    $storyRegBefore = Get-FileHash -LiteralPath (Join-Path $storyOut 'regression-before.jsonl')
++    $storyRegAfter = Get-FileHash -LiteralPath (Join-Path $storyOut 'regression-after.jsonl')
++    if ($storyRegBefore.Hash -cne $storyRegAfter.Hash) { throw 'Regression changed the isolated database rows/schema.' }
++    $storyRegLines = @(Get-Content -LiteralPath (Join-Path $storyOut 'regression.stdout.txt'),(Join-Path $storyOut 'regression.stderr.txt') -Encoding UTF8)
++    $storyFound = @($storyRegLines | Where-Object { $_ -match '^Found \d+ test\(s\)\.$' })
++    $storyRan = @($storyRegLines | Where-Object { $_ -match '^Ran \d+ tests in ' })
++    $storyPassed = @($storyRegLines | Where-Object { $_ -cmatch '^ok$|\.{3} ok$' }).Count
++    $storySkipped = @($storyRegLines | Where-Object { $_ -match '\.{3} skipped ' }).Count
++    "found=$storyFound ran=$storyRan passed=$storyPassed skipped=$storySkipped expected=90" |
++        Set-Content -LiteralPath (Join-Path $storyOut 'regression-counts.txt') -Encoding UTF8
++    if ($storyFound.Count -ne 1 -or $storyFound[0] -cne 'Found 90 test(s).' -or $storyRan.Count -ne 1 -or
++        $storyRan[0] -cnotmatch '^Ran 90 tests in ' -or $storyPassed -ne 90 -or $storySkipped -ne 0) {
++        throw 'Expected 90 discovered, run and passed tests, with zero skips. See regression-counts.txt.'
++    }
++    foreach ($storyGroup in @('permissions','interleavings','faults','nfr001-standard','time-boundaries')) {
++        Invoke-StoryProbe $storyGroup $storyGroup
++    }
++    Write-StoryStage 'complete' 0
++} catch {
++    $_ | Out-String | Add-Content -LiteralPath (Join-Path $storyOut 'failure.txt') -Encoding UTF8
++    throw
++} finally {
++    try {
++        if (Test-Path -LiteralPath (Join-Path $storyOut 'before.sha256')) {
++            Save-StoryHashes 'after'
++            $storyHashBefore = Get-FileHash -LiteralPath (Join-Path $storyOut 'before.sha256')
++            $storyHashAfter = Get-FileHash -LiteralPath (Join-Path $storyOut 'after.sha256')
++            if ($storyHashBefore.Hash -cne $storyHashAfter.Hash) { throw 'Verification input SHA-256 changed during verification.' }
++        }
++    } finally {
++        foreach ($storyName in $storyEnvironment) {
++            [Environment]::SetEnvironmentVariable($storyName, $storyPrevious[$storyName], 'Process')
++        }
++        Pop-Location
++    }
++}
++Write-Output 'STORY21_VERIFICATION_OK'
+diff --git a/_bmad-output/implementation-artifacts/story-2-1-verification-map.md b/_bmad-output/implementation-artifacts/story-2-1-verification-map.md
+new file mode 100644
+index 0000000..6c17470
+--- /dev/null
++++ b/_bmad-output/implementation-artifacts/story-2-1-verification-map.md
+@@ -0,0 +1,34 @@
++# Story 2.1 · 验证证据索引和上线提案
++
++本文件是运行入口和证据对照，不是通过证明。仅在普通 Windows PowerShell 内用原项目 `.venv`、Chrome 和预建的 `127.0.0.1:5433/test_lab_booking` 执行。不得在该脚本运行时另行修改或使用同一隔离库做独立验证。
++
++```powershell
++powershell -NoProfile -ExecutionPolicy Bypass -File .\_bmad-output\implementation-artifacts\verify-story-2-1.ps1
++```
++
++凭据或 Chrome 不在预检默认位置时传入 `-Passfile` 和 `-Chrome`。脚本每次写独立目录，包含阶段退出码、命令以及分离的标准输出和错误、迁移计划与 SQL、输入 SHA-256、回归发现/执行/通过/跳过统计、隔离库前后完整行摘要、每组逐例 JSONL 和清理证明。边界组按数据库实际时间等待下一合法的北京时间整点，23:00 不作为开始时间。等待时不持有设备锁，开始前约 12 秒才启动竞争。不以可控时间替换该实测。
++
++| 正式 AC | 断言及证据位置 |
++| --- | --- |
++| AC-1 | `regression` 师生逐项字段、201、本人链接及立即冲突；`permissions` HTTP 正控制；`nfr001-standard` 独立提交后读回 |
++| AC-2 | `permissions` 状态、主体和路径、真实 CSRF、伪造字段控制和逐例前后数据；`interleavings` I6 锁后撤权 |
++| AC-3 | `regression` B1 前/等/后及 B2 北京时间矩阵、UTC 往返；`time-boundaries` B3/B4 真实时间 |
++| AC-4 | `interleavings` I2/I3 维修及停用各两次方向、独立锁阻塞及已提交设备/预约/历史 |
++| AC-5 | `regression` 完整重叠/相邻/跨设备/状态矩阵；`interleavings` I1 实际竞争和相邻/跨设备控制 |
++| AC-6 | `interleavings` I4 正反，旧预约/历史/无关设备；`regression` R-04 用 PostgreSQL 检查约束、两类外键和删除约束 |
++| AC-7 | `time-boundaries` B3/B4 唯一业务采样、真实阻塞、时序及独立读回，B4 分开记录原行状态与有效占用 |
++| AC-8 | `interleavings` I5 不可用、时间非法、仍有冲突分别保存独立前后快照；`regression` 验证 POST 提交业务拒绝后渲染不再读取设备 |
++| AC-9 | `faults` F1 各 INSERT 实际 23514、F2 PostgreSQL 延迟约束 23505、F3 实际断连未落库、F4 已真实落库并模拟确认丢失；`regression` 注入提交返回的 55P03、57014、08006、40003 及无 SQLSTATE，验证分类与 Epic 1 兼容 |
++| AC-10 | `permissions` 本人已结束待审核及重复读取、他人同不存在、合法 CSRF 的不支持方法；`interleavings` I6/I7 锁后撤权、终态无锁及固定候选 |
++| AC-11 | `nfr001-standard` 10 × 20、每轮 20 独立 PID、实际持锁期重叠证明、全部 HTTP 响应及最终存量。无响应、其他失败不算冲突，无速度结论 |
++
++## 正式库迁移和最小权限提案（未执行）
++
++另行取得正式库授权后，由既有迁移角色和连接守卫核验精确数据库、角色、地址、端口、版本、目标 schema、对象所有者及迁移计划。备份并按依赖顺序应用 `reservations.0001_initial`、`audit.0001_initial`。先审阅经隔离库生成的迁移 SQL 和实际运行语句。以下是 ACL 审阅范围，不是可直接运行的正式库脚本。
++
++| 表 | 拟给应用角色的列权限 |
++| --- | --- |
++| `public.reservations_reservation` | SELECT `id, applicant_id, equipment_id, start_at, end_at, status, applied_at`；INSERT `applicant_id, equipment_id, start_at, end_at, status, applied_at`；UPDATE `status` |
++| `public.audit_operationhistory` | INSERT `object_type, reservation_id, equipment_id, action, before_status, after_status, actor_type, actor_id, reason, decision_at, recorded_at`；仅 SELECT `id` 供 ORM 的 RETURNING |
++
++不预授序列权限，先核验实际 identity 和 INSERT 所需权限。沿用已有设备读取及基础字段 UPDATE 以支持行锁，不扩展设备状态写权限或账号权限。不授 DELETE、对象所有权、DDL、转授权、整表通配或默认全权。权限变更前后应核对 schema 限定列、角色、对象所有者、迁移和有效 ACL。正式环境不运行故障注入、标准竞争、回归或 fixture 清理命令。
+diff --git a/audit/__init__.py b/audit/__init__.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/audit/migrations/0001_initial.py b/audit/migrations/0001_initial.py
+new file mode 100644
+index 0000000..4d96646
+--- /dev/null
++++ b/audit/migrations/0001_initial.py
+@@ -0,0 +1,38 @@
++import django.db.models.deletion
++from django.conf import settings
++from django.db import migrations, models
++
++
++class Migration(migrations.Migration):
++    initial = True
++    dependencies = [
++        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
++        ("equipment", "0001_initial"),
++        ("reservations", "0001_initial"),
++    ]
++    operations = [
++        migrations.CreateModel(
++            name="OperationHistory",
++            fields=[
++                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
++                ("object_type", models.CharField(choices=[("reservation", "预约"), ("equipment", "设备")], max_length=16)),
++                ("action", models.CharField(max_length=32)),
++                ("before_status", models.CharField(max_length=16)),
++                ("after_status", models.CharField(max_length=16)),
++                ("actor_type", models.CharField(max_length=16)),
++                ("reason", models.TextField()),
++                ("decision_at", models.DateTimeField()),
++                ("recorded_at", models.DateTimeField()),
++                ("actor", models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
++                ("reservation", models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to="reservations.reservation")),
++                ("equipment", models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to="equipment.equipment")),
++            ],
++            options={"constraints": [
++                models.CheckConstraint(
++                    condition=(models.Q(object_type="reservation", reservation__isnull=False, equipment__isnull=True)
++                               | models.Q(object_type="equipment", reservation__isnull=True, equipment__isnull=False)),
++                    name="history_exactly_one_matching_object",
++                ),
++            ]},
++        ),
++    ]
+diff --git a/audit/migrations/__init__.py b/audit/migrations/__init__.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/audit/models.py b/audit/models.py
+new file mode 100644
+index 0000000..3e5b3ef
+--- /dev/null
++++ b/audit/models.py
+@@ -0,0 +1,32 @@
++from django.conf import settings
++from django.db import models
++
++
++class HistoryObject(models.TextChoices):
++    RESERVATION = "reservation", "预约"
++    EQUIPMENT = "equipment", "设备"
++
++
++class OperationHistory(models.Model):
++    object_type = models.CharField(max_length=16, choices=HistoryObject.choices)
++    reservation = models.ForeignKey("reservations.Reservation", on_delete=models.PROTECT, null=True)
++    equipment = models.ForeignKey("equipment.Equipment", on_delete=models.PROTECT, null=True)
++    action = models.CharField(max_length=32)
++    before_status = models.CharField(max_length=16)
++    after_status = models.CharField(max_length=16)
++    actor_type = models.CharField(max_length=16)
++    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True)
++    reason = models.TextField()
++    decision_at = models.DateTimeField()
++    recorded_at = models.DateTimeField()
++
++    class Meta:
++        constraints = [
++            models.CheckConstraint(
++                condition=(
++                    models.Q(object_type=HistoryObject.RESERVATION, reservation__isnull=False, equipment__isnull=True)
++                    | models.Q(object_type=HistoryObject.EQUIPMENT, reservation__isnull=True, equipment__isnull=False)
++                ),
++                name="history_exactly_one_matching_object",
++            ),
++        ]
+diff --git a/audit/services.py b/audit/services.py
+new file mode 100644
+index 0000000..d8b970e
+--- /dev/null
++++ b/audit/services.py
+@@ -0,0 +1,24 @@
++from django.db.models.functions import Now
++
++from reservations.models import ReservationStatus
++
++from .models import HistoryObject, OperationHistory
++
++
++EXPIRY_REASON = "开始时间已到仍待审核"
++
++
++def append_reservation_expiry(reservation_id, decision_at):
++    """Append within the reservation service's device-locked transaction."""
++    OperationHistory.objects.create(
++        object_type=HistoryObject.RESERVATION,
++        reservation_id=reservation_id,
++        action="expire",
++        before_status=ReservationStatus.PENDING,
++        after_status=ReservationStatus.EXPIRED,
++        actor_type="system",
++        actor_id=None,
++        reason=EXPIRY_REASON,
++        decision_at=decision_at,
++        recorded_at=Now(),
++    )
+diff --git a/reservations/__init__.py b/reservations/__init__.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/reservations/forms.py b/reservations/forms.py
+new file mode 100644
+index 0000000..68f143a
+--- /dev/null
++++ b/reservations/forms.py
+@@ -0,0 +1,6 @@
++from django import forms
++
++
++class ReservationForm(forms.Form):
++    start_at = forms.CharField(label="开始时间（北京时间）", widget=forms.DateTimeInput(attrs={"type": "datetime-local", "step": "3600"}))
++    end_at = forms.CharField(label="结束时间（北京时间）", widget=forms.DateTimeInput(attrs={"type": "datetime-local", "step": "3600"}))
+diff --git a/reservations/management/__init__.py b/reservations/management/__init__.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/reservations/management/commands/__init__.py b/reservations/management/commands/__init__.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/reservations/management/commands/verify_reservation_transactions.py b/reservations/management/commands/verify_reservation_transactions.py
+new file mode 100644
+index 0000000..65424db
+--- /dev/null
++++ b/reservations/management/commands/verify_reservation_transactions.py
+@@ -0,0 +1,924 @@
++import hashlib
++import json
++import platform
++import re
++from concurrent.futures import ThreadPoolExecutor
++from contextvars import ContextVar
++from datetime import timedelta
++from http.cookiejar import CookieJar
++from pathlib import Path
++from socketserver import ThreadingMixIn
++from threading import Barrier, Event, Thread
++from time import monotonic_ns, sleep, time_ns
++from unittest.mock import patch
++from urllib.error import HTTPError
++from urllib.parse import urlencode
++from urllib.request import HTTPCookieProcessor, HTTPRedirectHandler, ProxyHandler, Request, build_opener
++from uuid import uuid4
++from wsgiref.simple_server import WSGIRequestHandler, WSGIServer, make_server
++
++from django.conf import settings
++from django.contrib.sessions.models import Session
++from django.core.handlers.wsgi import WSGIHandler
++from django.core.management.base import BaseCommand, CommandError
++from django.db import Error, OperationalError, connections, transaction
++from django.db.migrations.executor import MigrationExecutor
++from django.urls import reverse
++from django.utils.crypto import get_random_string
++
++from accounts.models import Role, User
++from audit.models import OperationHistory
++from audit.services import EXPIRY_REASON
++from equipment.models import Equipment, EquipmentStatus
++from lab_booking.database_config import DATABASE_TARGETS, HOST, PORT, SERVER_VERSION_NUM
++from lab_booking.test_runner import IsolatedPostgresRunner
++from reservations import services
++from reservations.models import Reservation, ReservationStatus as Status
++from reservations.views import CONFLICT_MESSAGE, INVALID_TIME_MESSAGE, UNAVAILABLE_MESSAGE
++
++
++GROUPS = ("pre-migrate", "baseline", "permissions", "interleavings", "faults", "nfr001-standard", "time-boundaries")
++STORY_MIGRATIONS = {("reservations", "0001_initial"): "reservations_reservation",
++                    ("audit", "0001_initial"): "audit_operationhistory"}
++PROBE = ContextVar("story21_request_probe", default=None)
++CSRF = re.compile(r'(name="csrfmiddlewaretoken" value=")([^"]+)(")')
++REAL_DECISION = services._decision_time
++
++
++def require(condition, message):
++    if not condition:
++        raise CommandError(message)
++
++
++def query(connection, sql, params=()):
++    with connection.cursor() as cursor:
++        cursor.execute(sql, params)
++        return cursor.fetchone() if cursor.description else None
++
++
++def target(connection):
++    database, role = DATABASE_TARGETS["test"]
++    identity = query(connection, """
++        SELECT current_database() AS db_name, session_user AS login_role, current_user AS effective_role,
++               host(inet_server_addr()) AS server_host, inet_server_port() AS server_port,
++               current_setting('server_version_num') AS version_num, current_setting('transaction_isolation') AS isolation,
++               rolsuper OR rolcreatedb OR rolcreaterole OR rolreplication OR rolbypassrls AS role_excess,
++               has_database_privilege(current_user, %s, 'CONNECT') AS business_connect, pg_backend_pid() AS backend_pid
++        FROM pg_roles WHERE rolname = current_user
++    """, [DATABASE_TARGETS["runtime"][0]])
++    require(identity is not None and identity[:-1] == (database, role, role, HOST, int(PORT), str(SERVER_VERSION_NUM),
++                                                       "read committed", False, False), "Incorrect isolated database target")
++    query(connection, "SET statement_timeout = '45s'")
++    query(connection, "SET lock_timeout = '35s'")
++    return identity
++
++
++def wait_for(callback, label, timeout_seconds=10):
++    deadline = monotonic_ns() + timeout_seconds * 10**9
++    while monotonic_ns() < deadline:
++        result = callback()
++        if result:
++            return result
++        sleep(.02)
++    raise CommandError(f"Timeout: {label}")
++
++
++def sqlstate(error):
++    return getattr(error.__cause__, "sqlstate", None)
++
++
++def observe_decision(connection):
++    instant = REAL_DECISION(connection)
++    trace = PROBE.get()
++    if trace is not None:
++        trace["decisions"].append(instant)
++    return instant
++
++
++class ProbeWSGI(WSGIHandler):
++    def __init__(self, cases):
++        super().__init__()
++        self.cases = cases
++
++    def get_response(self, request):
++        app = connections["default"]
++        case = self.cases.get(request.headers.get("X-Story21-Probe"))
++        identity = target(app)
++        if case is None:
++            return super().get_response(request)
++        trace, control = case
++        trace.update(identity=identity, pid=identity[-1], server_start_ns=monotonic_ns(),
++                     decisions=[], sql=[], commit_attempts=0, history_attempts=0, reservation_attempts=0)
++        token = PROBE.set(trace)
++        real_commit = app._commit
++
++        def trace_sql(execute, sql, params, many, context):
++            # Never save auth/session SQL parameters. Lock intervals use the server process clock.
++            record = any(table in sql for table in ('"reservations_reservation"', '"audit_operationhistory"', '"equipment_equipment"'))
++            record = record or "clock_timestamp() AS decision_at" in sql or (
++                '"accounts_user"."is_active", "accounts_user"."role"' in sql)
++            if record:
++                trace["sql"].append(sql)
++            if "FOR UPDATE" in sql:
++                trace["lock_attempt_ns"] = monotonic_ns()
++            try:
++                if sql.startswith('INSERT INTO "audit_operationhistory"'):
++                    trace["history_attempts"] += 1
++                    if control.get("fault") == "F1-history":
++                        params = ("invalid", *params[1:])
++                elif sql.startswith('INSERT INTO "reservations_reservation"'):
++                    trace["reservation_attempts"] += 1
++                    if control.get("fault") == "F1-reservation":
++                        # Model INSERT order: applicant, equipment, start, end, status, applied.
++                        params = (*params[:4], "invalid_status", *params[5:])
++                result = execute(sql, params, many, context)
++                if "FOR UPDATE" in sql:
++                    trace["lock_acquired_ns"] = monotonic_ns()
++                return result
++            except Error as error:
++                trace["sqlstate"] = sqlstate(error)
++                raise
++
++        def commit():
++            trace["commit_attempts"] += 1
++            trace["commit_enter_ns"] = monotonic_ns()
++            if control.get("before_commit"):
++                control["before_commit"]()
++            fault = control.get("fault")
++            if fault == "F2":
++                query(app, "CREATE TEMP TABLE story21_commit_probe (n int UNIQUE DEFERRABLE INITIALLY DEFERRED) ON COMMIT DROP")
++                query(app, "INSERT INTO pg_temp.story21_commit_probe VALUES (1), (1)")
++            if fault == "F3":
++                control["terminate"](identity[-1])
++            try:
++                real_commit()
++                if fault == "F4":
++                    # Commit on PostgreSQL, then discard successful confirmation at the driver boundary.
++                    app.connection.close()
++                    raise OperationalError("Story 2.1 simulated missing COMMIT confirmation")
++                trace["commit_return_ns"] = monotonic_ns()
++            except Error as error:
++                trace["sqlstate"] = sqlstate(error)
++                raise
++
++        try:
++            with app.execute_wrapper(trace_sql), patch.object(app, "_commit", side_effect=commit):
++                return super().get_response(request)
++        finally:
++            trace["server_end_ns"] = monotonic_ns()
++            PROBE.reset(token)
++
++
++class ThreadedServer(ThreadingMixIn, WSGIServer):
++    request_queue_size = 64
++
++
++class QuietHandler(WSGIRequestHandler):
++    def log_message(self, format, *args):
++        pass
++
++
++class NoRedirect(HTTPRedirectHandler):
++    def redirect_request(self, *args, **kwargs):
++        return None
++
++
++def url(name, pk):
++    return reverse(name, args=[pk])
++
++
++def window(start, end):
++    return {key: value.astimezone(services.BEIJING).strftime("%Y-%m-%dT%H:%M")
++            for key, value in (("start_at", start), ("end_at", end))}
++
++
++def scrub(body):
++    return CSRF.sub(r"\1[redacted]\3", body)
++
++
++class Experiment:
++    def __init__(self, observer, server, cases, prefix, report):
++        self.observer, self.server, self.cases, self.prefix, self.report = observer, server, cases, prefix, report
++        self.session_keys = set()
++        self.password = get_random_string(28)
++        self.users = {}
++        self.counter = 0
++        self.base = f"http://{HOST}:{server.server_port}"
++
++    def now(self):
++        return query(self.observer, "SELECT clock_timestamp() AS observer_now")[0]
++
++    def fixture(self, status=EquipmentStatus.AVAILABLE):
++        self.counter += 1
++        return Equipment.objects.create(number=f"{self.prefix}{self.counter}", name=f"Story21 fixture {self.counter}",
++                                        category="probe", location="loopback", status=status)
++
++    def future(self):
++        start = (self.now().astimezone(services.BEIJING) + timedelta(days=1)).replace(hour=10, minute=0, second=0, microsecond=0)
++        return start, start + timedelta(hours=1)
++
++    def make(self, dev, start, end, role=Role.STUDENT, status=Status.PENDING):
++        return Reservation.objects.create(applicant=self.users[role], equipment=dev, start_at=start, end_at=end,
++                                          status=status, applied_at=start - timedelta(days=1))
++
++    def snapshot(self, dev, start=None, end=None):
++        with self.observer.cursor() as cursor:
++            def fetch(sql, params):
++                cursor.execute(sql, params)
++                fields = [column.name for column in cursor.description]
++                return [dict(zip(fields, row, strict=True)) for row in cursor.fetchall()]
++
++            device, = fetch("SELECT * FROM equipment_equipment WHERE id = %s", [dev.pk])
++            rows = fetch("SELECT * FROM reservations_reservation WHERE equipment_id = %s ORDER BY id", [dev.pk])
++            history = fetch("SELECT h.* FROM audit_operationhistory h LEFT JOIN reservations_reservation r "
++                            "ON h.reservation_id = r.id WHERE r.equipment_id = %s OR h.equipment_id = %s ORDER BY h.id", [dev.pk, dev.pk])
++        now = self.now()
++        active = [row for row in rows if (row["status"] == Status.APPROVED or (
++            row["status"] == Status.PENDING and row["start_at"] > now)) and (start is None or (
++                row["start_at"] < end and start < row["end_at"]))]
++        return dict(observed_at=now, device=device, rows=rows, effective=active, history=history)
++
++    def http(self, opener, path, values=None, *, token=None, csrf=None):
++        fields = None if values is None else dict(values)
++        if csrf is not None:
++            fields["csrfmiddlewaretoken"] = csrf
++        headers = {"X-Story21-Probe": token} if token else {}
++        request = Request(self.base + path, data=None if fields is None else urlencode(fields).encode(), headers=headers)
++        start = monotonic_ns()
++        start_wall = time_ns()
++        try:
++            response = opener.open(request, timeout=65)
++        except HTTPError as error:
++            response = error
++        except (OSError, TimeoutError) as error:
++            return dict(status=None, error=type(error).__name__, client_start_ns=start,
++                        client_start_wall_ns=start_wall, client_end_ns=monotonic_ns())
++        try:
++            with response:
++                return dict(status=response.code, body=response.read().decode("utf-8"), location=response.headers.get("Location"),
++                            client_start_ns=start, client_start_wall_ns=start_wall, client_end_ns=monotonic_ns())
++        except (OSError, TimeoutError) as error:
++            return dict(status=None, error=type(error).__name__, client_start_ns=start, client_start_wall_ns=start_wall,
++                        client_end_ns=monotonic_ns())
++
++    def pair(self, role, form_path=None):
++        cookies = CookieJar()
++        opener = build_opener(ProxyHandler({}), HTTPCookieProcessor(cookies), NoRedirect())
++        login = self.http(opener, reverse("login"))
++        require(login["status"] == 200, "Real login form unavailable")
++        login_csrf = CSRF.search(login["body"])[2]
++        if role is not None:
++            login = self.http(opener, reverse("login"), {"username": self.users[role].username, "password": self.password}, csrf=login_csrf)
++            require(login["status"] == 302, "Fixture session login failed")
++            ids = [cookie.value for cookie in cookies if cookie.name == settings.SESSION_COOKIE_NAME]
++            require(len(ids) == 1, "Fixture login did not create one session")
++            self.session_keys.add(ids[0])
++        else:
++            return opener, login_csrf
++        form = self.http(opener, form_path or reverse("login"))
++        require(form["status"] == 200 and CSRF.search(form["body"]) is not None, "CSRF form unavailable")
++        return opener, CSRF.search(form["body"])[2]
++
++    def prepare(self, pair, path, values=None, *, control=None, use_csrf=True, role=None):
++        token = uuid4().hex
++        trace = {}
++        self.cases[token] = (trace, control or {})
++        opener, csrf = pair
++
++        def execute():
++            try:
++                outcome = self.http(opener, path, values, token=token, csrf=csrf if values is not None and use_csrf else None)
++                if "body" in outcome:
++                    outcome["body"] = scrub(outcome["body"])
++                return dict(role=role, input=values, path=path, response=outcome, server=trace)
++            finally:
++                self.cases.pop(token)
++
++        return execute, trace
++
++    @staticmethod
++    def expect(outcome, status, message=None):
++        response = outcome["response"]
++        require(response["status"] == status and (message is None or message in response["body"]),
++                f"Expected HTTP {status}, received {response['status']} ({message or 'status-only'})")
++
++    def wait_blocker(self, trace, blocker):
++        pid = wait_for(lambda: trace.get("pid"), "HTTP actor backend PID")
++
++        def blocked():
++            blockers = query(self.observer, "SELECT pg_blocking_pids(%s) AS blockers", [pid])[0]
++            return blockers if blocker in blockers else None
++
++        return wait_for(blocked, "actual PostgreSQL lock wait")
++
++    @staticmethod
++    def expiry(snapshot, reservation_id, decision=None):
++        row, = (row for row in snapshot["rows"] if row["id"] == reservation_id)
++        record, = (row for row in snapshot["history"] if row["reservation_id"] == reservation_id)
++        require(row["status"] == Status.EXPIRED and record["object_type"] == "reservation"
++                and record["equipment_id"] is None and record["actor_id"] is None and record["actor_type"] == "system"
++                and record["action"] == "expire" and record["before_status"] == Status.PENDING
++                and record["after_status"] == Status.EXPIRED and record["reason"] == EXPIRY_REASON
++                and row["start_at"] <= record["decision_at"] <= record["recorded_at"] <= snapshot["observed_at"]
++                and (decision is None or record["decision_at"] == decision), "Incomplete or inconsistent expiry/history")
++
++    @staticmethod
++    def unchanged(before, after):
++        return all(before[key] == after[key] for key in ("device", "rows", "effective", "history"))
++
++    @staticmethod
++    def check_order(outcome):
++        trace = outcome["server"]
++        statements = trace["sql"]
++        locks = [i for i, sql in enumerate(statements) if "FOR UPDATE" in sql]
++        clocks = [i for i, sql in enumerate(statements) if "clock_timestamp() AS decision_at" in sql]
++        require(len(locks) == len(clocks) == len(trace["decisions"]) == trace["commit_attempts"] == 1,
++                "Expected one device lock, clock and COMMIT")
++        lock, clock = locks[0], clocks[0]
++        require('"equipment_equipment"."id"' in statements[lock] and "SKIP LOCKED" not in statements[lock],
++                "Lock is not the required primary-key lock")
++        between = statements[lock + 1:clock]
++        require(any('"accounts_user"."is_active"' in sql for sql in between)
++                and any(('"equipment_equipment"."status"' in sql or '"reservations_reservation"."status"' in sql)
++                        for sql in between), "No separate reread of target and account after locking")
++
++    def hold_device(self, dev):
++        Equipment.objects.select_for_update().values_list("pk", flat=True).get(pk=dev.pk)
++
++    def standard(self):
++        for round_number in range(1, 11):
++            dev = self.fixture()
++            start, end = self.future()
++            values, path = window(start, end), url("reservation-submit", dev.pk)
++            before = self.snapshot(dev, start, end)
++            require(not before["rows"] and not before["effective"] and before["device"]["status"] == EquipmentStatus.AVAILABLE,
++                    "Standard round is not isolated and initially available")
++            actors = []
++            for index in range(20):
++                role = (Role.STUDENT, Role.TEACHER)[index // 10]
++                execute, _ = self.prepare(self.pair(role, path), path, values, role=role)
++                actors.append(execute)
++            release = {}
++
++            def released():
++                release.update(monotonic_ns=monotonic_ns(), wall_ns=time_ns())
++
++            barrier = Barrier(20, action=released, timeout=30)
++
++            def worker(execute):
++                barrier.wait()
++                return execute()
++
++            with ThreadPoolExecutor(max_workers=20) as pool:
++                results = list(pool.map(worker, actors))
++            after = self.snapshot(dev, start, end)
++            traces = [outcome["server"] for outcome in results]
++            overlaps = [
++                [a["pid"], b["pid"]] for a in traces for b in traces
++                if a is not b and a.get("lock_acquired_ns", float("inf")) <= b.get("lock_attempt_ns", -1)
++                and b.get("lock_attempt_ns", float("inf")) < a.get("commit_enter_ns", -1)
++            ]
++            counts = dict(success=sum(x["response"]["status"] == 201 for x in results),
++                          conflict=sum(x["response"]["status"] == 409 and CONFLICT_MESSAGE in x["response"].get("body", "")
++                                       for x in results),
++                          no_response=sum(x["response"]["status"] is None for x in results))
++            counts["other"] = 20 - sum(counts.values())
++            client_starts = [row["response"]["client_start_ns"] for row in results]
++            self.report(round=round_number, before=before, after=after, release=release, counts=counts,
++                        start_distribution_ns=[x - release["monotonic_ns"] for x in client_starts],
++                        observed_overlaps=overlaps, accounts={str(role): user.pk for role, user in self.users.items()
++                                                             if role in (Role.STUDENT, Role.TEACHER)}, responses=results)
++            require(counts == dict(success=1, conflict=19, no_response=0, other=0), "Standard HTTP outcome counts mismatch")
++            require(len({t["pid"] for t in traces}) == 20 and overlaps, "No proof of 20 distinct backends and actual contention")
++            for result in results:
++                self.check_order(result)
++            winner, = (row for row in results if row["response"]["status"] == 201)
++            require(len(after["rows"]) == len(after["effective"]) == 1 and not after["history"]
++                    and after["rows"] == after["effective"]
++                    and after["rows"][0]["status"] == Status.PENDING
++                    and (after["rows"][0]["start_at"], after["rows"][0]["end_at"]) == (start, end)
++                    and after["rows"][0]["applicant_id"] == self.users[winner["role"]].pk
++                    and after["rows"][0]["applied_at"] == winner["server"]["decisions"][0],
++                    "Standard final reservation differs from the HTTP winner")
++
++    def simultaneous(self, first, second, first_trace, second_trace, entered, release):
++        with ThreadPoolExecutor(max_workers=2) as pool:
++            a = pool.submit(first)
++            try:
++                require(entered.wait(10), "First actor did not reach held COMMIT")
++                b = pool.submit(second)
++                blockers = self.wait_blocker(second_trace, first_trace["pid"])
++            finally:
++                release.set()
++            return a.result(), b.result(), blockers
++
++    @staticmethod
++    def commit_latch():
++        entered, release = Event(), Event()
++
++        def before_commit():
++            entered.set()
++            require(release.wait(28), "Test-only COMMIT latch timed out")
++
++        return entered, release, {"before_commit": before_commit}
++
++    def i1(self):
++        dev = self.fixture()
++        start, end = self.future()
++        path, values = url("reservation-submit", dev.pk), window(start, end)
++        before = self.snapshot(dev)
++        entered, release, control = self.commit_latch()
++        first, a_trace = self.prepare(self.pair(Role.STUDENT, path), path, values, control=control, role=Role.STUDENT)
++        second, b_trace = self.prepare(self.pair(Role.TEACHER, path), path, values, role=Role.TEACHER)
++        a, b, blockers = self.simultaneous(first, second, a_trace, b_trace, entered, release)
++        after = self.snapshot(dev, start, end)
++        adjacent_path = url("reservation-submit", self.fixture().pk)
++        adjacent = self.prepare(self.pair(Role.TEACHER, path), path, window(end, end + timedelta(hours=1)))[0]()
++        different = self.prepare(self.pair(Role.STUDENT, adjacent_path), adjacent_path, values)[0]()
++        self.report(case="I1", before=before, after=after, blockers=blockers, responses=[a, b, adjacent, different])
++        self.expect(a, 201)
++        self.expect(b, 409, CONFLICT_MESSAGE)
++        self.expect(adjacent, 201)
++        self.expect(different, 201)
++        self.check_order(a)
++        self.check_order(b)
++        require(len({self.observer_identity[-1], a_trace["pid"], b_trace["pid"]}) == 3 and
++                len(after["rows"]) == len(after["effective"]) == 1 and not after["history"], "I1 data mismatch")
++
++    def i2_i3(self, status, *, request_first):
++        dev = self.fixture()
++        start, end = self.future()
++        path = url("reservation-submit", dev.pk)
++        old = self.make(dev, self.now() - timedelta(minutes=1), end) if not request_first else None
++        before = self.snapshot(dev)
++        pair = self.pair(Role.STUDENT, path)
++        entered, release, control = self.commit_latch()
++        execute, trace = self.prepare(pair, path, window(start, end), control=control if request_first else None)
++        writer_trace = {}
++
++        def writer():
++            app = connections["default"]
++            try:
++                writer_trace["pid"] = target(app)[-1]
++                with transaction.atomic():
++                    self.hold_device(dev)
++                    Equipment.objects.filter(pk=dev.pk).update(status=status)
++            finally:
++                connections.close_all()
++
++        with ThreadPoolExecutor(max_workers=2) as pool:
++            if request_first:
++                a = pool.submit(execute)
++                try:
++                    require(entered.wait(10), "Applicant did not reach held COMMIT")
++                    b = pool.submit(writer)
++                    blockers = self.wait_blocker(writer_trace, trace["pid"])
++                    require(self.unchanged(before, self.snapshot(dev)), "I3 uncommitted request leaked")
++                finally:
++                    release.set()
++                response = a.result()
++                b.result()
++            else:
++                app = connections["default"]
++                with transaction.atomic():
++                    self.hold_device(dev)
++                    Equipment.objects.filter(pk=dev.pk).update(status=status)
++                    a = pool.submit(execute)
++                    blockers = self.wait_blocker(trace, target(app)[-1])
++                    require(self.unchanged(before, self.snapshot(dev)), "I2 uncommitted status leaked")
++                response = a.result()
++        after = self.snapshot(dev, start, end)
++        self.report(case="I3" if request_first else "I2", status=status, before=before, after=after,
++                    blockers=blockers, response=response, writer=writer_trace)
++        self.check_order(response)
++        require(after["device"]["status"] == status and len(after["rows"]) == 1, "I2/I3 durable data mismatch")
++        if request_first:
++            self.expect(response, 201)
++            require(len(after["effective"]) == 1 and not after["history"], "I3 changed initial pending occupancy")
++        else:
++            self.expect(response, 409, UNAVAILABLE_MESSAGE)
++            self.expiry(after, old.pk, trace["decisions"][0])
++            require(len(after["history"]) == 1 and not after["effective"], "I2 expiry data mismatch")
++
++    def i4(self, *, read_first):
++        dev, other = self.fixture(), self.fixture()
++        start, end = self.future()
++        old = self.make(dev, self.now() - timedelta(minutes=1), end)
++        approved = self.make(dev, end, end + timedelta(hours=1), status=Status.APPROVED)
++        unrelated = self.make(other, self.now() - timedelta(minutes=1), end)
++        submit, result = url("reservation-submit", dev.pk), url("reservation-result", old.pk)
++        before, other_before = self.snapshot(dev), self.snapshot(other)
++        entered, release, control = self.commit_latch()
++        owner = self.pair(Role.STUDENT, submit)
++        applicant = self.pair(Role.TEACHER, submit)
++        reader, read_trace = self.prepare(owner, result, control=control if read_first else None)
++        writer, write_trace = self.prepare(applicant, submit, window(start, end), control=None if read_first else control)
++        if read_first:
++            read, write, blockers = self.simultaneous(reader, writer, read_trace, write_trace, entered, release)
++        else:
++            write, read, blockers = self.simultaneous(writer, reader, write_trace, read_trace, entered, release)
++        repeat = self.prepare(owner, result)[0]()
++        after, other_after = self.snapshot(dev, start, end), self.snapshot(other)
++        self.report(case="I4", reader_first=read_first, before=before, after=after, blockers=blockers,
++                    other_before=other_before, other_after=other_after, responses=[read, write, repeat])
++        self.expect(read, 200, "已失效")
++        self.expect(repeat, 200, "已失效")
++        self.expect(write, 201)
++        self.expiry(after, old.pk, (read_trace if read_first else write_trace)["decisions"][0])
++        require(self.unchanged(other_before, other_after) and len(after["rows"]) == 3
++                and len(after["history"]) == len(after["effective"]) == 1
++                and any(row["id"] == approved.pk and row["status"] == Status.APPROVED for row in after["rows"]),
++                "I4 affected unrelated/approved state, or failed to release old occupancy")
++
++    def i5(self, kind):
++        dev = self.fixture(EquipmentStatus.DISABLED if kind == "unavailable" else EquipmentStatus.AVAILABLE)
++        start, end = self.future()
++        old = self.make(dev, self.now() - timedelta(minutes=1), end)
++        conflict = self.make(dev, start, end, status=Status.APPROVED) if kind == "conflict" else None
++        path = url("reservation-submit", dev.pk)
++        values = window(start, end) if kind != "invalid" else {"start_at": "bad"}
++        before = self.snapshot(dev)
++        response = self.prepare(self.pair(Role.STUDENT, path), path, values)[0]()
++        after = self.snapshot(dev)
++        self.report(case="I5", kind=kind, before=before, after=after, response=response)
++        code, text = {"unavailable": (409, UNAVAILABLE_MESSAGE), "invalid": (400, INVALID_TIME_MESSAGE),
++                      "conflict": (409, CONFLICT_MESSAGE)}[kind]
++        self.expect(response, code, text)
++        self.check_order(response)
++        self.expiry(after, old.pk, response["server"]["decisions"][0])
++        require(len(after["rows"]) == len(before["rows"]) and len(after["history"]) == 1
++                and before["effective"] == after["effective"]
++                and (conflict is None or after["effective"][0]["id"] == conflict.pk), "I5 durable data mismatch")
++
++    def i6(self, *, read, deactivate):
++        dev = self.fixture()
++        start, end = self.future()
++        now = self.now()
++        old = self.make(dev, now - timedelta(hours=2), now - timedelta(hours=1))
++        form = url("reservation-submit", dev.pk)
++        app = connections["default"]
++        applicant = self.users[Role.STUDENT]
++        before = self.snapshot(dev)
++        execute, trace = self.prepare(self.pair(Role.STUDENT, form), url("reservation-result", old.pk) if read else form,
++                                      None if read else window(start, end), role=Role.STUDENT)
++        try:
++            with ThreadPoolExecutor(max_workers=1) as pool:
++                with transaction.atomic():
++                    self.hold_device(dev)
++                    actor = pool.submit(execute)
++                    blockers = self.wait_blocker(trace, target(app)[-1])
++                    change = ("is_active", False) if deactivate else ("role", Role.ADMIN)
++                    require(query(self.observer, f"UPDATE accounts_user SET {change[0]} = %s WHERE id = %s RETURNING id",
++                                  [change[1], applicant.pk]) == (applicant.pk,), "Test-only revoke failed")
++                response = actor.result()
++        finally:
++            User.objects.filter(pk=applicant.pk).update(is_active=True, role=Role.STUDENT)
++        after = self.snapshot(dev)
++        self.report(case="I6", read=read, requested_revocation=change, blockers=blockers,
++                    before=before, after=after, response=response)
++        self.expect(response, 403)
++        require(not trace["decisions"] and not trace["commit_attempts"] and self.unchanged(before, after)
++                and dev.name not in response["response"]["body"], "Post-lock revoke leaked or wrote business state")
++
++    def i7(self):
++        dev = self.fixture()
++        now = self.now()
++        terminal = self.make(dev, now - timedelta(hours=3), now - timedelta(hours=2), status=Status.EXPIRED)
++        old = self.make(dev, now - timedelta(hours=2), now - timedelta(hours=1))
++        form = url("reservation-submit", dev.pk)
++        pair = self.pair(Role.STUDENT, form)
++        terminal_read, _ = self.prepare(pair, url("reservation-result", terminal.pk))
++        pending_read, trace = self.prepare(pair, url("reservation-result", old.pk))
++        before = self.snapshot(dev)
++        app = connections["default"]
++        with ThreadPoolExecutor(max_workers=1) as pool:
++            with transaction.atomic():
++                self.hold_device(dev)
++                terminal_response = pool.submit(terminal_read).result(timeout=5)
++                actor = pool.submit(pending_read)
++                blockers = self.wait_blocker(trace, target(app)[-1])
++                added = self.make(dev, now - timedelta(hours=3), now - timedelta(hours=2), role=Role.TEACHER)
++            pending_response = actor.result()
++        after = self.snapshot(dev)
++        self.report(case="I7", before=before, after=after, blockers=blockers,
++                    responses=[terminal_response, pending_response])
++        self.expect(terminal_response, 200, "已失效")
++        self.expect(pending_response, 200, "已失效")
++        self.expiry(after, old.pk, trace["decisions"][0])
++        require("lock_attempt_ns" not in terminal_response["server"] and len(after["history"]) == 1
++                and any(row["id"] == added.pk and row["status"] == Status.PENDING for row in after["rows"]),
++                "Terminal result locked or fixed-candidate scope expanded")
++
++    def interleavings(self):
++        self.i1()
++        for status in (EquipmentStatus.MAINTENANCE, EquipmentStatus.DISABLED):
++            self.i2_i3(status, request_first=False)
++            self.i2_i3(status, request_first=True)
++        for read_first in (True, False):
++            self.i4(read_first=read_first)
++        for kind in ("unavailable", "invalid", "conflict"):
++            self.i5(kind)
++        for read in (True, False):
++            for deactivate in (True, False):
++                self.i6(read=read, deactivate=deactivate)
++        self.i7()
++
++    def permissions(self):
++        dev = self.fixture()
++        other = self.fixture()
++        start, end = self.future()
++        now = self.now()
++        old = self.make(dev, now - timedelta(hours=2), now - timedelta(hours=1))
++        form, result = url("reservation-submit", dev.pk), url("reservation-result", old.pk)
++        values = window(start, end)
++        student = self.pair(Role.STUDENT, form)
++        teacher = self.pair(Role.TEACHER, form)
++        admin = self.pair(Role.ADMIN)
++        anon = self.pair(None)
++        # Use a separate account for the stale session while leaving student positive controls authorized.
++        denied = User.objects.create_user(username=f"{self.prefix}inactive", password=self.password, role=Role.STUDENT)
++        main_student = self.users[Role.STUDENT]
++        self.users[Role.STUDENT] = denied
++        try:
++            inactive = self.pair(Role.STUDENT, form)
++        finally:
++            self.users[Role.STUDENT] = main_student
++        User.objects.filter(pk=denied.pk).update(is_active=False)
++        detail = url("equipment-detail", dev.pk)
++        for role, pair in [(Role.STUDENT, student), (Role.TEACHER, teacher), (Role.ADMIN, admin)]:
++            response = self.prepare(pair, detail, role=role)[0]()
++            self.report(case="detail-link", response=response)
++            self.expect(response, 200)
++            require((f'href="{form}"' in response["response"]["body"]) == (role != Role.ADMIN), "Wrong detail link permission")
++        cases = [
++            ("admin-get", admin, form, None, True, 403),
++            ("anon-get", anon, form, None, True, 302),
++            ("inactive-get", inactive, form, None, True, 302),
++            ("admin-post", admin, form, values, True, 403),
++            ("anon-post", anon, form, values, True, 302),
++            ("inactive-post", inactive, form, values, True, 302),
++            ("missing-csrf", student, form, values, False, 403),
++            ("wrong-csrf", (student[0], teacher[1]), form, values, True, 403),
++            ("foreign-result", teacher, result, None, True, 404),
++            ("admin-result", admin, result, None, True, 403),
++            ("anon-result", anon, result, None, True, 302),
++            ("inactive-result", inactive, result, None, True, 302),
++            ("missing-result", teacher, url("reservation-result", 2**62), None, True, 404),
++            ("result-post", student, result, {}, True, 405),
++        ]
++        responses = {}
++        for name, pair, path, data, csrf, code in cases:
++            before = self.snapshot(dev)
++            response = self.prepare(pair, path, data, use_csrf=csrf)[0]()
++            after = self.snapshot(dev)
++            self.report(case=name, before=before, after=after, response=response)
++            self.expect(response, code)
++            responses[name] = response["response"]
++            require(dev.name not in response["response"]["body"] and dev.number not in response["response"]["body"]
++                    and "lock_attempt_ns" not in response["server"] and not response["server"]["decisions"]
++                    and self.unchanged(before, after), "Denied request leaked or acquired a business lock/wrote state")
++        require(responses["foreign-result"]["body"] == responses["missing-result"]["body"], "Foreign GET differs from missing GET")
++        before = self.snapshot(dev)
++        owned = self.prepare(student, result)[0]()
++        repeated = self.prepare(student, result)[0]()
++        after = self.snapshot(dev)
++        self.report(case="own-ended-repeat", before=before, after=after, responses=[owned, repeated])
++        self.expect(owned, 200, "已失效")
++        self.expect(repeated, 200, "已失效")
++        self.expiry(after, old.pk, owned["server"]["decisions"][0])
++        for index, (role, pair) in enumerate(((Role.STUDENT, student), (Role.TEACHER, teacher))):
++            before = self.snapshot(dev)
++            data = window(start + timedelta(hours=index), end + timedelta(hours=index))
++            if index == 1:
++                data.update(applicant=self.users[Role.ADMIN].pk, applicant_id=main_student.pk,
++                            equipment=other.pk, equipment_id=other.pk, timezone="UTC")
++            response = self.prepare(pair, form, data, role=role)[0]()
++            after = self.snapshot(dev)
++            row, = (r for r in after["rows"] if r not in before["rows"])
++            read = self.prepare(pair, url("reservation-result", row["id"]), role=role)[0]()
++            self.report(case="authorized" if index == 0 else "tampered-authorized", before=before, after=after,
++                        other=self.snapshot(other), responses=[response, read])
++            self.expect(response, 201)
++            self.expect(read, 200, "待审核")
++            require((row["applicant_id"], row["equipment_id"], row["start_at"], row["end_at"], row["applied_at"])
++                    == (self.users[role].pk, dev.pk, start + timedelta(hours=index), end + timedelta(hours=index),
++                        response["server"]["decisions"][0]) and not self.snapshot(other)["rows"], "Trusted data source mismatch")
++        self.report(denied=12, missing_control=1, unsupported_method_control=1,
++                    positive_submission_controls=2, tampered_subset=1)
++
++    def faults(self):
++        def terminate(pid):
++            app = connections["default"]
++            killer = app.copy(alias="story21-killer")
++            try:
++                require(target(killer)[-1] != pid, "Termination must use a separate isolated backend")
++                require(query(killer, "SELECT pg_terminate_backend(%s, 3000) AS terminated", [pid]) == (True,),
++                        "Could not terminate the isolated request backend")
++            finally:
++                killer.close()
++
++        for fault in ("F1-history", "F1-reservation", "F2", "F3", "F4"):
++            dev = self.fixture()
++            start, end = self.future()
++            old = self.make(dev, self.now() - timedelta(minutes=1), end)
++            path = url("reservation-submit", dev.pk)
++            before = self.snapshot(dev)
++            response = self.prepare(self.pair(Role.STUDENT, path), path, window(start, end),
++                                    control={"fault": fault, "terminate": terminate})[0]()
++            after = self.snapshot(dev)
++            trace = response["server"]
++            self.report(case=fault, before=before, after=after, response=response,
++                        confirmation_simulated=fault == "F4")
++            unknown = fault in ("F3", "F4")
++            self.expect(response, 503, "结果待核查，请勿重复提交。" if unknown else "数据库事务已回滚")
++            require("记录编号" not in response["response"]["body"] and CONFLICT_MESSAGE not in response["response"]["body"]
++                    and (not unknown or "已回滚" not in response["response"]["body"])
++                    and len(trace["decisions"]) == trace["history_attempts"] == 1
++                    and trace["reservation_attempts"] == int(fault != "F1-history")
++                    and trace["commit_attempts"] == int(not fault.startswith("F1")), "Fault evidence indicates retry or misleading response")
++            code = trace.get("sqlstate")
++            if unknown:
++                require(code is None or code.startswith("08") or code in {"57P01", "57P02", "57P03"},
++                        "Disconnect did not manifest as a connection error")
++            else:
++                require(code == ("23514" if fault.startswith("F1") else "23505"), "Wrong injected PostgreSQL SQLSTATE")
++            if fault == "F4":
++                self.expiry(after, old.pk, trace["decisions"][0])
++                require(len(after["rows"]) == 2 and len(after["effective"]) == len(after["history"]) == 1,
++                        "F4 real commit did not persist the combined result")
++            else:
++                require(self.unchanged(before, after), "Fault left partial durable rows")
++
++    def time_boundaries(self):
++        now = self.now().astimezone(services.BEIJING)
++        start = now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
++        # 23:00 cannot be a valid start (23:00 is the latest legal end).
++        while start.hour == 23 or start - now < timedelta(seconds=30):
++            start += timedelta(hours=1)
++        end = start + timedelta(hours=1)
++        self.report(case="schedule", actual_server_now=now, boundary=start, legal_window=window(start, end))
++        self.announce(f"B3/B4 real server boundary (Asia/Shanghai): {start.isoformat()}; waiting without a device lock")
++        b3, b4 = self.fixture(), self.fixture()
++        b3_old = self.make(b3, now - timedelta(hours=2), now - timedelta(hours=1))
++        form3, form4 = url("reservation-submit", b3.pk), url("reservation-submit", b4.pk)
++        pair3, pair4 = self.pair(Role.STUDENT, form3), self.pair(Role.TEACHER, form4)
++        entered, release, control = self.commit_latch()
++        exec3, trace3 = self.prepare(pair3, form3, window(start, end), role=Role.STUDENT)
++        exec4, trace4 = self.prepare(pair4, form4, window(start, end), control=control, role=Role.TEACHER)
++        while self.now() < start - timedelta(seconds=12):
++            sleep(min(2, max(0.02, (start - self.now()).total_seconds() - 12)))
++        require(self.now() < start - timedelta(seconds=8), "Missed scheduled real boundary before obtaining locks")
++        app = connections["default"]
++        with ThreadPoolExecutor(max_workers=2) as pool:
++            try:
++                with transaction.atomic():
++                    self.hold_device(b3)
++                    actor3 = pool.submit(exec3)
++                    actor4 = pool.submit(exec4)
++                    blockers = self.wait_blocker(trace3, target(app)[-1])
++                    blocked_at = self.now()
++                    require(blocked_at < start and entered.wait(7) and trace4["decisions"][0] < start,
++                            "Not ready before actual Beijing hour")
++                    before3, before4 = self.snapshot(b3), self.snapshot(b4)
++                    require(len(before3["rows"]) == 1 and not before3["history"]
++                            and not before4["rows"] and not before4["history"], "Observer saw uncommitted boundary writes")
++                    wait_for(lambda: self.now() >= start, "real Beijing start", timeout_seconds=20)
++                    releasing_at = self.now()
++            finally:
++                release.set()
++            response3, response4 = actor3.result(), actor4.result()
++        after3, after4 = self.snapshot(b3), self.snapshot(b4)
++        self.report(case="B3", real_blocked_at=blocked_at, release_at=releasing_at, start=start,
++                    before=before3, after=after3, blockers=blockers, response=response3)
++        self.report(case="B4", real_blocked_at=blocked_at, release_at=releasing_at, start=start,
++                    before=before4, after=after4, response=response4)
++        self.check_order(response3)
++        self.check_order(response4)
++        self.expect(response3, 400, INVALID_TIME_MESSAGE)
++        self.expect(response4, 201)
++        require(blocked_at < start <= releasing_at <= trace3["decisions"][0]
++                and trace4["decisions"][0] < start and len(after3["rows"]) == len(after3["history"]) == 1,
++                "Lock crossing and sample timestamps not demonstrated")
++        self.expiry(after3, b3_old.pk, trace3["decisions"][0])
++        row, = after4["rows"]
++        require(row["applied_at"] == trace4["decisions"][0] and row["status"] == Status.PENDING
++                and not after4["effective"] and not after4["history"], "B4 late COMMIT persistence mismatch")
++        result = self.prepare(pair4, url("reservation-result", row["id"]), role=Role.TEACHER)[0]()
++        finalized = self.snapshot(b4)
++        self.report(case="B4-readback", before=after4, after=finalized, response=result)
++        self.expect(result, 200, "已失效")
++        self.expiry(finalized, row["id"], result["server"]["decisions"][0])
++
++
++def baseline(connection, existing_tables=None):
++    # Store full-row digests, never account passwords, session payloads or key material.
++    tables = ("accounts_user", "django_session", "equipment_equipment", "reservations_reservation", "audit_operationhistory")
++    summary = {}
++    with connection.cursor() as cursor:
++        for name in tables:
++            if existing_tables is not None and name not in existing_tables:
++                continue
++            cursor.execute(f'SELECT row_to_json(t)::text AS payload FROM public.{name} AS t ORDER BY 1')
++            payloads = [row[0] for row in cursor.fetchall()]
++            summary[name] = {"count": len(payloads), "sha256": hashlib.sha256(json.dumps(payloads).encode()).hexdigest()}
++    return summary
++
++
++def pre_migration_state(connection):
++    executor = MigrationExecutor(connection)
++    executor.loader.check_consistent_history(connection)
++    state = IsolatedPostgresRunner.database_state(connection)
++    require(state[2:] == (0, 0), "Isolated database must have zero accounts and sessions before migration")
++    tables, applied = {row[0] for row in state[0]}, set(state[1])
++    require(not any(app in {"reservations", "audit"} and (app, name) not in STORY_MIGRATIONS for app, name in applied),
++            "Unexpected reservation/audit migration already recorded; no rollback or migration authorized")
++    require(all((key in applied) == (table in tables) for key, table in STORY_MIGRATIONS.items()),
++            "Story migration tracking and actual table presence disagree")
++    plan = [(migration.app_label, migration.name, backwards)
++            for migration, backwards in executor.migration_plan(executor.loader.graph.leaf_nodes())]
++    require(all(not backwards and (app, name) in STORY_MIGRATIONS for app, name, backwards in plan),
++            "Only forward Story 2.1 initial migrations are authorized")
++    require({(app, name) for app, name, _ in plan} == STORY_MIGRATIONS.keys() - applied,
++            "Migration plan does not match the missing Story 2.1 initial migrations")
++    return {"schema": state, "rows": baseline(connection, tables), "forward_plan": plan}
++
++
++class Command(BaseCommand):
++    help = "Run real loopback reservation probes only against the pre-created PostgreSQL test database."
++
++    def add_arguments(self, parser):
++        parser.add_argument("--group", choices=GROUPS, required=True)
++        parser.add_argument("--evidence", type=Path, required=True)
++
++    def handle(self, *args, **options):
++        require(settings.LAB_BOOKING_DB_MODE == "test" and list(connections) == ["default"],
++                "Reservation probes require the sole guarded test database")
++        app = connections["default"]
++        require(app.get_autocommit() and not app.in_atomic_block, "Probe fixtures must be genuinely committed")
++        observer = app.copy(alias="story21-observer")
++        group = options["group"]
++        runner = IsolatedPostgresRunner(verbosity=0, parallel=1, keepdb=True)
++        try:
++            observer_identity = target(observer)
++            app_identity = target(app)
++            require(observer_identity[-1] != app_identity[-1], "Observer connection is not independent")
++            if group == "pre-migrate":
++                state = pre_migration_state(app)
++                with options["evidence"].open("x", encoding="utf-8") as raw:
++                    json.dump({"database": app_identity, **state}, raw, sort_keys=True)
++                self.stdout.write("STORY21_PROBE_OK pre-migrate")
++                return
++            before_schema = runner.setup_databases(aliases={"default": True})
++            before = baseline(observer)
++            if group == "baseline":
++                with options["evidence"].open("x", encoding="utf-8") as raw:
++                    json.dump({"schema": before_schema, "rows": before}, raw, sort_keys=True)
++                self.stdout.write("STORY21_PROBE_OK baseline")
++                return
++            cases = {}
++            prefix = f"S21-{uuid4().hex[:18]}-"
++            with options["evidence"].open("x", encoding="utf-8") as raw:
++                def report(**record):
++                    raw.write(json.dumps(record, ensure_ascii=False, default=str) + "\n")
++                    raw.flush()
++
++                report(group=group, hostname=platform.node(), python=platform.python_version(), machine=platform.platform(),
++                       database=observer_identity, fixture_prefix=prefix, before=before, schema_before=before_schema)
++                with make_server(HOST, 0, ProbeWSGI(cases), server_class=ThreadedServer, handler_class=QuietHandler) as server:
++                    experiment = Experiment(observer, server, cases, prefix, report)
++                    experiment.observer_identity = observer_identity
++                    experiment.announce = lambda line: self.stdout.write(line, ending="\n")
++                    thread = Thread(target=server.serve_forever, name="story21-loopback")
++                    thread.start()
++                    try:
++                        for role in (Role.STUDENT, Role.TEACHER, Role.ADMIN):
++                            experiment.users[role] = User.objects.create_user(
++                                username=prefix + role, role=role, password=experiment.password)
++                        with patch.object(services, "_decision_time", observe_decision):
++                            {
++                                "permissions": experiment.permissions,
++                                "interleavings": experiment.interleavings,
++                                "faults": experiment.faults,
++                                "nfr001-standard": experiment.standard,
++                                "time-boundaries": experiment.time_boundaries,
++                            }[group]()
++                    finally:
++                        server.shutdown()
++                        thread.join()
++                        server.server_close()  # Wait for request threads before deleting owned fixtures.
++                        equipment_ids = list(Equipment.objects.filter(number__startswith=prefix).values_list("pk", flat=True))
++                        owned = Reservation.objects.filter(equipment_id__in=equipment_ids)
++                        with transaction.atomic():
++                            Session.objects.filter(session_key__in=experiment.session_keys).delete()
++                            OperationHistory.objects.filter(reservation__in=owned).delete()
++                            owned.delete()
++                            Equipment.objects.filter(pk__in=equipment_ids).delete()
++                            User.objects.filter(username__startswith=prefix).delete()
++                        after = baseline(observer)
++                        after_schema = runner.database_state(observer)
++                        report(cleanup=True, after=after, schema_after=after_schema)
++                        require(after == before and after_schema == before_schema, "Full-row or schema baseline changed")
++            self.stdout.write(f"STORY21_PROBE_OK {group}")
++        finally:
++            observer.close()
++            app.close()
+diff --git a/reservations/migrations/0001_initial.py b/reservations/migrations/0001_initial.py
+new file mode 100644
+index 0000000..6f40e79
+--- /dev/null
++++ b/reservations/migrations/0001_initial.py
+@@ -0,0 +1,29 @@
++import django.db.models.deletion
++from django.conf import settings
++from django.db import migrations, models
++
++
++class Migration(migrations.Migration):
++    initial = True
++    dependencies = [
++        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
++        ("equipment", "0001_initial"),
++    ]
++    operations = [
++        migrations.CreateModel(
++            name="Reservation",
++            fields=[
++                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
++                ("start_at", models.DateTimeField()),
++                ("end_at", models.DateTimeField()),
++                ("status", models.CharField(choices=[("pending", "待审核"), ("approved", "已批准"), ("rejected", "已拒绝"), ("cancelled", "已取消"), ("expired", "已失效")], default="pending", max_length=16)),
++                ("applied_at", models.DateTimeField()),
++                ("applicant", models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
++                ("equipment", models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to="equipment.equipment")),
++            ],
++            options={"constraints": [
++                models.CheckConstraint(condition=models.Q(status__in=["pending", "approved", "rejected", "cancelled", "expired"]), name="reservation_status_valid"),
++                models.CheckConstraint(condition=models.Q(end_at__gt=models.F("start_at")), name="reservation_start_before_end"),
++            ]},
++        ),
++    ]
+diff --git a/reservations/migrations/__init__.py b/reservations/migrations/__init__.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/reservations/models.py b/reservations/models.py
+new file mode 100644
+index 0000000..9b06a85
+--- /dev/null
++++ b/reservations/models.py
+@@ -0,0 +1,25 @@
++from django.conf import settings
++from django.db import models
++
++
++class ReservationStatus(models.TextChoices):
++    PENDING = "pending", "待审核"
++    APPROVED = "approved", "已批准"
++    REJECTED = "rejected", "已拒绝"
++    CANCELLED = "cancelled", "已取消"
++    EXPIRED = "expired", "已失效"
++
++
++class Reservation(models.Model):
++    applicant = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
++    equipment = models.ForeignKey("equipment.Equipment", on_delete=models.PROTECT)
++    start_at = models.DateTimeField()
++    end_at = models.DateTimeField()
++    status = models.CharField(max_length=16, choices=ReservationStatus.choices, default=ReservationStatus.PENDING)
++    applied_at = models.DateTimeField()
++
++    class Meta:
++        constraints = [
++            models.CheckConstraint(condition=models.Q(status__in=ReservationStatus.values), name="reservation_status_valid"),
++            models.CheckConstraint(condition=models.Q(end_at__gt=models.F("start_at")), name="reservation_start_before_end"),
++        ]
+diff --git a/reservations/services.py b/reservations/services.py
+new file mode 100644
+index 0000000..ae360ba
+--- /dev/null
++++ b/reservations/services.py
+@@ -0,0 +1,156 @@
++import re
++from dataclasses import dataclass
++from datetime import datetime, time, timedelta
++from zoneinfo import ZoneInfo
++
++from django.core.exceptions import PermissionDenied
++from django.db import Error, transaction
++from django.db.models import Q
++
++from accounts.models import User
++from accounts.policies import RESERVATION_ROLES, can_reserve
++from audit.services import append_reservation_expiry
++from equipment.models import Equipment, EquipmentStatus
++from equipment.services import lock_equipment
++from lab_booking.transactions import transaction_rejected
++
++from .models import Reservation, ReservationStatus
++
++
++BEIJING = ZoneInfo("Asia/Shanghai")
++LOCAL_INPUT = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(?::[0-9]{2}(?:\.[0-9]{1,6})?)?")
++# Unlike a lost connection or SQLSTATE 40003, these server responses confirm rejection.
++COMMIT_CANCELLATION_STATES = {"55P03", "57014"}
++RESULT_FIELDS = ("id", "equipment_id", "equipment__number", "equipment__name", "start_at", "end_at", "status")
++
++
++class ReservationFailed(Exception):
++    pass
++
++
++class ReservationUnknown(Exception):
++    pass
++
++
++@dataclass(frozen=True)
++class Submission:
++    outcome: str
++    record: dict | None = None
++    equipment: dict | None = None
++
++
++def require_applicant(user):
++    if not can_reserve(user):
++        raise PermissionDenied
++
++
++def _recheck_applicant(pk):
++    row = User.objects.filter(pk=pk).values_list("is_active", "role").first()
++    if row is None or not row[0] or row[1] not in RESERVATION_ROLES:
++        raise PermissionDenied
++
++
++def _decision_time(connection):
++    with connection.cursor() as cursor:
++        cursor.execute("SELECT clock_timestamp() AS decision_at")
++        return cursor.fetchone()[0]
++
++
++def _parse_local(value):
++    if not isinstance(value, str) or not LOCAL_INPUT.fullmatch(value):
++        raise ValueError
++    return datetime.fromisoformat(value).replace(tzinfo=BEIJING)
++
++
++def valid_window(raw_start, raw_end, decision_at):
++    try:
++        start, end = _parse_local(raw_start), _parse_local(raw_end)
++        if (start.date() == end.date() and start > decision_at
++                and not any((start.minute, start.second, start.microsecond, end.minute, end.second, end.microsecond))
++                and end - start >= timedelta(hours=1) and end.time() <= time(23)):
++            return start, end
++    except (ValueError, OverflowError):
++        pass
++    return None
++
++
++def _expire(queryset, decision_at):
++    due = queryset.filter(status=ReservationStatus.PENDING, start_at__lte=decision_at)
++    expired = list(due.order_by("pk").values_list("pk", flat=True))
++    for pk in expired:
++        if due.filter(pk=pk).update(status=ReservationStatus.EXPIRED) != 1:
++            raise ReservationFailed
++        append_reservation_expiry(pk, decision_at)
++    return expired
++
++
++def _durable_operation(operation):
++    connection = transaction.get_connection()
++    ready_to_commit = False
++    try:
++        if not connection.in_atomic_block and not connection.get_autocommit():
++            raise RuntimeError("预约操作要求由服务管理最外层事务。")
++        with transaction.atomic(durable=True):
++            result = operation(connection)
++            if connection.closed_in_transaction or transaction.get_rollback():
++                raise ReservationFailed
++            ready_to_commit = True
++    except Error as error:
++        if ready_to_commit and not transaction_rejected(error, additional_sqlstates=COMMIT_CANCELLATION_STATES):
++            raise ReservationUnknown from None
++        raise ReservationFailed from None
++    return result
++
++
++def submit_reservation(user, equipment_pk, raw_start, raw_end):
++    require_applicant(user)
++
++    def submit(connection):
++        if lock_equipment(equipment_pk) is None:
++            return Submission("missing")
++        equipment = Equipment.objects.values("number", "name", "status").get(pk=equipment_pk)
++        _recheck_applicant(user.pk)
++        decision_at = _decision_time(connection)
++        reservations = Reservation.objects.filter(equipment_id=equipment_pk)
++        _expire(reservations, decision_at)
++        if equipment["status"] != EquipmentStatus.AVAILABLE:
++            return Submission("unavailable", equipment=equipment)
++        window = valid_window(raw_start, raw_end, decision_at)
++        if window is None:
++            return Submission("invalid_time", equipment=equipment)
++        start, end = window
++        effective = Q(status=ReservationStatus.APPROVED) | Q(status=ReservationStatus.PENDING, start_at__gt=decision_at)
++        if reservations.filter(effective, start_at__lt=end, end_at__gt=start).exists():
++            return Submission("conflict", equipment=equipment)
++        created = reservations.create(applicant_id=user.pk, equipment_id=equipment_pk,
++                                      start_at=start, end_at=end, applied_at=decision_at)
++        return Submission("created", {
++            "id": created.pk, "equipment_id": equipment_pk, "equipment__number": equipment["number"],
++            "equipment__name": equipment["name"], "start_at": start, "end_at": end, "status": created.status,
++        })
++
++    return _durable_operation(submit)
++
++
++def get_reservation_result(user, pk):
++    require_applicant(user)
++    owned = Reservation.objects.filter(pk=pk, applicant_id=user.pk)
++
++    def read(connection):
++        candidate = owned.values(*RESULT_FIELDS).first()
++        if candidate is None or candidate["status"] != ReservationStatus.PENDING:
++            return candidate
++        equipment_id = candidate["equipment_id"]
++        if lock_equipment(equipment_id) is None:
++            return None
++        _recheck_applicant(user.pk)
++        fixed = owned.filter(equipment_id=equipment_id)
++        current = fixed.values(*RESULT_FIELDS).first()
++        if current is None or current["status"] != ReservationStatus.PENDING:
++            return current
++        decision_at = _decision_time(connection)
++        if _expire(fixed, decision_at):
++            current["status"] = ReservationStatus.EXPIRED
++        return current
++
++    return _durable_operation(read)
+diff --git a/reservations/templates/reservations/form.html b/reservations/templates/reservations/form.html
+new file mode 100644
+index 0000000..0c8f809
+--- /dev/null
++++ b/reservations/templates/reservations/form.html
+@@ -0,0 +1,15 @@
++<!doctype html>
++<html lang="zh-CN">
++<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>申请预约 · 实验室设备预约</title></head>
++<body><main>
++    <h1>申请预约</h1>
++    <p>设备：{{ equipment.number }} · {{ equipment.name }}</p>
++    <p id="time-rules">请填写北京时间同一天的整点时段。开始时间须在未来，至少预约一小时，最晚 23:00 结束。</p>
++    {% if message %}<p role="alert">{{ message }}</p>{% endif %}
++    <form method="post" aria-describedby="time-rules">
++        {% csrf_token %}
++        {{ form.as_p }}
++        <button type="submit">提交预约申请</button>
++    </form>
++</main></body>
++</html>
+diff --git a/reservations/templates/reservations/result.html b/reservations/templates/reservations/result.html
+new file mode 100644
+index 0000000..5b8ada7
+--- /dev/null
++++ b/reservations/templates/reservations/result.html
+@@ -0,0 +1,19 @@
++<!doctype html>
++<html lang="zh-CN">
++<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>预约结果 · 实验室设备预约</title></head>
++<body><main>
++    {% if error %}
++        <h1>预约结果</h1>
++        <p role="alert">{{ error }}</p>
++    {% else %}
++        <h1>{% if created %}预约申请提交成功{% else %}我的预约结果{% endif %}</h1>
++        <dl>
++            <dt>记录编号</dt><dd>{{ record.id|stringformat:"d" }}</dd>
++            <dt>设备</dt><dd>{{ record.equipment__number }} · {{ record.equipment__name }}</dd>
++            <dt>时段（北京时间）</dt><dd>{{ record.start_text }} 至 {{ record.end_text }}</dd>
++            <dt>{% if created %}提交时状态{% else %}当前状态{% endif %}</dt><dd>{{ record.status_label }}</dd>
++        </dl>
++        {% if created %}<p><a href="{% url 'reservation-result' record.id %}">查看本人预约结果</a></p>{% endif %}
++    {% endif %}
++</main></body>
++</html>
+diff --git a/reservations/tests.py b/reservations/tests.py
+new file mode 100644
+index 0000000..3c132bf
+--- /dev/null
++++ b/reservations/tests.py
+@@ -0,0 +1,339 @@
++from contextlib import contextmanager
++from datetime import datetime, timedelta, timezone
++import re
++from types import SimpleNamespace
++from unittest.mock import patch
++
++from django.db import IntegrityError, OperationalError, connection, transaction
++from django.test import Client, SimpleTestCase, TestCase
++from django.urls import reverse
++
++from accounts.models import Role, User
++from audit.models import HistoryObject, OperationHistory
++from audit.services import EXPIRY_REASON
++from equipment.models import Equipment, EquipmentStatus
++from lab_booking.transactions import transaction_rejected
++
++from . import services
++from .models import Reservation, ReservationStatus as Status
++from .services import BEIJING, valid_window
++from .views import CONFLICT_MESSAGE, UNAVAILABLE_MESSAGE
++
++
++DECISION = datetime(2030, 2, 3, 9, tzinfo=BEIJING)
++
++
++def local(hour, day=3):
++    return datetime(2030, 2, day, hour, tzinfo=BEIJING)
++
++
++def raw(moment):
++    return moment.isoformat(timespec="minutes")[:16]
++
++
++@contextmanager
++def rollback_subcase():
++    # A manual savepoint does not wrap the service's durable block in another atomic block.
++    savepoint = transaction.savepoint()
++    try:
++        yield
++    finally:
++        transaction.savepoint_rollback(savepoint)
++
++
++class TimeRulesTests(SimpleTestCase):
++    def test_b1_microsecond_boundaries(self):
++        start, end = local(10), local(11)
++        delta = timedelta(microseconds=1)
++        for decision, accepted in [(start - delta, True), (start, False), (start + delta, False)]:
++            with self.subTest(decision=decision):
++                self.assertEqual(valid_window(raw(start), raw(end), decision) is not None, accepted)
++
++    def test_b2_beijing_legal_and_utc_round_trip(self):
++        for start, end in [(local(10), local(11)), (local(22, 4), local(23, 4)), (local(0, 4), local(1, 4)),
++                           (datetime(2099, 1, 2, 10, tzinfo=BEIJING), datetime(2099, 1, 2, 11, tzinfo=BEIJING))]:
++            with self.subTest(start=start):
++                actual = valid_window(raw(start), raw(end), DECISION.astimezone(timezone.utc))
++                self.assertEqual(actual, (start, end))
++                self.assertEqual(actual[0].astimezone(timezone.utc).astimezone(BEIJING), start)
++        self.assertEqual(valid_window(raw(local(10)) + ':00.000', raw(local(11)), DECISION), (local(10), local(11)))
++
++    def test_b2_rejects_invalid_dates_precision_windows_and_zone_suffixes(self):
++        hour = raw(local(10))
++        end = raw(local(11))
++        for start, stop in [(None, end), ("", end), (hour, hour), (end, hour), (raw(local(9)), end),
++                            (hour + "Z", end), (hour + "+08:00", end), (hour + ":01", end),
++                            (hour + ":00.000001", end), (hour[:-2] + "30", end[:-2] + "30"),
++                            ("2030-02-30T10:00", end), (raw(local(23)), raw(local(0, 4))),
++                            (raw(local(22)), raw(local(1, 4))), (hour, raw(local(23)) + ":01")]:
++            with self.subTest(start=start, end=stop):
++                self.assertIsNone(valid_window(start, stop, DECISION))
++
++    def test_ac9_commit_server_cancellation_is_confirmed_but_disconnect_is_unknown(self):
++        db = SimpleNamespace(in_atomic_block=False, get_autocommit=lambda: True, closed_in_transaction=False)
++
++        @contextmanager
++        def commit_error(error):
++            yield
++            raise error
++
++        for code, expected in [("55P03", services.ReservationFailed), ("57014", services.ReservationFailed),
++                               ("08006", services.ReservationUnknown), ("40003", services.ReservationUnknown),
++                               (None, services.ReservationUnknown)]:
++            with self.subTest(sqlstate=code):
++                cause = Exception()
++                cause.sqlstate = code
++                error = OperationalError()
++                error.__cause__ = cause
++                self.assertFalse(transaction_rejected(error))  # The Epic 1 classification is unchanged.
++                with (patch.object(transaction, "get_connection", return_value=db),
++                      patch.object(transaction, "atomic", return_value=commit_error(error)),
++                      patch.object(transaction, "get_rollback", return_value=False),
++                      self.assertRaises(expected)):
++                    services._durable_operation(lambda connection: None)
++
++
++class ReservationTests(TestCase):
++    @classmethod
++    def setUpTestData(cls):
++        cls.student = User.objects.create_user(username="story21-student", password="Student-pass-21!", role=Role.STUDENT)
++        cls.teacher = User.objects.create_user(username="story21-teacher", role=Role.TEACHER)
++        cls.admin = User.objects.create_user(username="story21-admin", role=Role.ADMIN)
++        cls.inactive = User.objects.create_user(username="story21-inactive", role=Role.STUDENT, is_active=False)
++        cls.equipment = Equipment.objects.create(number="21-device", name="私有预约测试设备", category="显微镜", location="实验室")
++        cls.other = Equipment.objects.create(number="21-other", name="第二台设备", category="显微镜", location="实验室")
++
++    def setUp(self):
++        clock = patch("reservations.services._decision_time", return_value=DECISION)
++        self.clock = clock.start()
++        self.addCleanup(clock.stop)
++        self.url = reverse("reservation-submit", args=[self.equipment.pk])
++
++    def login_client(self, user, *, protected=False):
++        client = Client(enforce_csrf_checks=protected)
++        client.force_login(user)
++        return client
++
++    def make(self, start=local(8), end=local(11), *, user=None, equipment=None, status=Status.PENDING):
++        return Reservation.objects.create(applicant=user or self.student, equipment=equipment or self.equipment,
++                                          start_at=start, end_at=end, status=status, applied_at=start - timedelta(days=1))
++
++    def form_data(self, start=local(10), end=local(11), **extra):
++        return {"start_at": raw(start), "end_at": raw(end), **extra}
++
++    def token(self, response):
++        return re.search(r'name="csrfmiddlewaretoken" value="([^"]+)"', response.content.decode())[1]
++
++    def result_url(self, row):
++        return reverse("reservation-result", args=[row.pk])
++
++    def snapshot(self):
++        return list(Reservation.objects.order_by("pk").values()), list(OperationHistory.objects.order_by("pk").values())
++
++    def assert_expired_once(self, row, decision=DECISION):
++        row.refresh_from_db()
++        self.assertEqual(row.status, Status.EXPIRED)
++        history = OperationHistory.objects.get(reservation=row)
++        self.assertEqual((history.object_type, history.equipment_id, history.action, history.before_status,
++                          history.after_status, history.actor_type, history.actor_id, history.reason, history.decision_at),
++                         (HistoryObject.RESERVATION, None, "expire", Status.PENDING, Status.EXPIRED, "system", None,
++                          EXPIRY_REASON, decision))
++        self.assertIsNotNone(history.recorded_at)
++
++    def test_ac1_both_roles_follow_detail_submit_with_csrf_and_read_own_result(self):
++        for index, user in enumerate((self.student, self.teacher)):
++            with self.subTest(role=user.role):
++                client = self.login_client(user, protected=True)
++                detail = client.get(reverse("equipment-detail", args=[self.equipment.pk]))
++                self.assertContains(detail, f'href="{self.url}"')
++                form = client.get(self.url)
++                self.assertContains(form, 'type="datetime-local"', count=2)
++                start, end = local(10 + index), local(11 + index)
++                response = client.post(self.url, self.form_data(start, end, csrfmiddlewaretoken=self.token(form)))
++                row = Reservation.objects.get(applicant=user)
++                self.assertContains(response, "预约申请提交成功", status_code=201)
++                self.assertContains(response, self.result_url(row), status_code=201)
++                self.assertEqual((row.equipment_id, row.start_at, row.end_at, row.applied_at, row.status),
++                                 (self.equipment.pk, start, end, DECISION, Status.PENDING))
++                result = client.get(self.result_url(row))
++                self.assertContains(result, "待审核")
++                self.assertContains(result, raw(start).replace("T", " "))
++                self.assertContains(client.post(self.url, self.form_data(start, end, csrfmiddlewaretoken=self.token(form))),
++                                    CONFLICT_MESSAGE, status_code=409)
++
++    def test_ac2_unauthorized_or_csrf_failures_do_not_expire(self):
++        self.make()
++        student = self.login_client(self.student, protected=True)
++        admin = self.login_client(self.admin, protected=True)
++        # An admin detail response has no form, so mint a valid token via the normal login view.
++        token = self.token(admin.get(reverse("login")))
++        admin_detail = admin.get(reverse("equipment-detail", args=[self.equipment.pk]))
++        self.assertNotContains(admin_detail, self.url)
++        self.assertEqual(admin.get(self.url).status_code, 403)
++        anon = Client(enforce_csrf_checks=True)
++        anon_token = self.token(anon.get(reverse("login")))
++        self.assertRedirects(anon.get(self.url), f'/login/?next={self.url}', fetch_redirect_response=False)
++        inactive = self.login_client(self.inactive, protected=True)
++        inactive_token = self.token(inactive.get(reverse("login")))
++        student.get(self.url)
++        for client, extra, status in [(admin, {"csrfmiddlewaretoken": token}, 403),
++                                      (anon, {"csrfmiddlewaretoken": anon_token}, 302),
++                                      (inactive, {"csrfmiddlewaretoken": inactive_token}, 302),
++                                      (student, {}, 403), (student, {"csrfmiddlewaretoken": token}, 403)]:
++            before = self.snapshot()
++            response = client.post(self.url, self.form_data(**extra))
++            self.assertNotContains(response, self.equipment.name, status_code=status)
++            self.assertEqual(self.snapshot(), before)
++        self.clock.assert_not_called()
++
++    def test_ac2_tampered_identity_device_and_timezone_are_ignored(self):
++        client = self.login_client(self.student, protected=True)
++        token = self.token(client.get(self.url))
++        response = client.post(self.url, self.form_data(csrfmiddlewaretoken=token, applicant=self.teacher.pk,
++                                                       applicant_id=self.admin.pk, equipment=self.other.pk,
++                                                       equipment_id=self.other.pk, timezone="UTC"))
++        self.assertEqual(response.status_code, 201)
++        row = Reservation.objects.get()
++        self.assertEqual((row.applicant_id, row.equipment_id, row.start_at), (self.student.pk, self.equipment.pk, local(10)))
++
++    def test_ac4_both_unavailable_statuses_report_unavailability(self):
++        client = self.login_client(self.student)
++        later = self.make(local(15), local(16))
++        for status in (EquipmentStatus.MAINTENANCE, EquipmentStatus.DISABLED):
++            Equipment.objects.filter(pk=self.equipment.pk).update(status=status)
++            self.assertContains(client.post(self.url, self.form_data()), UNAVAILABLE_MESSAGE, status_code=409)
++        later.refresh_from_db()
++        self.assertEqual(later.status, Status.PENDING)
++        self.assertEqual(Reservation.objects.count(), 1)
++        self.assertFalse(OperationHistory.objects.exists())
++
++    def test_ac5_overlap_matrix_for_both_effective_states(self):
++        client = self.login_client(self.student)
++        for status in (Status.PENDING, Status.APPROVED):
++            for start, end in [(11, 13), (10, 12), (12, 14), (10, 14), (11, 12)]:
++                with self.subTest(status=status, start=start, end=end), rollback_subcase():
++                    self.make(local(11), local(13), user=self.teacher, status=status)
++                    response = client.post(self.url, self.form_data(local(start), local(end)))
++                    self.assertContains(response, CONFLICT_MESSAGE, status_code=409)
++                    self.assertNotContains(response, self.teacher.username, status_code=409)
++                    self.assertEqual(Reservation.objects.count(), 1)
++
++    def test_ac5_adjacency_both_directions_cross_device_and_terminal_states(self):
++        client = self.login_client(self.student)
++        self.make(local(11), local(13), status=Status.APPROVED)
++        for status in (Status.REJECTED, Status.CANCELLED, Status.EXPIRED):
++            self.make(local(10), local(11), status=status)
++        for url, start, end in [(self.url, 10, 11), (self.url, 13, 14),
++                                (reverse("reservation-submit", args=[self.other.pk]), 11, 13)]:
++            self.assertEqual(client.post(url, self.form_data(local(start), local(end))).status_code, 201)
++
++    def test_ac6_expiry_boundary_and_approved_record_never_expires(self):
++        owner = self.login_client(self.student)
++        start, end = local(10), local(11)
++        old = self.make(start, end)
++        approved = self.make(start, end, status=Status.APPROVED)
++        for decision in (start - timedelta(microseconds=1), start, start + timedelta(microseconds=1),
++                         end - timedelta(microseconds=1), end, end + timedelta(microseconds=1)):
++            with self.subTest(decision=decision), rollback_subcase():
++                self.clock.return_value = decision
++                self.assertContains(owner.get(self.result_url(old)), "待审核" if decision < start else "已失效")
++                if decision >= start:
++                    self.assert_expired_once(old, decision)
++                self.assertContains(owner.get(self.result_url(approved)), "已批准")
++                self.assertFalse(OperationHistory.objects.filter(reservation=approved).exists())
++
++    def test_ac6_submit_expiry_is_scoped_and_only_once(self):
++        client = self.login_client(self.student)
++        old = self.make(user=self.teacher)
++        unrelated = self.make(equipment=self.other)
++        approved = self.make(local(7), local(10), status=Status.APPROVED)
++        self.assertEqual(client.post(self.url, self.form_data()).status_code, 201)
++        self.assert_expired_once(old)
++        self.assertEqual(client.post(self.url, self.form_data()).status_code, 409)
++        self.assert_expired_once(old)
++        unrelated.refresh_from_db()
++        approved.refresh_from_db()
++        self.assertEqual((unrelated.status, approved.status), (Status.PENDING, Status.APPROVED))
++
++    def test_ac8_business_rejections_keep_expiry_and_preserve_other_rows(self):
++        client = self.login_client(self.student)
++        for kind, expected in [("unavailable", 409), ("invalid", 400), ("conflict", 409)]:
++            with self.subTest(kind=kind), rollback_subcase():
++                old = self.make()
++                other = self.make(local(10), local(11), status=Status.APPROVED) if kind == "conflict" else None
++                if kind == "unavailable":
++                    Equipment.objects.filter(pk=self.equipment.pk).update(status=EquipmentStatus.DISABLED)
++                values = self.form_data() if kind != "invalid" else {"start_at": "not-a-time"}
++                self.assertEqual(client.post(self.url, values).status_code, expected)
++                self.assert_expired_once(old)
++                self.assertEqual(Reservation.objects.count(), 2 if other else 1)
++
++    def test_ac8_business_rejections_render_locked_equipment_without_another_read(self):
++        client = self.login_client(self.student)
++        with patch("reservations.views.get_equipment_detail", side_effect=AssertionError("POST must not reread the device")) as detail:
++            self.assertContains(client.post(self.url, {"start_at": "bad"}), self.equipment.name, status_code=400)
++            self.make(local(10), local(11), status=Status.APPROVED)
++            self.assertContains(client.post(self.url, self.form_data()), CONFLICT_MESSAGE, status_code=409)
++            Equipment.objects.filter(pk=self.equipment.pk).update(status=EquipmentStatus.DISABLED)
++            self.assertContains(client.post(self.url, self.form_data()), UNAVAILABLE_MESSAGE, status_code=409)
++            detail.assert_not_called()
++
++    def test_ac10_foreign_and_missing_are_equal_and_post_is_disallowed(self):
++        old = self.make()
++        before = self.snapshot()
++        url = self.result_url(old)
++        for client, status in [(self.login_client(self.teacher), 404), (self.login_client(self.admin), 403),
++                               (Client(), 302), (self.login_client(self.inactive), 302)]:
++            response = client.get(url)
++            self.assertNotContains(response, self.equipment.name, status_code=status)
++            if status == 404:
++                self.assertEqual(response.content, client.get(reverse("reservation-result", args=[old.pk + 1])).content)
++            self.assertEqual(self.snapshot(), before)
++        student = self.login_client(self.student, protected=True)
++        self.assertEqual(student.post(url, {"csrfmiddlewaretoken": self.token(student.get(self.url))}).status_code, 405)
++        self.assertEqual(self.snapshot(), before)
++        self.clock.assert_not_called()
++
++    def test_ac10_expired_ended_result_only_updates_fixed_owned_row(self):
++        old = self.make(local(6), local(7))
++        foreign = self.make(user=self.teacher)
++        same_owner_other = self.make()
++        student = self.login_client(self.student)
++        for _ in range(2):
++            self.assertContains(student.get(self.result_url(old)), "已失效")
++            self.assert_expired_once(old)
++        self.clock.assert_called_once()
++        for row in (foreign, same_owner_other):
++            row.refresh_from_db()
++            self.assertEqual(row.status, Status.PENDING)
++            self.assertFalse(OperationHistory.objects.filter(reservation=row).exists())
++
++    def test_own_result_login_redirect_returns_to_target_form(self):
++        client = Client(enforce_csrf_checks=True)
++        login = client.get(self.url, follow=True)
++        response = client.post(login.redirect_chain[-1][0], {"username": self.student.username,
++                               "password": "Student-pass-21!", "next": self.url, "csrfmiddlewaretoken": self.token(login)})
++        self.assertRedirects(response, self.url)
++
++    def test_r04_database_checks_both_fk_and_protects_referenced_rows(self):
++        reservation = self.make()
++        values = dict(action="fixture", before_status="pending", after_status="expired", actor_type="system",
++                      reason="isolated fixture", decision_at=DECISION, recorded_at=DECISION)
++        for object_type, reservation_id, equipment_id in [
++            (None, reservation.pk, None), ("reservation", None, None), ("equipment", None, None),
++            ("reservation", reservation.pk, self.equipment.pk), ("equipment", reservation.pk, self.equipment.pk),
++            ("equipment", reservation.pk, None), ("reservation", None, self.equipment.pk),
++            ("unknown", reservation.pk, None), ("reservation", 2**62, None), ("equipment", None, 2**62),
++        ]:
++            with self.subTest(object_type=object_type, reservation_id=reservation_id, equipment_id=equipment_id):
++                with self.assertRaises(IntegrityError), transaction.atomic():
++                    OperationHistory.objects.create(object_type=object_type, reservation_id=reservation_id, equipment_id=equipment_id, **values)
++                    with connection.cursor() as cursor:
++                        cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
++        OperationHistory.objects.create(object_type="reservation", reservation=reservation, **values)
++        OperationHistory.objects.create(object_type="equipment", equipment=self.other, **values)
++        for table, pk in [("reservations_reservation", reservation.pk), ("equipment_equipment", self.other.pk)]:
++            with self.assertRaises(IntegrityError), transaction.atomic(), connection.cursor() as cursor:
++                cursor.execute(f"DELETE FROM {table} WHERE id = %s", [pk])
++                cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
++        self.assertEqual(OperationHistory.objects.count(), 2)
+diff --git a/reservations/urls.py b/reservations/urls.py
+new file mode 100644
+index 0000000..240cb32
+--- /dev/null
++++ b/reservations/urls.py
+@@ -0,0 +1,9 @@
++from django.urls import path
++
++from .views import reservation_result, reserve_equipment
++
++
++urlpatterns = [
++    path("equipment/<int:pk>/reserve/", reserve_equipment, name="reservation-submit"),
++    path("reservations/<int:pk>/result/", reservation_result, name="reservation-result"),
++]
+diff --git a/reservations/views.py b/reservations/views.py
+new file mode 100644
+index 0000000..c4563b6
+--- /dev/null
++++ b/reservations/views.py
+@@ -0,0 +1,73 @@
++from django.contrib.auth.decorators import login_required
++from django.http import Http404
++from django.shortcuts import render
++from django.views.decorators.cache import never_cache
++from django.views.decorators.http import require_GET, require_http_methods
++
++from equipment.services import get_equipment_detail
++
++from .forms import ReservationForm
++from .models import ReservationStatus
++from .services import BEIJING, ReservationFailed, ReservationUnknown, get_reservation_result, require_applicant, submit_reservation
++
++
++CONFLICT_MESSAGE = "所选时段与有效预约冲突，请选择其他时段。"
++UNAVAILABLE_MESSAGE = "设备当前不可用，不能申请预约。"
++INVALID_TIME_MESSAGE = "预约须为北京时间同一天的整点时段，开始必须晚于判定时间，至少一小时，且最晚 23:00 结束。"
++
++
++def _render_result(request, record=None, *, created=False, error=None):
++    if record is not None:
++        record = dict(record, status_label=ReservationStatus(record["status"]).label,
++                      start_text=record["start_at"].astimezone(BEIJING).strftime("%Y-%m-%d %H:%M"),
++                      end_text=record["end_at"].astimezone(BEIJING).strftime("%Y-%m-%d %H:%M"))
++    return render(request, "reservations/result.html", {"record": record, "created": created, "error": error},
++                  status=503 if error else (201 if created else 200))
++
++
++@never_cache
++@require_http_methods(["GET", "POST"])
++@login_required
++def reserve_equipment(request, pk):
++    require_applicant(request.user)
++    form = ReservationForm(request.POST if request.method == "POST" else None)
++    status = 200
++    message = None
++    if request.method == "POST":
++        try:
++            # Do not short-circuit an authorized invalid POST before device-scoped expiry.
++            outcome = submit_reservation(request.user, pk, request.POST.get("start_at"), request.POST.get("end_at"))
++        except ReservationFailed:
++            return _render_result(request, error="本次申请未成功，数据库事务已回滚。")
++        except ReservationUnknown:
++            return _render_result(request, error="结果待核查，请勿重复提交。")
++        if outcome.outcome == "created":
++            return _render_result(request, outcome.record, created=True)
++        if outcome.outcome == "missing":
++            raise Http404
++        status, message = {
++            "invalid_time": (400, INVALID_TIME_MESSAGE),
++            "unavailable": (409, UNAVAILABLE_MESSAGE),
++            "conflict": (409, CONFLICT_MESSAGE),
++        }[outcome.outcome]
++        equipment = outcome.equipment
++    else:
++        equipment = get_equipment_detail(request.user, pk)
++        if equipment is None:
++            raise Http404
++    return render(request, "reservations/form.html", {"form": form, "equipment": equipment, "message": message}, status=status)
++
++
++@never_cache
++@require_GET
++@login_required
++def reservation_result(request, pk):
++    try:
++        record = get_reservation_result(request.user, pk)
++    except ReservationFailed:
++        return _render_result(request, error="本次结果读取未成功，数据库事务已回滚。")
++    except ReservationUnknown:
++        return _render_result(request, error="结果待核查，请勿重复提交。")
++    if record is None:
++        raise Http404
++    return _render_result(request, record)

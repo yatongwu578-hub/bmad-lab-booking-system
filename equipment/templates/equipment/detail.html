@@ -14,5 +14,8 @@
     {% if edit_pk is not None %}
         <p><a href="{% url 'equipment-edit' edit_pk %}">编辑设备基础信息</a></p>
     {% endif %}
+    {% if reserve_pk is not None %}
+        <p><a href="{% url 'reservation-submit' reserve_pk %}">申请预约</a></p>
+    {% endif %}
     <p><a href="{% url 'equipment-catalog' %}">返回设备目录</a></p>
 {% endblock %}

@@ -1,0 +1,13 @@
+{
+    "attempted_at":  "2026-11-26T20:57:00.2565856+08:00",
+    "destination":  "deferred-work.md",
+    "before_sha256":  "884398F5361B49FBB334E0AE11E548D7C56E4A4CFF1ECF893924A1B9FE9F55B7",
+    "source_files":  [
+                         "story-2-1-deferred-work-appendix.md",
+                         "story-2-1-targeted-independent-recheck/pending-deferred-entry.md",
+                         "story-2-1-targeted-independent-recheck/d040-pending-deferred-entries.md"
+                     ],
+    "disposition":  "not-merged",
+    "after_sha256":  "884398F5361B49FBB334E0AE11E548D7C56E4A4CFF1ECF893924A1B9FE9F55B7",
+    "error":  "使用“3”个参数调用“AppendAllText”时发生异常:“对路径“F:\\softwork\\SE-Management\\bmad-lab-booking-system\\_bmad-output\\implementation-artifacts\\deferred-work.md”的访问被拒绝。”"
+}

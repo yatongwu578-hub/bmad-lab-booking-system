@@ -1,0 +1,223 @@
+{
+  "source": "bounded read of the active server stderr; no query strings, credentials or other team traffic",
+  "automated_scope": [
+    {
+      "clock": "21:48:17",
+      "method": "GET",
+      "path": "/login/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:18",
+      "method": "POST",
+      "path": "/login/",
+      "status": 302
+    },
+    {
+      "clock": "21:48:18",
+      "method": "GET",
+      "path": "/identity/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:18",
+      "method": "GET",
+      "path": "/equipment/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:18",
+      "method": "GET",
+      "path": "/equipment/1/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:18",
+      "method": "GET",
+      "path": "/equipment/1/reserve/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:18",
+      "method": "POST",
+      "path": "/equipment/1/reserve/",
+      "status": 201
+    },
+    {
+      "clock": "21:48:19",
+      "method": "GET",
+      "path": "/reservations/1/result/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:19",
+      "method": "GET",
+      "path": "/identity/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:19",
+      "method": "POST",
+      "path": "/logout/",
+      "status": 302
+    },
+    {
+      "clock": "21:48:19",
+      "method": "GET",
+      "path": "/login/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:19",
+      "method": "GET",
+      "path": "/login/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:19",
+      "method": "POST",
+      "path": "/login/",
+      "status": 302
+    },
+    {
+      "clock": "21:48:19",
+      "method": "GET",
+      "path": "/identity/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:20",
+      "method": "GET",
+      "path": "/equipment/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:20",
+      "method": "GET",
+      "path": "/equipment/1/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:20",
+      "method": "GET",
+      "path": "/equipment/1/reserve/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:20",
+      "method": "POST",
+      "path": "/equipment/1/reserve/",
+      "status": 409
+    },
+    {
+      "clock": "21:48:20",
+      "method": "GET",
+      "path": "/reservations/1/result/",
+      "status": 404
+    },
+    {
+      "clock": "21:48:20",
+      "method": "GET",
+      "path": "/reservations/9223372036854775807/result/",
+      "status": 404
+    },
+    {
+      "clock": "21:48:20",
+      "method": "GET",
+      "path": "/identity/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:20",
+      "method": "POST",
+      "path": "/logout/",
+      "status": 302
+    },
+    {
+      "clock": "21:48:20",
+      "method": "GET",
+      "path": "/login/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:20",
+      "method": "GET",
+      "path": "/login/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:21",
+      "method": "POST",
+      "path": "/login/",
+      "status": 302
+    },
+    {
+      "clock": "21:48:21",
+      "method": "GET",
+      "path": "/identity/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:21",
+      "method": "GET",
+      "path": "/equipment/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:21",
+      "method": "GET",
+      "path": "/equipment/1/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:21",
+      "method": "GET",
+      "path": "/equipment/1/reserve/",
+      "status": 403
+    },
+    {
+      "clock": "21:48:21",
+      "method": "GET",
+      "path": "/identity/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:21",
+      "method": "POST",
+      "path": "/equipment/1/reserve/",
+      "status": 403
+    },
+    {
+      "clock": "21:48:22",
+      "method": "GET",
+      "path": "/reservations/1/result/",
+      "status": 403
+    },
+    {
+      "clock": "21:48:22",
+      "method": "GET",
+      "path": "/identity/",
+      "status": 200
+    },
+    {
+      "clock": "21:48:22",
+      "method": "POST",
+      "path": "/logout/",
+      "status": 302
+    },
+    {
+      "clock": "21:48:22",
+      "method": "GET",
+      "path": "/login/",
+      "status": 200
+    }
+  ],
+  "subsequent_team_http_success_only": [
+    {
+      "clock": "21:49:49",
+      "method": "POST",
+      "path": "/equipment/1/reserve/",
+      "status": 201
+    }
+  ]
+}

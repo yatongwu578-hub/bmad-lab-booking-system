@@ -1,0 +1,114 @@
+{
+  "kind": "independent review reading only; no Django, Chrome, DB or service launched",
+  "receipt": "independent-run-20261126-205234-685-de507a170d40",
+  "raw": "story-2-1-remediation-run-20261126-205236-052-255e13d05b24",
+  "stages": [
+    "2026-11-26T20:53:44.8318996+08:00 live-launcher exit=0",
+    "2026-11-26T20:53:45.9292929+08:00 reviewer-raw-audit exit=0",
+    "2026-11-26T20:53:45.9812492+08:00 independent-recheck-complete exit=0"
+  ],
+  "scope_target": "127.0.0.1:5433/test_lab_booking",
+  "source_manifest_digest": "4A6EF690D72AEACF4D7844455081C68D2C7B3399395D7F9D4B7A2C9185DD5F4A",
+  "db_fingerprint": "5DF4D59616196EA9BC2604E46B584A1281CAD313151634F0C5F4DB0035A34272",
+  "P01": {
+    "chrome": "Chrome/159.0.8154.34",
+    "bad": {
+      "start_at": "2026-11-27T10:30",
+      "end_at": "2026-11-27T11:30"
+    },
+    "corrected": {
+      "start_at": "2026-11-27T10:00",
+      "end_at": "2026-11-27T11:00"
+    },
+    "http": [
+      200,
+      200,
+      400,
+      201,
+      200
+    ],
+    "result": "/reservations/205/result/"
+  },
+  "P02": {
+    "actual_peer": {
+      "user_id": 787,
+      "role": "student",
+      "is_active": true,
+      "is_authenticated": true,
+      "method": "GET",
+      "path": "/reservations/206/result/"
+    },
+    "actual_owner": {
+      "user_id": 784,
+      "role": "student",
+      "is_active": true,
+      "is_authenticated": true,
+      "method": "GET",
+      "path": "/reservations/206/result/"
+    },
+    "target": 206,
+    "target_start": "2026-11-26 10:53:17.463754+00:00",
+    "overdue_observed_at": "2026-11-26 12:53:22.634889+00:00",
+    "denied_digest": "005ba513d9d80807a1c22bef04a204ae4b6bdfbb0559c7f4dda4ec50e0ca2074",
+    "denied_dml_counts": [
+      0,
+      0
+    ],
+    "owner_dml_first_repeat": [
+      [
+        "UPDATE",
+        "INSERT"
+      ],
+      []
+    ],
+    "history_id": 92
+  },
+  "P03": {
+    "candidates": {
+      "target": {
+        "id": 233,
+        "applicant_id": 789,
+        "equipment_id": 512
+      },
+      "terminal": {
+        "id": 232,
+        "applicant_id": 789,
+        "equipment_id": 512
+      },
+      "same_owner_added": {
+        "id": 234,
+        "applicant_id": 789,
+        "equipment_id": 512
+      },
+      "other_owner_added": {
+        "id": 235,
+        "applicant_id": 790,
+        "equipment_id": 512
+      }
+    },
+    "state_after": {
+      "232": "expired",
+      "233": "expired",
+      "234": "pending",
+      "235": "pending"
+    },
+    "pids": {
+      "blocker_pid": 28048,
+      "blocked_pid": 1288,
+      "observer_pid": 43568
+    },
+    "blockers": [
+      28048
+    ],
+    "lock_attempt_to_acquired_ns": 7779500,
+    "blocked_observation_to_same_insert_ns": 757700,
+    "clock": "2026-11-26 12:53:40.950710+00:00",
+    "history_id": 100,
+    "history_at": "2026-11-26 12:53:40.953604+00:00"
+  },
+  "history_reuse": {
+    "time-boundaries": "BCCB5AFA5B7F2AC96F8B0454F0A69EA6E4A1CA157A95E84946DCD5CF4C308C9E",
+    "faults": "FC59FC3DC9B32531A4E02FE0DB7D03100B615E93ECF6C56935A3AA96503C2FD2",
+    "nfr001-standard": "3364EDF809D5F11C2E865C6608636C6A80FA16736D16C74CA4E1C759D9A7AEC1"
+  }
+}
