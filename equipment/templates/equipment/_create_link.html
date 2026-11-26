@@ -1,0 +1,3 @@
+{% if account.is_active and account.role == "admin" %}
+    <p><a href="{% url 'equipment-create' %}">新增设备</a></p>
+{% endif %}

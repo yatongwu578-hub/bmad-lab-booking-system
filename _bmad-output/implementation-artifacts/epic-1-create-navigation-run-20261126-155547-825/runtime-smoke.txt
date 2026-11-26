@@ -1,0 +1,2 @@
+GET /login/ 200
+GET /equipment/new/ 302 Location=/login/?next=/equipment/new/

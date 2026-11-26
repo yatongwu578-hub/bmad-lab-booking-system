@@ -15,6 +15,7 @@
             <dd>{{ account.get_role_display }}</dd>
         </dl>
         <p><a href="{% url 'equipment-catalog' %}">查看设备目录</a></p>
+        {% include "equipment/_create_link.html" %}
         <form method="post" action="{% url 'logout' %}">
             {% csrf_token %}
             <button type="submit">退出登录</button>

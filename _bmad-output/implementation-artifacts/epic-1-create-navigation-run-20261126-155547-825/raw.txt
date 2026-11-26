@@ -1,0 +1,17 @@
+Python 3.13.17
+Exit 0
+test_active_admin_can_follow_create_link_from_empty_catalog (equipment.test_create_navigation.EquipmentCreateNavigationTests.test_active_admin_can_follow_create_link_from_empty_catalog) ... ok
+test_active_admin_can_follow_create_link_from_identity_and_catalog (equipment.test_create_navigation.EquipmentCreateNavigationTests.test_active_admin_can_follow_create_link_from_identity_and_catalog) ... ok
+test_anonymous_and_inactive_admin_are_redirected_to_login (equipment.test_create_navigation.EquipmentCreateNavigationTests.test_anonymous_and_inactive_admin_are_redirected_to_login) ... ok
+test_student_and_teacher_keep_read_navigation_but_cannot_create (equipment.test_create_navigation.EquipmentCreateNavigationTests.test_student_and_teacher_keep_read_navigation_but_cannot_create) ... ok
+System.Management.Automation.RemoteException
+----------------------------------------------------------------------
+Ran 4 tests in 0.185s
+System.Management.Automation.RemoteException
+OK
+Found 4 test(s).
+已核验并保留 127.0.0.1:5433/test_lab_booking，角色 lab_booking_test，PostgreSQL 17.12。
+测试前：10 张表、17 条迁移、0 个账号、0 条会话。
+System check identified no issues (0 silenced).
+测试后：10 张表、17 条迁移、0 个账号、0 条会话。
+Exit 0

@@ -1,0 +1,10 @@
+actual operator(s), as reported: w
+started=2026-11-26T15:55:47.8275233+08:00
+ended=2026-11-26T15:55:52.6497829+08:00
+git=20fb2a8bd506b1a28911fe0ae2c46db904e55024
+isolated_target=127.0.0.1:5433/test_lab_booking (lab_booking_test)
+tests=PASS 4/4 via test_lab_booking; no skips
+service=PASS launcher=41208 listener=18648 http://127.0.0.1:8001/login/
+runtime_key=FRESH KEY; SIGN IN AGAIN
+temporary_server_logs=C:\Users\15860\AppData\Local\Temp\lab-booking-navigation-8001-951a4558b2f744ab9b71bb6beaafba29
+

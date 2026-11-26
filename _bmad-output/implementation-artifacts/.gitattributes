@@ -7,3 +7,7 @@ story-1-4-verification-*.txt -text whitespace=cr-at-eol,-trailing-space
 story-1-4-sandbox-verification.txt -text whitespace=cr-at-eol,-trailing-space
 story-1-4-*.patch -text whitespace=-trailing-space
 story-1-4-acceptance-auditor-handoff.md -text whitespace=cr-at-eol,-trailing-space
+
+# Preserve the reviewed navigation patch and the exact Windows verification evidence.
+epic-1-create-navigation.patch -text whitespace=-trailing-space
+epic-1-create-navigation-run-*/** -text whitespace=cr-at-eol,-trailing-space

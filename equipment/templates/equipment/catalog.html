@@ -3,6 +3,7 @@
 {% block title %}设备目录{% endblock %}
 {% block heading %}设备目录{% endblock %}
 {% block content %}
+    {% include "equipment/_create_link.html" %}
     {% if equipment_items %}
         <table>
             <thead>

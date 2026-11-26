@@ -327,3 +327,13 @@
 3. **人类判断与依据**。负责人明确批准 Story 1.4 最终验收，接受 AC-1～AC-8、68/68 Django、10/10 PostgreSQL、1/1 Q-3、R1／R2／R7／Q-3 已关闭、D-035 四列最小授权和真 Chrome、设备主键／编号／状态／总数保持的证据。批准保留延期、第二台 Windows 待复现和实验 A 原安排，并授权满足条件后完成 Epic 1、按指定消息提交及推送 main。本决定不是三位组员分别发表意见。
 4. **结果**。Story 1.4 规格与 Sprint 已为 `done`。Epic 1 经 4 条 Story、28 条编号 AC 的实证追溯、跨 Story 差异检查和证据回顾收尾，为 `done`，回顾裁决 `accepted-with-open-items`。其余已批准延期不变，Story 2.1 和其他未开始 Story 仍为 `backlog`。 [最终验收](_bmad-output/implementation-artifacts/story-1-4-final-acceptance.md) · [Epic 1 回顾](_bmad-output/implementation-artifacts/epic-1-retro-2026-11-26.md)
 5. **事后验证**。复核已有证据、运行前后输入和 53 项隔离认证散列。没有新测试、业务代码修改、迁移、重授、正式需求变更或实验 A 度量。新提交及同步结果以实际 Git 历史和远程 SHA 为准，不预填。 [Sprint 状态](_bmad-output/implementation-artifacts/sprint-status.yaml)
+
+## D-037 2026-11-26 负责人批准 Epic 1 新增设备导航改进
+
+1. **触发**。团队实际体验报告管理员登录后找不到新增设备页面入口。只读检查确认身份页、目录和详情无新增链接，原新增路由有 Story 1.2 真实运行证据，符合 Epic 1 回顾的既有导航观察。 [Epic 1 回顾](_bmad-output/implementation-artifacts/epic-1-retro-2026-11-26.md)
+2. **AI 建议及依据**。归类为非阻塞集成可用性改进。在身份页与目录复用仅启用业务管理员可见的新增模板链接，目录空态也可用。沿用 Story 1.2 原路由及 FR-016／FR-002 的服务端权限，不改变正式 AC。
+3. **人类判断与依据**。项目负责人明确接受团队实际体验及只读诊断，批准最小模板改进与隔离验证、独立评审、核对身份后的既有 8001 服务重启。保持学生教师导航、详情、数据库、Story 及 Epic 状态，禁止自动提交推送。此处只记录负责人当轮决定，不代填组员意见。
+4. **结果**。四文件增量、四项导航回归和本机验证／重启入口已备妥。实际源目录出现写入拒绝，已撤回仅部分写入的模板改动，工作区补丁预检及临时副本应用均通过。独立静态评审未发现阻塞，未冒充实测。 [补丁和审查证据](_bmad-output/implementation-artifacts/epic-1-create-navigation-evidence.md)
+5. **事后验证**。沙箱原 `.venv` 实际退出 103，0 项新 Django 实测，旧 8001 未停止。待团队普通 PowerShell 应用、在隔离库实跑并完成受控重启后核对退出码与回执。GitHub main 实查不含此前本地 Story 1.4 提交。Story 1.1～1.4 和 Epic 1 仍为 `done`，Story 2.1 为 `backlog`，实验 A 不变。
+
+   **2026-11-26 15:55 实测与收尾**。团队自报操作者 `w` 在普通 PowerShell 实际应用并验证，当前四文件差异和散列均匹配已独立静态评审版本。隔离回归 4/4、无跳过、退出 0，覆盖管理员身份页、目录及空态的表单链接、师生不显示且直达 403、匿名或停用管理员跳转。8001 新监听 PID 18648，匿名运行冒烟 200／302。后续实际访问另有两次新增表单 GET 200，脱敏摘录未显示该表单 POST，不归属个人或点击来源。负责人在回执会话明确批准全部证据通过后收尾并提交、推送，本轮按该条件执行。无新 AC 回归，原 Story 或 Epic 状态、既有权限、实验 A 和 Story 2.1 状态不变。 [实际验证与过程](_bmad-output/implementation-artifacts/epic-1-create-navigation-evidence.md) · [原始日志](_bmad-output/implementation-artifacts/epic-1-create-navigation-run-20261126-155547-825/raw.txt)
