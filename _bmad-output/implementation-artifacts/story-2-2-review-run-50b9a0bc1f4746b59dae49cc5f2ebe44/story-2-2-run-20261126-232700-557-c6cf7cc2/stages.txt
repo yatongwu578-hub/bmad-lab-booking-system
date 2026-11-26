@@ -1,0 +1,11 @@
+﻿2026-11-26T23:27:00.8235481+08:00 powershell-parse exit=0
+2026-11-26T23:27:00.8315368+08:00 verification-locks exit=0
+2026-11-26T23:27:01.2893929+08:00 preflight exit=0
+2026-11-26T23:27:03.3222703+08:00 baseline-before exit=0
+2026-11-26T23:27:04.3562806+08:00 check exit=0
+2026-11-26T23:27:05.3790849+08:00 migration-drift exit=0
+2026-11-26T23:27:31.6538715+08:00 regression exit=0
+2026-11-26T23:27:33.7389277+08:00 baseline-after-regression exit=0
+2026-11-26T23:28:11.1091270+08:00 independent exit=0
+2026-11-26T23:28:13.3806198+08:00 baseline-after-independent exit=0
+2026-11-26T23:28:13.6034450+08:00 complete exit=0

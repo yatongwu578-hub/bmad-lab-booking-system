@@ -1,0 +1,6 @@
+{"check": "effective column matrix", "stage": "before"}
+{"check": "explicit catalog ACL", "stage": "before"}
+{"check": "effective table and delegation ACL", "stage": "before"}
+{"check": "effective column matrix", "stage": "after"}
+{"check": "explicit catalog ACL", "stage": "after"}
+{"check": "effective table and delegation ACL", "stage": "after"}

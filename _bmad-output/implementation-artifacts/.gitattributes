@@ -1,13 +1,4 @@
-# Preserve the byte-level SHA-256 and original CRLF/UTF-16 of Story 1.4 evidence.
-story-1-4-runtime-acl-check-*/** -text whitespace=cr-at-eol,-trailing-space
-story-1-4-runtime-run-*/** -text whitespace=cr-at-eol,-trailing-space
-story-1-4-remediation-run-*/** -text whitespace=cr-at-eol,-trailing-space
-story-1-4-independent-remediation-*/** -text whitespace=cr-at-eol,-trailing-space
-story-1-4-verification-*.txt -text whitespace=cr-at-eol,-trailing-space
-story-1-4-sandbox-verification.txt -text whitespace=cr-at-eol,-trailing-space
-story-1-4-*.patch -text whitespace=-trailing-space
-story-1-4-acceptance-auditor-handoff.md -text whitespace=cr-at-eol,-trailing-space
-
-# Preserve the reviewed navigation patch and the exact Windows verification evidence.
-epic-1-create-navigation.patch -text whitespace=-trailing-space
-epic-1-create-navigation-run-*/** -text whitespace=cr-at-eol,-trailing-space
+# 原样保留三批 Story 2.2 证据的字节，确保 SHA-256 跨工作区一致。
+/story-2-2-run-20261126-224427-552-98c04aee/** -text
+/story-2-2-review-run-50b9a0bc1f4746b59dae49cc5f2ebe44/story-2-2-run-20261126-232700-557-c6cf7cc2/** -text
+/story-2-2-runtime-20261127-000918-77eb9198/** -text

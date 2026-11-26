@@ -1,0 +1,26 @@
+diff --git a/equipment/views.py b/equipment/views.py
+--- a/equipment/views.py
++++ b/equipment/views.py
+@@ -53,6 +53,7 @@ def equipment_detail(request, pk):
+         "equipment/detail.html",
+         {
+             "account": request.user, "equipment": equipment,
++            "occupancy_pk": pk,
+             "edit_pk": pk if is_equipment_admin(request.user) else None,
+             "reserve_pk": pk if can_reserve(request.user) else None,
+         },
+diff --git a/equipment/templates/equipment/detail.html b/equipment/templates/equipment/detail.html
+--- a/equipment/templates/equipment/detail.html
++++ b/equipment/templates/equipment/detail.html
+@@ -11,6 +11,11 @@
+         <dt>说明</dt><dd id="equipment-description" style="white-space: pre-wrap">{{ equipment.description|default:"暂无说明" }}</dd>
+         <dt>当前状态</dt><dd>{{ equipment.status_label }}</dd>
+     </dl>
++    <form method="get" action="{% url 'equipment-occupancy' occupancy_pk %}">
++        <label for="id_date">查询日期（北京时间）:</label>
++        <input type="date" name="date" id="id_date" required>
++        <button type="submit">查询占用</button>
++    </form>
+     {% if edit_pk is not None %}
+         <p><a href="{% url 'equipment-edit' edit_pk %}">编辑设备基础信息</a></p>
+     {% endif %}

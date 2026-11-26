@@ -1,0 +1,58 @@
+{% load tz %}
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>设备日期占用 · 实验室设备预约</title></head>
+<body><main>
+    <h1>设备日期占用</h1>
+    {% if error %}<p role="alert">{{ error }}</p>{% endif %}
+    {% if form %}
+        <form method="get" action="{% url 'equipment-occupancy' equipment_pk %}">
+            {{ form.as_p }}
+            <button type="submit">查询占用</button>
+        </form>
+        <p><a href="{% url 'equipment-detail' equipment_pk %}">返回设备详情</a></p>
+    {% endif %}
+    {% if result %}
+        {% timezone "Asia/Shanghai" %}
+        <h2>{{ result.equipment.number }} · {{ result.equipment.name }}</h2>
+        <p>设备当前状态：{{ result.equipment.status_label }}</p>
+        <p>所选日期：{{ day.isoformat }}（北京时间）</p>
+        <p>本次仅按查询开始时确定的预约范围与北京时间 {{ result.decision_at|date:"Y-m-d H:i:s.u" }} 判定，并非全库实时快照。</p>
+        <h3>被有效预约占用</h3>
+        {% if result.occupied %}
+            <ul>
+            {% for interval in result.occupied %}
+                <li>{{ interval.start_at|date:"Y-m-d H:i:s" }} ～ {{ interval.end_at|date:"Y-m-d H:i:s" }} —
+                    {% if interval.category == "in_progress" %}已批准（进行中）
+                    {% elif interval.category == "approved_future" %}已批准（未开始）
+                    {% else %}待审核（未开始）{% endif %}
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>该日期无有效预约占用。</p>
+        {% endif %}
+        {% if result.historical %}
+            <h3>历史预约区间</h3>
+            <p>这些已结束的批准预约不再占用当前或未来时段。</p>
+            <ul>
+            {% for interval in result.historical %}
+                <li>{{ interval.start_at|date:"Y-m-d H:i:s" }} ～ {{ interval.end_at|date:"Y-m-d H:i:s" }} — 已批准（已结束）</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+        <h3>未被占用的时段</h3>
+        <p>以下时段不包含有效占用或已单独列出的历史区间。</p>
+        <ul>
+        {% for interval in result.unoccupied %}
+            <li>{{ interval.start_at|date:"Y-m-d H:i:s" }} ～ {{ interval.end_at|date:"Y-m-d H:i:s" }}</li>
+        {% empty %}
+            <li>该日期没有剩余时段。</li>
+        {% endfor %}
+        </ul>
+        <p>无占用不等于可预约，最终以提交预约时重新校验设备状态、时间规则和冲突的结果为准。</p>
+        {% endtimezone %}
+    {% endif %}
+    <p><a href="{% url 'equipment-catalog' %}">返回设备目录</a></p>
+</main></body>
+</html>

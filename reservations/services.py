@@ -1,17 +1,17 @@
 import re
 from dataclasses import dataclass
-from datetime import datetime, time, timedelta
+from datetime import UTC, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
 from django.core.exceptions import PermissionDenied
 from django.db import Error, transaction
 from django.db.models import Q
 
-from accounts.models import User
+from accounts.models import Role, User
 from accounts.policies import RESERVATION_ROLES, can_reserve
 from audit.services import append_reservation_expiry
 from equipment.models import Equipment, EquipmentStatus
-from equipment.services import lock_equipment
+from equipment.services import get_equipment_detail, lock_equipment
 from lab_booking.transactions import transaction_rejected
 
 from .models import Reservation, ReservationStatus
@@ -37,6 +37,33 @@ class Submission:
     outcome: str
     record: dict | None = None
     equipment: dict | None = None
+
+
+@dataclass(frozen=True)
+class OccupancyInterval:
+    start_at: datetime
+    end_at: datetime
+    category: str
+
+
+@dataclass(frozen=True)
+class DailyOccupancy:
+    equipment: dict
+    decision_at: datetime
+    occupied: tuple[OccupancyInterval, ...]
+    historical: tuple[OccupancyInterval, ...]
+    unoccupied: tuple[OccupancyInterval, ...]
+
+
+def require_occupancy_reader(user):
+    if not user.is_authenticated or not user.is_active or user.role not in Role.values:
+        raise PermissionDenied
+
+
+def _recheck_occupancy_reader(pk):
+    row = User.objects.filter(pk=pk).values_list("is_active", "role").first()
+    if row is None or not row[0] or row[1] not in Role.values:
+        raise PermissionDenied
 
 
 def require_applicant(user):
@@ -152,5 +179,63 @@ def get_reservation_result(user, pk):
         if _expire(fixed, decision_at):
             current["status"] = ReservationStatus.EXPIRED
         return current
+
+    return _durable_operation(read)
+
+
+def _project_daily_occupancy(equipment, day_start, day_end, decision_at, rows):
+    occupied, historical = [], []
+    for start_at, end_at, status in rows:
+        if status == ReservationStatus.APPROVED:
+            category = ("historical" if end_at <= decision_at else
+                        "in_progress" if start_at <= decision_at else "approved_future")
+        elif status == ReservationStatus.PENDING and start_at > decision_at:
+            category = "pending"
+        else:
+            continue
+        interval = OccupancyInterval(max(start_at, day_start), min(end_at, day_end), category)
+        (historical if category == "historical" else occupied).append(interval)
+
+    unoccupied = []
+    covered_until = day_start
+    # Take the complement of today's occupied and historical intervals, including overlaps.
+    for interval in sorted((*occupied, *historical), key=lambda item: item.start_at):
+        if covered_until < interval.start_at:
+            unoccupied.append(OccupancyInterval(covered_until, interval.start_at, "unoccupied"))
+        covered_until = max(covered_until, interval.end_at)
+    if covered_until < day_end:
+        unoccupied.append(OccupancyInterval(covered_until, day_end, "unoccupied"))
+    return DailyOccupancy(
+        {key: equipment[key] for key in ("number", "name", "status_label")},
+        decision_at, tuple(occupied), tuple(historical), tuple(unoccupied),
+    )
+
+
+def get_daily_occupancy(user, equipment_pk, day):
+    require_occupancy_reader(user)
+    day_start = datetime.combine(day, time.min, BEIJING).astimezone(UTC)
+    day_end = datetime.combine(day + timedelta(days=1), time.min, BEIJING).astimezone(UTC)
+
+    def read(connection):
+        if not Equipment.objects.filter(pk=equipment_pk).exists():
+            return None
+        scoped = Reservation.objects.filter(equipment_id=equipment_pk, start_at__lt=day_end, end_at__gt=day_start)
+        # Freeze scope before locking, including any pending row that has already ended.
+        candidates = list(scoped.values_list("pk", "status"))
+        has_pending = any(status == ReservationStatus.PENDING for _, status in candidates)
+        if has_pending and lock_equipment(equipment_pk) is None:
+            return None
+
+        # Recheck the account and read current rows independently of the lock statement.
+        _recheck_occupancy_reader(user.pk)
+        equipment = get_equipment_detail(user, equipment_pk)
+        if equipment is None:
+            return None
+        fixed = scoped.filter(pk__in=[pk for pk, _ in candidates])
+        rows = list(fixed.order_by("start_at", "end_at", "pk").values_list("start_at", "end_at", "status"))
+        decision_at = _decision_time(connection)
+        if has_pending:
+            _expire(fixed, decision_at)
+        return _project_daily_occupancy(equipment, day_start, day_end, decision_at, rows)
 
     return _durable_operation(read)

@@ -1,14 +1,24 @@
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.core.exceptions import PermissionDenied
+from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_http_methods
 
 from equipment.services import get_equipment_detail
 
-from .forms import ReservationForm
+from .forms import OccupancyDateForm, ReservationForm
 from .models import ReservationStatus
-from .services import BEIJING, ReservationFailed, ReservationUnknown, get_reservation_result, require_applicant, submit_reservation
+from .services import (
+    BEIJING,
+    ReservationFailed,
+    ReservationUnknown,
+    get_daily_occupancy,
+    get_reservation_result,
+    require_applicant,
+    require_occupancy_reader,
+    submit_reservation,
+)
 
 
 CONFLICT_MESSAGE = "所选时段与有效预约冲突，请选择其他时段。"
@@ -71,3 +81,28 @@ def reservation_result(request, pk):
     if record is None:
         raise Http404
     return _render_result(request, record)
+
+
+@never_cache
+@require_GET
+@login_required
+def equipment_occupancy(request, pk):
+    try:
+        require_occupancy_reader(request.user)
+        form = OccupancyDateForm(request.GET)
+        context = {"form": form, "equipment_pk": pk}
+        if not form.is_valid():
+            return render(request, "reservations/occupancy.html", context, status=400)
+        day = form.cleaned_data["date"]
+        result = get_daily_occupancy(request.user, pk, day)
+    except PermissionDenied:
+        return HttpResponseForbidden("无权查询设备占用。")
+    except ReservationFailed:
+        return render(request, "reservations/occupancy.html",
+                      {"error": "本次占用查询未成功，数据库事务已回滚。"}, status=503)
+    except ReservationUnknown:
+        return render(request, "reservations/occupancy.html",
+                      {"error": "本次占用查询结果待核查，暂勿重复查询。"}, status=503)
+    if result is None:
+        return render(request, "reservations/occupancy.html", {"error": "设备不存在。"}, status=404)
+    return render(request, "reservations/occupancy.html", {**context, "day": day, "result": result})

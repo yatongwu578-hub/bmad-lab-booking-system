@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 11-17-2026 20:05
-last_updated: 11-26-2026 22:00
+last_updated: 11-27-2026 00:32
 project: bmad-lab-booking-system
 project_key: NOKEY
 tracking_system: file-system
@@ -44,7 +44,7 @@ development_status:
 
   epic-2: in-progress
   2-1-提交具体设备预约并获得可靠申请结果: done
-  2-2-查询具体设备在指定日期的占用时段: backlog
+  2-2-查询具体设备在指定日期的占用时段: done
   2-3-查询本人全部预约及处理结果: backlog
   2-4-取消本人尚未开始的预约: backlog
   2-5-管理员查询预约详情并按设备筛选: backlog

@@ -53,6 +53,7 @@ def equipment_detail(request, pk):
         "equipment/detail.html",
         {
             "account": request.user, "equipment": equipment,
+            "occupancy_pk": pk,
             "edit_pk": pk if is_equipment_admin(request.user) else None,
             "reserve_pk": pk if can_reserve(request.user) else None,
         },

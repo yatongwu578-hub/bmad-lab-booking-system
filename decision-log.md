@@ -396,3 +396,31 @@
 3. **人类决定。** 负责人明确在正式 AC-1～AC-11 均满足且无阻塞时批准最终验收、文档及 Git 同步，指定一个 commit 消息和普通 PowerShell 推送退路。保持 Epic 2 in-progress、2.2 等未开始 Story backlog、Sprint 8/5。三人共同操作，不虚构成员各自意见。
 4. **结果。** 条件经独立核对成立，实施规格和 Sprint 的 2.1 均为 done，2.3/2.5 不提前开始，D-041 原关闭、延期和 D01 未核实不变。未执行新的测试、迁移、授权或业务代码修改。Git 实际提交、推送和 SHA 另行如实报告，书面决定不等于已推送。
 5. **事后验证。** 保存 91/91、师生 NAV、Chrome、13/13、15/15、5/5、20×10 真实并发和 18:00 原始证据；保留 ACL 失败、修复、只读恢复与实际续跑。体验另有后续 HTTP 201 佐证，不冒充独立验库。 [最终验收](_bmad-output/implementation-artifacts/story-2-1-final-acceptance.md) · [验收索引](_bmad-output/implementation-artifacts/story-2-1-verification-map.md)
+
+## D-043 2026-11-26 负责人批准 Story 2.2 Checkpoint 1
+
+1. **触发。** BMAD 6.12.4 Build Step 2 展示正式 AC-1～AC-8 的实施规格和隔离验收设计。 [检查点](_bmad-output/implementation-artifacts/story-2-2-checkpoint-1.md)
+2. **AI 建议。** 直接复用 2.1 的设备锁、单一判定时刻、失效／历史与异常协议，固定目标日期候选，将进行中、历史与未占用分开。仅补本入口交错，不重复不受影响的 NFR-001 标准组。
+3. **人类决定。** 负责人在本会话回复「批准并继续」。以正式 AC、D-024、只用隔离测试库及不提前开始后续 Story 为约束。没有代填成员意见或实验数据。
+4. **结果。** 规格从 draft 经 ready-for-dev 进入 in-progress，Sprint 同步本 Story。实现范围只含日期占用、需求内按需失效及对应取证，不改 Sprint 8／5，不碰正式库，不执行 Git 提交或推送。
+5. **事后验证。** 见本轮实际静态核对和隔离验证交接。新动态验证在成功回执前不记通过，不进入 review，不标 done。 [实施规格](_bmad-output/implementation-artifacts/spec-2-2-query-equipment-occupancy.md)
+
+   **2026-11-26 事后实证。** 团队在普通 PowerShell 完整应用设备入口补丁并实跑，Build 会话复核原始结果及文件散列。Django 103/103（原 91 同名用例及新增 12，零跳过）、真实隔离探针 21/21、夹具清理和正式八条 AC 通过，2.1 不回归，标准竞争原证据继续复用。依据本轮实际授权推进至 review，待新会话独立评审。未触及正式库、后续 Story、实验 A 或 Git 提交。 [证据与交接](_bmad-output/implementation-artifacts/story-2-2-dev-evidence.md)
+
+## D-044 2026-11-26 负责人处置 Story 2.2 独立评审
+
+1. **触发。** 安装版 BMAD 6.12.4 `bmad-code-review` full Step 4。基线 `930d3cb1c6ce02a934a93295b850c9109165dcf1`，四视角返回，0 Decision、6 Patch、1 Defer、13 Rejected。正式依据为 AC-1～AC-8、FR-004／002／018／015、ADR-002～008、project-context 相关规则、D-043 及原始日志。 [独立评审](_bmad-output/implementation-artifacts/story-2-2-independent-review.md) · [逐条裁决](_bmad-output/implementation-artifacts/story-2-2-review-triage.md)
+2. **AI 建议及理由。** 建议选 2，保留六项测试与取证待办，不把覆盖增强当成产品缺陷。当前未发现正式 AC、安全性或数据一致性阻塞。P1 原始绑定在注入前采样，不能声称是实际执行绑定，但实际 SQLSTATE 23514、两次 INSERT 尝试、零 COMMIT 及独立前后快照支持 AC-8 原子回滚。用现有隔离入口运行一次，不先新增整改，不重复跑 NFR-001。
+3. **人类决定及依据。** 项目负责人在本会话明确回复「选择2：保留为规格中的待办」，并接受四视角及逐项裁决。在现有证据足以支持正式 AC、安全性和一致性要求的前提下，批准 P1（Medium）及 P2～P6（Low）作为非阻塞改进延期。明确区分 P1 注入前记录与实际执行值，不虚构验证结果。原 D1 延期及 13 条不采纳理由保持。不得改业务代码、访问正式库、提前开发 Story 2.3、标 done 或自动 commit/push。原 8／5、实验 A、三位组员共同操作保持，不代录个人审批。
+4. **结果与残余风险。** 六项仍未修复且未勾选，实施规格与 Sprint 按选项 2 同步为 `in-progress`，等待独立运行回执，不表示需先整改。后续节点覆盖故障探针执行绑定、清理成功信号、输入文件集、真实日期表单、混合日期补集、历史与未占用 HTML，以及共享租约。中央延期台账的沙箱写入被拒绝，原台账未改，七条完整待合并文本及普通 PowerShell 安全合并入口已提供。 [Step 4 处置](_bmad-output/implementation-artifacts/story-2-2-review-disposition.md) · [逐项理由、风险与节点](_bmad-output/implementation-artifacts/story-2-2-d044-deferred-pending.md)
+5. **事后验证。** 已独立核对开发归档 103/103（零跳过）、21/21 探针、11 个退出 0 阶段、文件散列及夹具清理，不计作新独立运行。现有 `review-story-2-2-isolated.ps1` 可直接用于普通 PowerShell 的一次隔离独立复验，仅 `127.0.0.1:5433/test_lab_booking`，见新目录及 `STORY22_INDEPENDENT_REVIEW_RUN_OK` 才记录新结果。NFR-001 的 D-040 历史标准组 20×10 继续复用，不再次等整点。正式 Chrome 和运行还需另行计划，不把本次处置当成最终验收或部署。
+
+   **2026-11-26 D-044 事后验证。** 负责人报告团队在普通 PowerShell 真实执行一次隔离独立入口。实际批次为 `story-2-2-run-20261126-232700-557-c6cf7cc2`，评审会话复读并重算原始 103/103、零跳过、21/21 探针、11 个阶段退出 0、79/79 输入、三份等值数据库基线与夹具清理。AC-1～AC-8 通过，未发现新增阻塞。仍将 P1 的注入前值和实际执行绑定区分，不取消 D-044 延期或改写原裁决。规格与 Sprint 回 `in-review`／`review` 待正式运行，没有标 done。不重跑 NFR-001 或等待整点。仅提供正式运行命令未执行，先只读核对 D-042 权限，复用现有迁移及权限，不迁移或 GRANT。未提前开发 2.3，未提交或推送。 [逐 AC 复验](_bmad-output/implementation-artifacts/story-2-2-independent-recheck.md) · [正式运行命令](_bmad-output/implementation-artifacts/story-2-2-runtime-handoff.md)
+
+## D-045 2026-11-27 负责人最终验收 Story 2.2
+
+1. **触发。** 负责人报告实际体验正常，补充首次登录 POST 302、身份页 200、重复登录 POST CSRF 403 后恢复以及 D-044 台账合并已执行。 [体验记录](_bmad-output/implementation-artifacts/story-2-2-runtime-experience.md)
+2. **AI 核验。** 正式前后只读回执均为 0，业务摘要、既有两项迁移和 D-042 权限无漂移。逐项比对 D-044 七项，单次追加且历史原文不变。未留存的角色、日期、查询状态和恢复步骤不推断，正式体验不代替独立隔离验证。
+3. **人类决定。** 负责人批准在正式 AC 和证据条件均满足后直接最终验收、按指定消息提交并推送。保持原 Sprint 8／5、实验 A、三人共同操作审阅及 D-044 原处置，不代填个人决定。
+4. **结果。** Story 2.2 与实施规格为 `done`，Epic 2 仍 `in-progress`，Story 2.3 等未开始项仍 `backlog`。本轮不改业务、不执行正式库操作。Git 结果按实际退出码和 SHA 另行报告。
+5. **事后验证。** 开发和独立批次各保留 103/103 Django、21/21 真实探针和各 11 阶段退出 0，复用历史 NFR-001 20×10。不重跑，不将原 403 写成未发生或虚构恢复动作。 [最终验收](_bmad-output/implementation-artifacts/story-2-2-final-acceptance.md)
