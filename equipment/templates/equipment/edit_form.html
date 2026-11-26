@@ -1,0 +1,20 @@
+{% extends "equipment/catalog_base.html" %}
+
+{% block title %}编辑设备基础信息{% endblock %}
+{% block heading %}编辑设备基础信息{% endblock %}
+{% block content %}
+    <dl>
+        <dt>设备编号（不可修改）</dt><dd>{{ equipment.number }}</dd>
+        <dt>当前状态（不可在此修改）</dt><dd>{{ equipment.status_label }}</dd>
+    </dl>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <p>{{ form.name.label_tag }} {{ form.name }} {{ form.name.errors }}</p>
+        <p>{{ form.category.label_tag }} {{ form.category }} {{ form.category.errors }}</p>
+        <p>{{ form.location.label_tag }} {{ form.location }} {{ form.location.errors }}</p>
+        <p>{{ form.description.label_tag }} {{ form.description }} {{ form.description.errors }}</p>
+        <button type="submit">保存基础信息</button>
+    </form>
+    <p><a href="{% url 'equipment-detail' equipment_pk %}">返回设备详情</a></p>
+{% endblock %}

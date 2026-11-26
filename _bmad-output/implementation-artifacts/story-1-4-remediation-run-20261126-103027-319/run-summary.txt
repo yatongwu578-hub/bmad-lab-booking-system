@@ -1,0 +1,12 @@
+actual operator(s), as reported: w
+run mode: ordinary PowerShell, team development self-test
+target: lab_booking_test@127.0.0.1:5433/test_lab_booking
+started=2026-11-26T10:30:27.3217555+08:00
+ended=2026-11-26T10:30:52.0729764+08:00
+patch-sha256=1ABA031F506CD5901A2A245E6516B4C3AA62F277CC099AFC3610DC7281464488
+before-manifest-sha256=81FE2E7497A5816135F18121B0D121EF262BD72BE2DB9151CD1B194B3DB5A15E
+after-manifest-sha256=81FE2E7497A5816135F18121B0D121EF262BD72BE2DB9151CD1B194B3DB5A15E
+raw-log-sha256=E050ACEE0261604971C068BDF7ECACCC90716552B12371FACB7E8B30364B4C27
+verification exit=0
+result=PASS: 67 baseline + 1 new Django tests; 8 prior + 2 R1 probes; 6 T-03 denial records.
+

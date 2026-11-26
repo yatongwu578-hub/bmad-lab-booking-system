@@ -1,0 +1,12 @@
+actual operator(s), as reported: w
+started=2026-11-26T11:20:28.2500895+08:00
+ended=2026-11-26T11:20:30.9082589+08:00
+target=PostgreSQL 17.12, 127.0.0.1:5433/lab_booking
+python=Python 3.13.17
+node=v24.22.1
+acl=COMMIT CONFIRMED; D035 assertion and psql exit 0
+runtime=STARTED; DO NOT REPLAY IF AN EDIT MAY HAVE COMMITTED
+started-pid=39000
+listener-pid=5364
+login=http://127.0.0.1:8001/login/
+Chrome or independent readback did not complete. Preserve the logs and do not replay.

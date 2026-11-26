@@ -1,0 +1,12 @@
+2026-11-25T22:03:28.0496462+08:00
+> .\.venv\Scripts\python.exe --version
+did not find executable at 'C:\Users\15860\AppData\Local\Programs\Python\Python313\python.exe': ?????
+System.Management.Automation.RemoteException
+System.Management.Automation.RemoteException
+Exit 103
+> Test-Path -LiteralPath (Join-Path $env:LOCALAPPDATA 'LabBooking/PostgreSQL17/pgpass.conf') -PathType Leaf
+Access is denied
+False
+> & .\_bmad-output\implementation-artifacts\verify-story-1-4.ps1
+无法加载文件 F:\softwork\SE-Management\bmad-lab-booking-system\_bmad-output\implementation-artifacts\verify-story-1-4.ps1，因为在此系统上禁止运行脚本。有关详细信息，请参阅 https:/go.microsoft.com/fwlink/?LinkID=135170 中的 about_Execution_Policies。
+UnauthorizedAccess

@@ -1,0 +1,14 @@
+actual operator(s), as reported: w
+mode: independent review rerun in ordinary PowerShell
+target: lab_booking_test@127.0.0.1:5433/test_lab_booking
+started=2026-11-26T10:30:26.9139806+08:00
+ended=2026-11-26T10:30:53.1449622+08:00
+full-suite-sibling-directory=story-1-4-remediation-run-20261126-103027-319
+Full-suite nested metadata uses its historical development-self-test label.
+before-manifest-sha256=A9B6F16E107385EB52A013ADA19C13DC21C9987AFC287A307F1398DFA6A358CA
+after-manifest-sha256=A9B6F16E107385EB52A013ADA19C13DC21C9987AFC287A307F1398DFA6A358CA
+q3-raw-sha256=D1F27FC6086776E531E1A1C74CC1F7A1C2994E798488369AF0B52C8D2D873E8D
+q3-exit=0
+verification-exit=0
+result=68 Django + 10 PostgreSQL probes; separate Q-3 1 test with 2 cases.
+

@@ -1,0 +1,849 @@
+diff --git a/equipment/forms.py b/equipment/forms.py
+index 3fda746..a260043 100644
+--- a/equipment/forms.py
++++ b/equipment/forms.py
+@@ -1,6 +1,8 @@
+ from django import forms
++from django.utils.datastructures import MultiValueDict
+ 
+ from .models import Equipment
++from .services import EQUIPMENT_EDIT_FIELDS
+ 
+ 
+ class EquipmentCreateForm(forms.Form):
+@@ -9,3 +11,28 @@ class EquipmentCreateForm(forms.Form):
+     category = Equipment._meta.get_field("category").formfield()
+     location = Equipment._meta.get_field("location").formfield()
+     description = Equipment._meta.get_field("description").formfield()
++
++
++class EquipmentEditForm(forms.Form):
++    name = Equipment._meta.get_field("name").formfield(label="名称")
++    category = Equipment._meta.get_field("category").formfield(label="类别")
++    location = Equipment._meta.get_field("location").formfield(label="位置")
++    description = Equipment._meta.get_field("description").formfield(label="说明")
++
++    def clean(self):
++        cleaned = super().clean()
++        submitted = self.data.keys() | self.files.keys()
++        errors = []
++        if "number" in submitted:
++            errors.append("设备编号不可修改。")
++        if "status" in submitted:
++            errors.append("设备状态不可在此修改。")
++        if submitted - {*EQUIPMENT_EDIT_FIELDS, "csrfmiddlewaretoken", "number", "status"} or self.files:
++            errors.append("提交包含不允许的字段。")
++        if isinstance(self.data, MultiValueDict) and any(len(values) != 1 for _, values in self.data.lists()):
++            errors.append("提交包含重复字段。")
++        if "description" not in submitted:
++            errors.append("请提交说明字段，内容可留空。")
++        if errors:
++            raise forms.ValidationError(errors)
++        return cleaned
+diff --git a/equipment/management/commands/verify_equipment_edit_transactions.py b/equipment/management/commands/verify_equipment_edit_transactions.py
+new file mode 100644
+index 0000000..40f5fc9
+--- /dev/null
++++ b/equipment/management/commands/verify_equipment_edit_transactions.py
+@@ -0,0 +1,303 @@
++import re
++from concurrent.futures import ThreadPoolExecutor
++from threading import Event
++from time import monotonic, sleep
++from unittest.mock import patch
++from uuid import uuid4
++
++from django.conf import settings
++from django.contrib.sessions.models import Session
++from django.core.management.base import BaseCommand, CommandError
++from django.db import Error, connections, transaction
++from django.test import Client
++from django.urls import reverse
++
++from accounts.models import Role, User
++from equipment.models import Equipment, EquipmentStatus
++from equipment.services import EQUIPMENT_EDIT_FIELDS
++from lab_booking.database_config import DATABASE_TARGETS, HOST, PORT, SERVER_VERSION_NUM
++from lab_booking.test_runner import IsolatedPostgresRunner
++
++
++def require(condition, message):
++    if not condition:
++        raise CommandError(message)
++
++
++def query(connection, sql, params=()):
++    with connection.cursor() as cursor:
++        cursor.execute(sql, params)
++        return cursor.fetchone() if cursor.description else None
++
++
++def wait_for(check, label):
++    deadline = monotonic() + 5
++    while monotonic() < deadline:
++        result = check()
++        if result:
++            return result
++        sleep(0.025)
++    raise CommandError(f"等待超时：{label}")
++
++
++def verify_target(connection):
++    database, role = DATABASE_TARGETS["test"]
++    actual = query(
++        connection,
++        "SELECT current_database(), session_user, current_user, host(inet_server_addr()), "
++        "inet_server_port(), current_setting('server_version_num'), current_setting('transaction_isolation'), "
++        "pg_backend_pid(), rolsuper OR rolcreatedb OR rolcreaterole OR rolreplication OR rolbypassrls, "
++        "has_database_privilege(current_user, %s, 'CONNECT') FROM pg_roles WHERE rolname = current_user",
++        [DATABASE_TARGETS["runtime"][0]],
++    )
++    require(actual is not None and actual[:7] == (
++        database, role, role, HOST, int(PORT), str(SERVER_VERSION_NUM), "read committed",
++    ) and actual[8:] == (False, False), "隔离连接实际目标、权限或隔离级别不符。")
++    query(connection, "SET statement_timeout = '12s'")
++    query(connection, "SET lock_timeout = '10s'")
++    return actual[7]
++
++
++def snapshot(connection):
++    with connection.cursor() as cursor:
++        cursor.execute(
++            "SELECT id, number, name, category, location, description, status "
++            "FROM equipment_equipment ORDER BY id"
++        )
++        columns = [column.name for column in cursor.description]
++        return [dict(zip(columns, row, strict=True)) for row in cursor.fetchall()]
++
++
++def expected_rows(before, pk, **updates):
++    return [{**row, **updates} if row["id"] == pk else row for row in before]
++
++
++def is_equipment_statement(sql):
++    return '"equipment_equipment"' in sql
++
++
++def check_edit_sql(queries):
++    require(len(queries) == 3, f"设备 SQL 数量非 3：{queries!r}")
++    lock, reread, update = queries
++    require(lock.startswith('SELECT "equipment_equipment"."id"') and "FOR UPDATE" in lock,
++            f"首条设备 SQL 未按主键取锁：{lock}")
++    require(reread.startswith("SELECT") and '"equipment_equipment"."status"' in reread
++            and "FOR UPDATE" not in reread, f"未独立锁后重读状态：{reread}")
++    set_clause = update.split(" WHERE ")[0]
++    require(update.startswith("UPDATE ") and set(re.findall(r'"(\w+)"\s*=', set_clause))
++            == set(EQUIPMENT_EDIT_FIELDS), f"UPDATE 列超出四列边界：{update}")
++    require(all('"equipment_equipment"."id" =' in sql for sql in queries), "设备 SQL 未按主键定向。")
++
++
++class Command(BaseCommand):
++    help = "使用预建隔离测试库验证设备编辑的真实锁等待、回滚和未知提交。"
++
++    def handle(self, *args, **options):
++        database = DATABASE_TARGETS["test"][0]
++        require(settings.LAB_BOOKING_DB_MODE == "test" and list(connections) == ["default"],
++                "此命令仅允许使用 test 模式的默认连接。")
++        app = connections["default"]
++        require(app.settings_dict["TEST"]["NAME"] == database, "未配置预建 test_lab_booking。")
++        observer = app.copy(alias="story14-observer")
++        try:
++            observer_pid = verify_target(observer)
++            verify_target(app)
++            runner = IsolatedPostgresRunner(verbosity=0, parallel=1, keepdb=True)
++            # Reuse the existing migration and fixture checks, not a migration or flush.
++            db_before = runner.setup_databases(aliases={"default": True})
++            rows_before = snapshot(observer)
++            user_tag = f"story14-probe-{uuid4().hex}"
++            prefix = f"E14-{uuid4().hex[:20]}-"
++            require(not Equipment.objects.filter(number__startswith=prefix).exists()
++                    and not User.objects.filter(username=user_tag).exists(), "隔离夹具标识已存在。")
++            client = Client(enforce_csrf_checks=True, HTTP_HOST="localhost")
++            self.stdout.write(f"隔离观察连接 PID {observer_pid}，{HOST}:{PORT}/{database}，Read Committed。")
++            try:
++                admin = User.objects.create_user(username=user_tag, role=Role.ADMIN)
++                client.force_login(admin)
++                self.make_equipment(prefix + "other")
++                index = 0
++                for status in (EquipmentStatus.MAINTENANCE, EquipmentStatus.DISABLED):
++                    for blocking in (False, True):
++                        equipment = self.make_equipment(prefix + str(index))
++                        index += 1
++                        self.interleave(observer, observer_pid, client, equipment, status, blocking)
++                for fault in ("write-rollback", "commit-rejected", "commit-pre-disconnect", "commit-lost-ack"):
++                    equipment = self.make_equipment(prefix + str(index))
++                    index += 1
++                    self.fault(observer, observer_pid, client, equipment, fault)
++            finally:
++                app.close()  # Reconnect cleanly even if the actor's last connection was interrupted.
++                session = client.cookies.get(settings.SESSION_COOKIE_NAME)
++                if session is not None:
++                    Session.objects.filter(session_key=session.value).delete()
++                User.objects.filter(username=user_tag).delete()
++                Equipment.objects.filter(number__startswith=prefix).delete()
++                require(snapshot(observer) == rows_before, "清理后设备全字段或总数不一致。")
++                require(runner.database_state(observer) == db_before, "清理后表、迁移、账号或会话不一致。")
++                self.stdout.write("清理通过：设备全字段与总数、表、迁移、账号和会话恢复运行前状态。")
++            self.stdout.write(self.style.SUCCESS("AC-6／T-01 4/4；AC-8 异常探针 4/4。"))
++        finally:
++            app.close()
++            observer.close()
++
++    @staticmethod
++    def make_equipment(number):
++        return Equipment.objects.create(number=number, name="原名称", category="原类别",
++                                        location="原位置", description="原说明")
++
++    @staticmethod
++    def open_form(client, equipment):
++        url = reverse("equipment-edit", args=[equipment.pk])
++        response = client.get(url)
++        text = response.content.decode(response.charset)
++        token = re.search(r'name="csrfmiddlewaretoken" value="([^"]+)"', text)
++        require(response.status_code == 200 and equipment.number in text
++                and "可用" in text and token is not None, "未成功取得旧设备表单及真实令牌。")
++        values = {"name": "更新名称", "category": "更新类别", "location": "更新位置", "description": "更新说明"}
++        return url, values, {**values, "csrfmiddlewaretoken": token[1]}
++
++    def interleave(self, observer, observer_pid, client, equipment, status, blocking):
++        url, values, data = self.open_form(client, equipment)
++        before = snapshot(observer)
++        locked = Event()
++        release = Event()
++        pids = {}
++        edit_sql = []
++
++        def writer():
++            try:
++                pids["A"] = verify_target(connections["default"])
++                with transaction.atomic():
++                    Equipment.objects.select_for_update().values_list("pk", flat=True).get(pk=equipment.pk)
++                    require(Equipment.objects.filter(pk=equipment.pk).update(status=status) == 1, "状态夹具更新失败。")
++                    locked.set()
++                    require(release.wait(8), "状态夹具事务等待放行超时。")
++            finally:
++                connections.close_all()
++
++        def editor():
++            app = connections["default"]
++            try:
++                pids["B"] = verify_target(app)
++
++                def trace(execute, sql, params, many, context):
++                    if is_equipment_statement(sql):
++                        edit_sql.append(sql)
++                    require("reservation" not in sql.lower() and "audit_" not in sql.lower(),
++                            "编辑触及预约或历史。")
++                    return execute(sql, params, many, context)
++
++                with app.execute_wrapper(trace):
++                    return client.post(url, data)
++            finally:
++                connections.close_all()
++
++        with ThreadPoolExecutor(max_workers=2) as pool:
++            a = pool.submit(writer)
++            try:
++                require(locked.wait(5), "状态夹具未及时取得行锁。")
++                if blocking:
++                    b = pool.submit(editor)
++                    pid_b = wait_for(lambda: pids.get("B"), "编辑连接 PID")
++                    blockers = wait_for(
++                        lambda: [pid for pid in query(observer, "SELECT pg_blocking_pids(%s)", [pid_b])[0]
++                                 if pid == pids["A"]],
++                        "观察连接确认编辑受状态夹具行锁阻塞",
++                    )
++                    require(snapshot(observer) == before, "阻塞时观察连接不应看到未提交更新。")
++                    self.stdout.write(f"T-01 绕不开同一行锁，状态={status}，B={pid_b}，阻塞者={blockers}。")
++                else:
++                    release.set()
++                    a.result(timeout=12)
++                    require(snapshot(observer) == expected_rows(before, equipment.pk, status=status),
++                            "事务 A 提交后状态或其他设备不符。")
++                    b = pool.submit(editor)
++            finally:
++                release.set()
++            a.result(timeout=12)
++            response = b.result(timeout=12)
++
++        require(len({pids["A"], pids["B"], observer_pid}) == 3, "三个数据库后端必须互相独立。")
++        require(response.status_code == 302
++                and response["Location"] == reverse("equipment-detail", args=[equipment.pk]), "编辑未成功跳转原设备。")
++        check_edit_sql(edit_sql)
++        after = snapshot(observer)
++        require(after == expected_rows(before, equipment.pk, status=status, **values),
++                "锁后最终状态、基本字段、记录身份、无关设备或总数不符。")
++        row = next(row for row in after if row["id"] == equipment.pk)
++        self.stdout.write(f"T-01 状态={status}，真实等待={blocking}，PID={pids}，更新=1，末态={row!r}。")
++
++    def fault(self, observer, observer_pid, client, equipment, fault):
++        url, values, data = self.open_form(client, equipment)
++        before = snapshot(observer)
++        expected = expected_rows(before, equipment.pk, **values)
++        app = connections["default"]
++        actor_pid = verify_target(app)
++        require(actor_pid != observer_pid, "应用与观察连接不能共用后端。")
++        edit_sql = []
++        commits = 0
++        sqlstate = None
++        real_commit = app._commit
++
++        def trace(execute, sql, params, many, context):
++            nonlocal sqlstate
++            if is_equipment_statement(sql):
++                edit_sql.append(sql)
++            result = execute(sql, params, many, context)
++            if fault == "write-rollback" and sql.startswith('UPDATE "equipment_equipment"'):
++                try:
++                    query(app, "DO $$ BEGIN RAISE EXCEPTION 'story14 probe' USING ERRCODE = '23514'; END $$")
++                except Error as error:
++                    sqlstate = error.__cause__.sqlstate
++                    raise
++            return result
++
++        def interrupt_commit():
++            nonlocal commits, sqlstate
++            commits += 1
++            raw = app.connection
++            if fault == "commit-rejected":
++                # This temporary table (never a business table) defers validation until the real COMMIT.
++                query(app, "CREATE TEMP TABLE edit_commit_probe (n int UNIQUE DEFERRABLE INITIALLY DEFERRED) "
++                           "ON COMMIT DROP")
++                query(app, "INSERT INTO pg_temp.edit_commit_probe VALUES (1), (1)")
++            elif fault == "commit-pre-disconnect":
++                require(query(observer, "SELECT pg_terminate_backend(%s, 3000)", [actor_pid]) == (True,),
++                        "未能关闭隔离应用后端。")
++            elif fault == "commit-lost-ack":
++                raw.pgconn.send_query(b"COMMIT")
++                require(raw.pgconn.flush() == 0, "发送 COMMIT 尚未刷新。")
++                wait_for(lambda: snapshot(observer) == expected, "独立观察连接读到真实 COMMIT")
++                raw.close()  # Discard the confirmation before the application receives it.
++            try:
++                real_commit()
++            except Error as error:
++                sqlstate = getattr(error.__cause__, "sqlstate", None)
++                raise
++
++        try:
++            with app.execute_wrapper(trace), patch.object(app, "_commit", side_effect=interrupt_commit):
++                response = client.post(url, data)
++        finally:
++            app.close()
++        check_edit_sql(edit_sql)
++        require(commits == (0 if fault == "write-rollback" else 1), f"COMMIT 尝试次数不符：{commits}")
++        body = response.content.decode(response.charset)
++        unknown = fault in {"commit-pre-disconnect", "commit-lost-ack"}
++        if unknown:
++            require(sqlstate is None or sqlstate.startswith("08") or sqlstate in {"57P01", "57P02", "57P03"},
++                    f"断连驱动返回非连接异常 SQLSTATE：{sqlstate}")
++        else:
++            require(sqlstate == {"write-rollback": "23514", "commit-rejected": "23505"}[fault],
++                    f"实际数据库 SQLSTATE 不符：{sqlstate}")
++        heading = "提交结果待核查" if unknown else "设备编辑失败"
++        require(response.status_code == 503 and heading in body and "<form" not in body
++                and "编号已存在" not in body and not response.has_header("Location"), "响应误报或提供了重试。")
++        if unknown:
++            require("请先核查设备记录" in body and "未保存" not in body, "未知结果不能断言回滚或未保存。")
++        after = snapshot(observer)
++        require(after == (expected if fault == "commit-lost-ack" else before), f"{fault} 的完整末态不符。")
++        row = next(row for row in after if row["id"] == equipment.pk)
++        self.stdout.write(f"AC-8 {fault} PID={actor_pid}，响应=503 {heading}，UPDATE=1，"
++                          f"COMMIT 路径={commits}，SQLSTATE={sqlstate}，末态={row!r}。")
+diff --git a/equipment/services.py b/equipment/services.py
+index 877c6b9..966ffb7 100644
+--- a/equipment/services.py
++++ b/equipment/services.py
+@@ -18,7 +18,20 @@ class EquipmentCreationUnknown(Exception):
+     pass
+ 
+ 
++class EquipmentEditFailed(Exception):
++    pass
++
++
++class EquipmentEditUnknown(Exception):
++    pass
++
++
+ CATALOG_FIELDS = ("number", "name", "category", "location", "status")
++EQUIPMENT_EDIT_FIELDS = ("name", "category", "location", "description")
++
++
++def is_equipment_admin(user):
++    return user.is_authenticated and user.is_active and user.role == Role.ADMIN
+ 
+ 
+ def _require_catalog_reader(user):
+@@ -80,9 +93,44 @@ def create_equipment(user, values):
+     except Error as error:
+         if _is_equipment_number_conflict(error):
+             raise EquipmentNumberConflict from None
+-        sqlstate = getattr(error.__cause__, "sqlstate", None) or ""
+-        transaction_rejected = sqlstate.startswith("23") or sqlstate in {"40001", "40002", "40P01"}
+-        if ready_to_commit and not transaction_rejected:
++        if ready_to_commit and not _transaction_rejected(error):
+             raise EquipmentCreationUnknown from None
+         raise EquipmentCreationFailed from None
+     return equipment
++
++
++def _transaction_rejected(error):
++    sqlstate = getattr(error.__cause__, "sqlstate", None) or ""
++    return sqlstate.startswith("23") or sqlstate in {"40001", "40002", "40P01"}
++
++
++def edit_equipment(user, pk, values):
++    if not is_equipment_admin(user):
++        raise PermissionDenied
++    if values.keys() != set(EQUIPMENT_EDIT_FIELDS):
++        raise ValueError("只允许更新设备的四项基础信息。")
++
++    connection = transaction.get_connection()
++    ready_to_commit = False
++    try:
++        if not connection.in_atomic_block and not connection.get_autocommit():
++            raise RuntimeError("编辑设备要求由服务管理最外层事务。")
++        with transaction.atomic(durable=True):
++            target = Equipment.objects.filter(pk=pk)
++            try:
++                target.select_for_update().values_list("pk", flat=True).get()
++            except Equipment.DoesNotExist:
++                return False
++            # Read the current row in a separate Read Committed statement after acquiring its lock.
++            current = target.values("id", *CATALOG_FIELDS, "description").get()
++            updated = Equipment.objects.filter(pk=current["id"]).update(
++                **{field: values[field] for field in EQUIPMENT_EDIT_FIELDS}
++            )
++            if updated != 1 or connection.closed_in_transaction or transaction.get_rollback():
++                raise EquipmentEditFailed
++            ready_to_commit = True
++    except Error as error:
++        if ready_to_commit and not _transaction_rejected(error):
++            raise EquipmentEditUnknown from None
++        raise EquipmentEditFailed from None
++    return True
+diff --git a/equipment/templates/equipment/detail.html b/equipment/templates/equipment/detail.html
+index b3c1ef8..853a6da 100644
+--- a/equipment/templates/equipment/detail.html
++++ b/equipment/templates/equipment/detail.html
+@@ -11,5 +11,8 @@
+         <dt>说明</dt><dd id="equipment-description" style="white-space: pre-wrap">{{ equipment.description|default:"暂无说明" }}</dd>
+         <dt>当前状态</dt><dd>{{ equipment.status_label }}</dd>
+     </dl>
++    {% if edit_pk is not None %}
++        <p><a href="{% url 'equipment-edit' edit_pk %}">编辑设备基础信息</a></p>
++    {% endif %}
+     <p><a href="{% url 'equipment-catalog' %}">返回设备目录</a></p>
+ {% endblock %}
+diff --git a/equipment/templates/equipment/edit_form.html b/equipment/templates/equipment/edit_form.html
+new file mode 100644
+index 0000000..81a6adf
+--- /dev/null
++++ b/equipment/templates/equipment/edit_form.html
+@@ -0,0 +1,20 @@
++{% extends "equipment/catalog_base.html" %}
++
++{% block title %}编辑设备基础信息{% endblock %}
++{% block heading %}编辑设备基础信息{% endblock %}
++{% block content %}
++    <dl>
++        <dt>设备编号（不可修改）</dt><dd>{{ equipment.number }}</dd>
++        <dt>当前状态（不可在此修改）</dt><dd>{{ equipment.status_label }}</dd>
++    </dl>
++    <form method="post">
++        {% csrf_token %}
++        {{ form.non_field_errors }}
++        <p>{{ form.name.label_tag }} {{ form.name }} {{ form.name.errors }}</p>
++        <p>{{ form.category.label_tag }} {{ form.category }} {{ form.category.errors }}</p>
++        <p>{{ form.location.label_tag }} {{ form.location }} {{ form.location.errors }}</p>
++        <p>{{ form.description.label_tag }} {{ form.description }} {{ form.description.errors }}</p>
++        <button type="submit">保存基础信息</button>
++    </form>
++    <p><a href="{% url 'equipment-detail' equipment_pk %}">返回设备详情</a></p>
++{% endblock %}
+diff --git a/equipment/templates/equipment/edit_result.html b/equipment/templates/equipment/edit_result.html
+new file mode 100644
+index 0000000..6761e70
+--- /dev/null
++++ b/equipment/templates/equipment/edit_result.html
+@@ -0,0 +1,12 @@
++{% extends "equipment/catalog_base.html" %}
++
++{% block title %}{% if unknown %}提交结果待核查{% else %}设备编辑失败{% endif %}{% endblock %}
++{% block heading %}{% if unknown %}提交结果待核查{% else %}设备编辑失败{% endif %}{% endblock %}
++{% block content %}
++    {% if unknown %}
++        <p>目前无法确认本次修改是否保存。请先核查设备记录。</p>
++    {% else %}
++        <p>本次修改未保存。</p>
++    {% endif %}
++    <p><a href="{% url 'equipment-detail' equipment_pk %}">查看设备详情</a></p>
++{% endblock %}
+diff --git a/equipment/test_edit.py b/equipment/test_edit.py
+new file mode 100644
+index 0000000..c81169a
+--- /dev/null
++++ b/equipment/test_edit.py
+@@ -0,0 +1,260 @@
++import re
++from types import SimpleNamespace
++from unittest.mock import patch
++from urllib.parse import urlencode
++
++from django.core.exceptions import PermissionDenied
++from django.core.files.uploadedfile import SimpleUploadedFile
++from django.db import IntegrityError, connection, transaction
++from django.test import Client, TestCase
++from django.test.utils import CaptureQueriesContext
++from django.urls import Resolver404, resolve, reverse
++
++from accounts.models import Role, User
++
++from .models import Equipment, EquipmentStatus
++from .services import EquipmentEditFailed, EquipmentEditUnknown, edit_equipment
++
++
++class EquipmentEditTests(TestCase):
++    @classmethod
++    def setUpTestData(cls):
++        cls.admin = User.objects.create_user(username="edit-admin", role=Role.ADMIN)
++        cls.student = User.objects.create_user(username="edit-student", role=Role.STUDENT)
++        cls.teacher = User.objects.create_user(
++            username="edit-teacher", role=Role.TEACHER, is_staff=True, is_superuser=True,
++        )
++        cls.target = Equipment.objects.create(
++            number="EDIT-001", name="原设备名称", category="原类别",
++            location="原位置", description="原说明",
++        )
++        cls.other = Equipment.objects.create(
++            number="EDIT-002", name="其他设备", category="其他类别", location="其他位置",
++        )
++
++    def setUp(self):
++        self.edit_url = reverse("equipment-edit", args=[self.target.pk])
++        self.detail_url = reverse("equipment-detail", args=[self.target.pk])
++        self.values = {
++            "name": "新设备名称", "category": "新类别",
++            "location": "新位置", "description": "新说明第一行\n第二行",
++        }
++
++    def client_as(self, user=None):
++        client = Client(enforce_csrf_checks=True)
++        if user is not None:
++            client.force_login(user)
++        return client
++
++    def admin_form(self):
++        client = self.client_as(self.admin)
++        response = client.get(self.edit_url)
++        self.assertEqual(response.status_code, 200)
++        # Use the masked token rendered in the form, as a browser does.
++        match = re.search(rb'name="csrfmiddlewaretoken" value="([^"]+)"', response.content)
++        self.assertIsNotNone(match)
++        return client, response, match[1].decode("ascii")
++
++    @staticmethod
++    def snapshot():
++        return list(Equipment.objects.order_by("pk").values())
++
++    def expected_edit(self, baseline):
++        return [{**row, **self.values} if row["id"] == self.target.pk else row for row in baseline]
++
++    @staticmethod
++    def equipment_sql(queries):
++        return [entry["sql"] for entry in queries if '"equipment_equipment"' in entry["sql"]]
++
++    def assert_only_read(self, queries):
++        equipment_sql = self.equipment_sql(queries)
++        self.assertTrue(all(sql.startswith("SELECT") and "FOR UPDATE" not in sql for sql in equipment_sql))
++        self.assertFalse(any("reservation" in entry["sql"].lower() or "audit_" in entry["sql"].lower()
++                             for entry in queries))
++
++    def test_ac1_admin_get_and_valid_csrf_post_preserve_identity(self):
++        baseline = self.snapshot()
++        client, form, token = self.admin_form()
++        self.assertEqual(tuple(form.context["form"].fields), tuple(self.values))
++        for value in (self.target.number, self.target.name, self.target.category,
++                      self.target.location, self.target.description, "可用"):
++            self.assertContains(form, value)
++        for name in ("id", "number", "status"):
++            self.assertNotContains(form, f'name="{name}"')
++        self.assertContains(client.get(self.detail_url), f'href="{self.edit_url}"')
++        response = client.post(self.edit_url, {**self.values, "csrfmiddlewaretoken": token})
++        self.assertRedirects(response, self.detail_url)
++        detail = client.get(self.detail_url)
++        for value in self.values.values():
++            self.assertContains(detail, value)
++        self.assertEqual(self.snapshot(), self.expected_edit(baseline))
++        print("合法对照（非 T-03 拒绝分母）：admin GET 200、有效 CSRF POST 302，重读四字段与身份一致。")
++
++    def test_ac2_forged_number_rejected_and_real_unique_constraint_preserved(self):
++        baseline = self.snapshot()
++        client, _, token = self.admin_form()
++        with CaptureQueriesContext(connection) as queries:
++            response = client.post(self.edit_url, {**self.values, "number": self.other.number},
++                                   HTTP_X_CSRFTOKEN=token)
++        self.assertContains(response, "设备编号不可修改", status_code=400)
++        self.assert_only_read(queries)
++        self.assertEqual(self.snapshot(), baseline)
++        with self.assertRaises(IntegrityError) as caught, transaction.atomic():
++            Equipment.objects.filter(pk=self.other.pk).update(number=self.target.number)
++        self.assertEqual(caught.exception.__cause__.diag.constraint_name, "equipment_number_unique")
++        self.assertEqual(self.snapshot(), baseline)
++
++    def test_ac3_forging_each_status_from_every_other_status_is_rejected(self):
++        client, _, token = self.admin_form()
++        for current in EquipmentStatus.values:
++            Equipment.objects.filter(pk=self.target.pk).update(status=current)
++            baseline = self.snapshot()
++            for forged in set(EquipmentStatus.values) - {current}:
++                with self.subTest(current=current, forged=forged):
++                    with CaptureQueriesContext(connection) as queries:
++                        response = client.post(self.edit_url, {**self.values, "status": forged},
++                                               HTTP_X_CSRFTOKEN=token)
++                    self.assertContains(response, "设备状态不可在此修改", status_code=400)
++                    self.assert_only_read(queries)
++                    self.assertEqual(self.snapshot(), baseline)
++
++    def test_ac4_t03_six_role_denials_with_valid_post_csrf_do_not_read_target(self):
++        baseline = self.snapshot()
++        for user in (None, self.student, self.teacher):
++            client = self.client_as(user)
++            if user is None:
++                self.assertEqual(client.get(reverse("login")).status_code, 200)
++            else:
++                self.assertNotContains(client.get(self.detail_url), f'href="{self.edit_url}"')
++                self.assertEqual(client.get(reverse("identity")).status_code, 200)
++            token = client.cookies["csrftoken"].value
++            for method in ("GET", "POST"):
++                with self.subTest(role=getattr(user, "role", "anonymous"), method=method):
++                    with CaptureQueriesContext(connection) as queries:
++                        response = (client.get(self.edit_url) if method == "GET" else
++                                    client.post(self.edit_url, {**self.values, "csrfmiddlewaretoken": token}))
++                    self.assertEqual(response.status_code, 302 if user is None else 403)
++                    if user is None:
++                        self.assertEqual(response["Location"], f"/login/?next={self.edit_url}")
++                    body = response.content.decode(response.charset)
++                    for value in (self.target.number, self.target.name, self.target.description,
++                                  "编辑设备基础信息", 'name="description"'):
++                        self.assertNotIn(value, body)
++                    self.assertEqual(self.equipment_sql(queries), [])
++                    self.assertEqual(self.snapshot(), baseline)
++                    print(f"T-03 {getattr(user, 'role', 'anonymous')} {method} {response.status_code}，"
++                          f"无设备读取或泄露，{len(baseline)} 行全字段不变。")
++
++    def test_ac4_missing_and_mismatched_admin_csrf_are_distinct_denials(self):
++        baseline = self.snapshot()
++        client, _, token = self.admin_form()
++        mismatch = ("a" if token[0] != "a" else "b") + token[1:]
++        for reason, headers in (("missing", {}), ("mismatch", {"HTTP_X_CSRFTOKEN": mismatch})):
++            with self.subTest(reason=reason):
++                with CaptureQueriesContext(connection) as queries:
++                    response = client.post(self.edit_url, self.values, **headers)
++                self.assertEqual(response.status_code, 403)
++                self.assertNotIn(self.target.number, response.content.decode(response.charset))
++                self.assertEqual(self.equipment_sql(queries), [])
++                self.assertEqual(self.snapshot(), baseline)
++                print(f"CSRF 单列（非 T-03 角色拒绝分母）：admin {reason} 403，无设备读取或变更。")
++
++    def test_ac5_missing_target_is_404_for_get_and_both_valid_and_invalid_post(self):
++        baseline = self.snapshot()
++        client, _, token = self.admin_form()
++        missing = reverse("equipment-edit", args=[max(row["id"] for row in baseline) + 10000])
++        for method, data in (("get", None), ("post", self.values), ("post", {**self.values, "id": "1"})):
++            with self.subTest(method=method, data=data), CaptureQueriesContext(connection) as queries:
++                response = (client.get(missing) if method == "get" else
++                            client.post(missing, data, HTTP_X_CSRFTOKEN=token))
++                self.assertContains(response, "设备不存在", status_code=404)
++                self.assertNotContains(response, self.other.number, status_code=404)
++            self.assertTrue(all(sql.startswith("SELECT") for sql in self.equipment_sql(queries)))
++            self.assertEqual(self.snapshot(), baseline)
++
++    def test_ac6_actual_sql_locks_then_rereads_then_updates_exactly_four_columns(self):
++        client, _, token = self.admin_form()
++        for status in (EquipmentStatus.MAINTENANCE, EquipmentStatus.DISABLED):
++            Equipment.objects.filter(pk=self.target.pk).update(status=status)
++            baseline = self.snapshot()
++            with self.subTest(status=status), CaptureQueriesContext(connection) as queries:
++                response = client.post(self.edit_url, self.values, HTTP_X_CSRFTOKEN=token)
++                self.assertEqual(response.status_code, 302)
++            lock_sql, read_sql, update_sql = self.equipment_sql(queries)
++            self.assertIn('SELECT "equipment_equipment"."id"', lock_sql)
++            self.assertIn("FOR UPDATE", lock_sql)
++            self.assertIn('"equipment_equipment"."status"', read_sql)
++            self.assertNotIn("FOR UPDATE", read_sql)
++            self.assertEqual(set(re.findall(r'"(\w+)"\s*=', update_sql.split(" WHERE ")[0])), set(self.values))
++            self.assertTrue(all('"equipment_equipment"."id" =' in sql for sql in (lock_sql, read_sql, update_sql)))
++            self.assertEqual(self.snapshot(), self.expected_edit(baseline))
++
++    def test_ac7_no_delete_method_route_or_form_action(self):
++        baseline = self.snapshot()
++        client, form, token = self.admin_form()
++        self.assertNotContains(form, "删除")
++        self.assertNotContains(client.get(self.detail_url), "删除")
++        for base in (self.edit_url, self.detail_url):
++            self.assertEqual(client.delete(base, HTTP_X_CSRFTOKEN=token).status_code, 405)
++        for url in (f"{self.detail_url}delete/", "/admin/"):
++            with self.assertRaises(Resolver404):
++                resolve(url)
++            self.assertEqual(client.post(url, self.values, HTTP_X_CSRFTOKEN=token).status_code, 404)
++        self.assertEqual(self.snapshot(), baseline)
++
++    def test_ac8_distinct_http_failures_do_not_offer_a_retry_or_claim_success(self):
++        baseline = self.snapshot()
++        client, _, token = self.admin_form()
++        for error, heading in ((EquipmentEditFailed, "设备编辑失败"), (EquipmentEditUnknown, "提交结果待核查")):
++            with self.subTest(error=error), patch("equipment.views.edit_equipment", side_effect=error) as edit:
++                response = client.post(self.edit_url, self.values, HTTP_X_CSRFTOKEN=token)
++                edit.assert_called_once()
++            self.assertContains(response, heading, status_code=503)
++            self.assertNotContains(response, "<form", status_code=503)
++            self.assertNotContains(response, "已保存", status_code=503)
++            self.assertNotContains(response, "编号已存在", status_code=503)
++            self.assertNotIn("Location", response)
++            if error is EquipmentEditUnknown:
++                self.assertContains(response, "请先核查设备记录", status_code=503)
++                self.assertNotContains(response, "未保存", status_code=503)
++            self.assertEqual(self.snapshot(), baseline)
++
++    def test_invalid_extra_duplicate_and_file_keys_reject_wording_and_do_not_lock(self):
++        baseline = self.snapshot()
++        client, _, token = self.admin_form()
++        cases = (
++            ({**self.values, "id": str(self.other.pk)}, "不允许"),
++            ({**self.values, "unexpected": ""}, "不允许"),
++            ({**self.values, "name": ["first", "second"]}, "重复字段"),
++            ({**self.values, "csrfmiddlewaretoken": [token, token]}, "重复字段"),
++            ({**self.values, "description": SimpleUploadedFile("edit.txt", b"content")}, "不允许"),
++            ({**self.values, "name": " "}, "必填"),
++            ({key: value for key, value in self.values.items() if key != "description"}, "说明字段"),
++        )
++        for data, message in cases:
++            with self.subTest(message=message), CaptureQueriesContext(connection) as queries:
++                response = client.post(self.edit_url, data, HTTP_X_CSRFTOKEN=token)
++                self.assertContains(response, message, status_code=400)
++            self.assert_only_read(queries)
++            self.assertEqual(self.snapshot(), baseline)
++        protected = urlencode({**self.values, "number": self.target.number})
++        response = client.post(self.edit_url, protected, content_type="application/x-www-form-urlencoded",
++                               HTTP_X_CSRFTOKEN=token)
++        self.assertContains(response, "设备编号不可修改", status_code=400)
++        self.assertEqual(self.snapshot(), baseline)
++
++    def test_service_enforces_active_admin_and_allowlist_before_database_access(self):
++        baseline = self.snapshot()
++        with self.assertNumQueries(0):
++            for user in (self.teacher, SimpleNamespace(is_authenticated=True, is_active=False, role=Role.ADMIN)):
++                with self.assertRaises(PermissionDenied):
++                    edit_equipment(user, self.target.pk, self.values)
++            with self.assertRaises(ValueError):
++                edit_equipment(self.admin, self.target.pk, {**self.values, "status": EquipmentStatus.DISABLED})
++        self.assertEqual(self.snapshot(), baseline)
++
++    def test_service_rejects_ordinary_outer_transaction_without_writes(self):
++        baseline = self.snapshot()
++        with transaction.atomic(), self.assertRaisesRegex(RuntimeError, "durable"):
++            edit_equipment(self.admin, self.target.pk, self.values)
++        self.assertEqual(self.snapshot(), baseline)
+diff --git a/equipment/urls.py b/equipment/urls.py
+index 28e94df..ca63b37 100644
+--- a/equipment/urls.py
++++ b/equipment/urls.py
+@@ -1,10 +1,11 @@
+ from django.urls import path
+ 
+-from .views import create_equipment_view, equipment_catalog, equipment_detail
++from .views import create_equipment_view, edit_equipment_view, equipment_catalog, equipment_detail
+ 
+ 
+ urlpatterns = [
+     path("equipment/", equipment_catalog, name="equipment-catalog"),
+     path("equipment/new/", create_equipment_view, name="equipment-create"),
+     path("equipment/<int:pk>/", equipment_detail, name="equipment-detail"),
++    path("equipment/<int:pk>/edit/", edit_equipment_view, name="equipment-edit"),
+ ]
+diff --git a/equipment/views.py b/equipment/views.py
+index 37d416a..4def353 100644
+--- a/equipment/views.py
++++ b/equipment/views.py
+@@ -1,20 +1,22 @@
+ from django.contrib.auth.decorators import login_required
+ from django.core.exceptions import PermissionDenied
+ from django.http import HttpResponseForbidden
+-from django.shortcuts import render
++from django.shortcuts import redirect, render
+ from django.views.decorators.cache import never_cache
+ from django.views.decorators.http import require_http_methods, require_safe
+ 
+-from accounts.models import Role
+-
+-from .forms import EquipmentCreateForm
++from .forms import EquipmentCreateForm, EquipmentEditForm
+ from .models import EquipmentStatus
+ from .services import (
+     EquipmentCreationFailed,
+     EquipmentCreationUnknown,
++    EquipmentEditFailed,
++    EquipmentEditUnknown,
+     EquipmentNumberConflict,
+     create_equipment,
++    edit_equipment,
+     get_equipment_detail,
++    is_equipment_admin,
+     list_equipment,
+ )
+ 
+@@ -47,12 +49,15 @@ def equipment_detail(request, pk):
+     return render(
+         request,
+         "equipment/detail.html",
+-        {"account": request.user, "equipment": equipment},
++        {
++            "account": request.user, "equipment": equipment,
++            "edit_pk": pk if is_equipment_admin(request.user) else None,
++        },
+     )
+ 
+ 
+ def require_equipment_admin(user):
+-    if not user.is_active or user.role != Role.ADMIN:
++    if not is_equipment_admin(user):
+         raise PermissionDenied
+ 
+ 
+@@ -78,3 +83,35 @@ def create_equipment_view(request):
+         "equipment/create_form.html",
+         {"form": form, "initial_status": EquipmentStatus.AVAILABLE.label},
+     )
++
++
++@never_cache
++@require_http_methods(["GET", "POST"])
++@login_required
++def edit_equipment_view(request, pk):
++    require_equipment_admin(request.user)
++    context = {"account": request.user, "equipment_pk": pk}
++    if request.method == "POST":
++        form = EquipmentEditForm(request.POST, request.FILES)
++        if form.is_valid():
++            try:
++                saved = edit_equipment(request.user, pk, form.cleaned_data)
++            except EquipmentEditUnknown:
++                return render(request, "equipment/edit_result.html", {**context, "unknown": True}, status=503)
++            except EquipmentEditFailed:
++                return render(request, "equipment/edit_result.html", context, status=503)
++            if saved:
++                return redirect("equipment-detail", pk=pk)
++            return render(request, "equipment/not_found.html", context, status=404)
++
++    equipment = get_equipment_detail(request.user, pk)
++    if equipment is None:
++        return render(request, "equipment/not_found.html", context, status=404)
++    if request.method == "GET":
++        form = EquipmentEditForm(initial=equipment)
++    return render(
++        request,
++        "equipment/edit_form.html",
++        {**context, "form": form, "equipment": equipment},
++        status=200 if request.method == "GET" else 400,
++    )

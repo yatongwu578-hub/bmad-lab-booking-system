@@ -1,0 +1,297 @@
+diff --git a/equipment/forms.py b/equipment/forms.py
+index a26004399ec9a01d04446d8eadb7d0b4cd42a3c0..363ad706e4b42d8a32a4054dfce3ecddc9a6b065 100644
+--- a/equipment/forms.py
++++ b/equipment/forms.py
+@@ -17,7 +17,7 @@ class EquipmentEditForm(forms.Form):
+     name = Equipment._meta.get_field("name").formfield(label="名称")
+     category = Equipment._meta.get_field("category").formfield(label="类别")
+     location = Equipment._meta.get_field("location").formfield(label="位置")
+-    description = Equipment._meta.get_field("description").formfield(label="说明")
++    description = Equipment._meta.get_field("description").formfield(label="说明", strip=False)
+ 
+     def clean(self):
+         cleaned = super().clean()
+diff --git a/equipment/services.py b/equipment/services.py
+index 966ffb79d82e7bf5d5822ebadcb6ec7a76f69a01..bd80b42b8db71c557fc144f823fa3ece63e7646c 100644
+--- a/equipment/services.py
++++ b/equipment/services.py
+@@ -1,7 +1,7 @@
+ from django.core.exceptions import PermissionDenied
+ from django.db import Error, transaction
+ 
+-from accounts.models import Role
++from accounts.models import Role, User
+ 
+ from .models import Equipment, EquipmentStatus
+ 
+@@ -104,6 +104,10 @@ def _transaction_rejected(error):
+     return sqlstate.startswith("23") or sqlstate in {"40001", "40002", "40P01"}
+ 
+ 
++def _textarea_newlines(value):
++    return value.replace("\r\n", "\n").replace("\r", "\n")
++
++
+ def edit_equipment(user, pk, values):
+     if not is_equipment_admin(user):
+         raise PermissionDenied
+@@ -121,11 +125,20 @@ def edit_equipment(user, pk, values):
+                 target.select_for_update().values_list("pk", flat=True).get()
+             except Equipment.DoesNotExist:
+                 return False
++            # The request's cached user can be stale after waiting for the device lock.
++            try:
++                active, role = User.objects.values_list("is_active", "role").get(pk=user.pk)
++            except User.DoesNotExist:
++                raise PermissionDenied from None
++            if not active or role != Role.ADMIN:
++                raise PermissionDenied
+             # Read the current row in a separate Read Committed statement after acquiring its lock.
+             current = target.values("id", *CATALOG_FIELDS, "description").get()
+-            updated = Equipment.objects.filter(pk=current["id"]).update(
+-                **{field: values[field] for field in EQUIPMENT_EDIT_FIELDS}
+-            )
++            updates = {field: values[field] for field in EQUIPMENT_EDIT_FIELDS}
++            # Browsers submit textarea line endings as CRLF even when the original text used LF.
++            if _textarea_newlines(updates["description"]) == _textarea_newlines(current["description"]):
++                updates["description"] = current["description"]
++            updated = Equipment.objects.filter(pk=current["id"]).update(**updates)
+             if updated != 1 or connection.closed_in_transaction or transaction.get_rollback():
+                 raise EquipmentEditFailed
+             ready_to_commit = True
+diff --git a/equipment/test_edit.py b/equipment/test_edit.py
+index c81169a028005b98b30cb49a2f78f2dcbf12aef9..582213b22ca20c1c9c1efdb6e26a1fe20ceb67f2 100644
+--- a/equipment/test_edit.py
++++ b/equipment/test_edit.py
+@@ -1,4 +1,7 @@
++import json
+ import re
++from hashlib import sha256
++from html import unescape
+ from types import SimpleNamespace
+ from unittest.mock import patch
+ from urllib.parse import urlencode
+@@ -9,6 +12,7 @@ from django.db import IntegrityError, connection, transaction
+ from django.test import Client, TestCase
+ from django.test.utils import CaptureQueriesContext
+ from django.urls import Resolver404, resolve, reverse
++from django.utils.html import escape
+ 
+ from accounts.models import Role, User
+ 
+@@ -59,6 +63,11 @@ class EquipmentEditTests(TestCase):
+     def snapshot():
+         return list(Equipment.objects.order_by("pk").values())
+ 
++    @staticmethod
++    def snapshot_evidence(rows):
++        payload = json.dumps(rows, sort_keys=True, separators=(",", ":")).encode("utf-8")
++        return {"count": len(rows), "sha256": sha256(payload).hexdigest()}
++
+     def expected_edit(self, baseline):
+         return [{**row, **self.values} if row["id"] == self.target.pk else row for row in baseline]
+ 
+@@ -90,6 +99,45 @@ class EquipmentEditTests(TestCase):
+         self.assertEqual(self.snapshot(), self.expected_edit(baseline))
+         print("合法对照（非 T-03 拒绝分母）：admin GET 200、有效 CSRF POST 302，重读四字段与身份一致。")
+ 
++    def test_r2_description_preserves_submitted_and_unchanged_whitespace(self):
++        client, _, token = self.admin_form()
++        baseline = self.snapshot()
++        description = '\n  第一行  <strong>literal & text</strong>\n\n  第二行  \n  '
++
++        def assert_saved_and_rendered(values):
++            self.assertEqual(
++                self.snapshot(),
++                [{**row, **values} if row["id"] == self.target.pk else row for row in baseline],
++            )
++            detail = client.get(self.detail_url)
++            self.assertEqual(detail.status_code, 200)
++            match = re.search(r'<dd id="equipment-description"[^>]*>(.*?)</dd>',
++                              detail.content.decode(detail.charset), re.DOTALL)
++            self.assertIsNotNone(match)
++            self.assertEqual(match[1], escape(description))
++            self.assertEqual(unescape(match[1]), description)
++
++        first = {**self.values, "description": description}
++        self.assertRedirects(client.post(self.edit_url, {**first, "csrfmiddlewaretoken": token}),
++                             self.detail_url)
++        assert_saved_and_rendered(first)
++
++        form = client.get(self.edit_url)
++        self.assertEqual(form.status_code, 200)
++        match = re.search(r'<textarea\b[^>]*\bname="description"[^>]*>(.*?)</textarea>',
++                          form.content.decode(form.charset), re.DOTALL)
++        self.assertIsNotNone(match)
++        # Django renders one initial newline that HTML ignores; the remaining text is the field value.
++        self.assertEqual(match[1], "\n" + escape(description))
++        kept = {**first, "name": "仅修改名称"}
++        browser_description = unescape(match[1][1:]).replace("\n", "\r\n")
++        self.assertNotEqual(browser_description, description)
++        self.assertRedirects(client.post(self.edit_url, {
++            **kept, "description": browser_description, "csrfmiddlewaretoken": token,
++        }), self.detail_url)
++        assert_saved_and_rendered(kept)
++        print("R2 whitespace preserved: new description and unchanged textarea with CRLF; detail auto-escaped.")
++
+     def test_ac2_forged_number_rejected_and_real_unique_constraint_preserved(self):
+         baseline = self.snapshot()
+         client, _, token = self.admin_form()
+@@ -128,20 +176,38 @@ class EquipmentEditTests(TestCase):
+                 self.assertNotContains(client.get(self.detail_url), f'href="{self.edit_url}"')
+                 self.assertEqual(client.get(reverse("identity")).status_code, 200)
+             token = client.cookies["csrftoken"].value
++            role = getattr(user, "role", "anonymous")
++            expected_status = 302 if user is None else 403
++            expected_location = f"/login/?next={self.edit_url}" if user is None else None
++            private_values = (self.target.number, self.target.name, self.target.description,
++                              "编辑设备基础信息", 'name="description"')
+             for method in ("GET", "POST"):
+-                with self.subTest(role=getattr(user, "role", "anonymous"), method=method):
++                with self.subTest(role=role, method=method):
++                    before = self.snapshot()
+                     with CaptureQueriesContext(connection) as queries:
+                         response = (client.get(self.edit_url) if method == "GET" else
+                                     client.post(self.edit_url, {**self.values, "csrfmiddlewaretoken": token}))
+-                    self.assertEqual(response.status_code, 302 if user is None else 403)
+-                    if user is None:
+-                        self.assertEqual(response["Location"], f"/login/?next={self.edit_url}")
++                    after = self.snapshot()
+                     body = response.content.decode(response.charset)
+-                    for value in (self.target.number, self.target.name, self.target.description,
+-                                  "编辑设备基础信息", 'name="description"'):
++                    record = {
++                        "role": role, "method": method, "route": self.edit_url, "target": self.target.number,
++                        "request": {} if method == "GET" else {**self.values, "csrf": "valid-redacted"},
++                        "expected_status": expected_status, "actual_status": response.status_code,
++                        "denied": response.status_code == expected_status and (
++                            expected_location is None or response.get("Location") == expected_location
++                        ),
++                        "no_leak": all(value not in body for value in private_values),
++                        "before": self.snapshot_evidence(before), "after": self.snapshot_evidence(after),
++                    }
++                    print("T-03 record " + json.dumps(record, sort_keys=True))
++                    self.assertEqual(response.status_code, expected_status)
++                    if user is None:
++                        self.assertEqual(response["Location"], expected_location)
++                    for value in private_values:
+                         self.assertNotIn(value, body)
+                     self.assertEqual(self.equipment_sql(queries), [])
+-                    self.assertEqual(self.snapshot(), baseline)
++                    self.assertEqual(after, before)
++                    self.assertEqual(after, baseline)
+                     print(f"T-03 {getattr(user, 'role', 'anonymous')} {method} {response.status_code}，"
+                           f"无设备读取或泄露，{len(baseline)} 行全字段不变。")
+ 
+diff --git a/equipment/management/commands/verify_equipment_edit_transactions.py b/equipment/management/commands/verify_equipment_edit_transactions.py
+index 40f5fc9b25b2d9bf7bf039d7709a8d7e8b681d03..d8a10909f7cec816730eb5ed2b9ac38263c80a4a 100644
+--- a/equipment/management/commands/verify_equipment_edit_transactions.py
++++ b/equipment/management/commands/verify_equipment_edit_transactions.py
+@@ -126,6 +126,17 @@ class Command(BaseCommand):
+                     equipment = self.make_equipment(prefix + str(index))
+                     index += 1
+                     self.fault(observer, observer_pid, client, equipment, fault)
++                for case, active, role in (
++                    ("account-inactive", False, Role.ADMIN),
++                    ("role-revoked", True, Role.STUDENT),
++                ):
++                    equipment = self.make_equipment(prefix + str(index))
++                    index += 1
++                    try:
++                        self.interleave(observer, observer_pid, client, equipment, None, True,
++                                        revoke=(case, admin.pk, active, role))
++                    finally:
++                        User.objects.filter(pk=admin.pk).update(is_active=True, role=Role.ADMIN)
+             finally:
+                 app.close()  # Reconnect cleanly even if the actor's last connection was interrupted.
+                 session = client.cookies.get(settings.SESSION_COOKIE_NAME)
+@@ -137,6 +148,7 @@ class Command(BaseCommand):
+                 require(runner.database_state(observer) == db_before, "清理后表、迁移、账号或会话不一致。")
+                 self.stdout.write("清理通过：设备全字段与总数、表、迁移、账号和会话恢复运行前状态。")
+             self.stdout.write(self.style.SUCCESS("AC-6／T-01 4/4；AC-8 异常探针 4/4。"))
++            self.stdout.write(self.style.SUCCESS("R1 2/2"))
+         finally:
+             app.close()
+             observer.close()
+@@ -157,20 +169,22 @@ class Command(BaseCommand):
+         values = {"name": "更新名称", "category": "更新类别", "location": "更新位置", "description": "更新说明"}
+         return url, values, {**values, "csrfmiddlewaretoken": token[1]}
+ 
+-    def interleave(self, observer, observer_pid, client, equipment, status, blocking):
++    def interleave(self, observer, observer_pid, client, equipment, status, blocking, *, revoke=None):
+         url, values, data = self.open_form(client, equipment)
+         before = snapshot(observer)
+         locked = Event()
+         release = Event()
+         pids = {}
+         edit_sql = []
++        authorization_after = []
+ 
+         def writer():
+             try:
+                 pids["A"] = verify_target(connections["default"])
+                 with transaction.atomic():
+                     Equipment.objects.select_for_update().values_list("pk", flat=True).get(pk=equipment.pk)
+-                    require(Equipment.objects.filter(pk=equipment.pk).update(status=status) == 1, "状态夹具更新失败。")
++                    if revoke is None:
++                        require(Equipment.objects.filter(pk=equipment.pk).update(status=status) == 1, "状态夹具更新失败。")
+                     locked.set()
+                     require(release.wait(8), "状态夹具事务等待放行超时。")
+             finally:
+@@ -184,6 +198,14 @@ class Command(BaseCommand):
+                 def trace(execute, sql, params, many, context):
+                     if is_equipment_statement(sql):
+                         edit_sql.append(sql)
++                    if revoke is not None:
++                        projection, accounts_from, _ = sql.partition(' FROM "accounts_user"')
++                        if (accounts_from and projection.count(",") == 1
++                                and projection.startswith('SELECT "accounts_user"."is_active"')
++                                and '"accounts_user"."role"' in projection):
++                            require('"accounts_user"."id" =' in sql and tuple(params) == (revoke[1],),
++                                    "锁后权限复核未按请求账号主键读取。")
++                            authorization_after.append(len(edit_sql))
+                     require("reservation" not in sql.lower() and "audit_" not in sql.lower(),
+                             "编辑触及预约或历史。")
+                     return execute(sql, params, many, context)
+@@ -206,7 +228,14 @@ class Command(BaseCommand):
+                         "观察连接确认编辑受状态夹具行锁阻塞",
+                     )
+                     require(snapshot(observer) == before, "阻塞时观察连接不应看到未提交更新。")
+-                    self.stdout.write(f"T-01 绕不开同一行锁，状态={status}，B={pid_b}，阻塞者={blockers}。")
++                    if revoke is None:
++                        self.stdout.write(f"T-01 绕不开同一行锁，状态={status}，B={pid_b}，阻塞者={blockers}。")
++                    else:
++                        _, admin_pk, active, role = revoke
++                        require(observer.get_autocommit(), "撤权观察连接必须立即提交。")
++                        require(query(observer, "UPDATE accounts_user SET is_active = %s, role = %s "
++                                      "WHERE id = %s RETURNING id", [active, role, admin_pk]) == (admin_pk,),
++                                "隔离账号夹具撤权失败。")
+                 else:
+                     release.set()
+                     a.result(timeout=12)
+@@ -219,6 +248,25 @@ class Command(BaseCommand):
+             response = b.result(timeout=12)
+ 
+         require(len({pids["A"], pids["B"], observer_pid}) == 3, "三个数据库后端必须互相独立。")
++        if revoke is not None:
++            case, admin_pk, active, role = revoke
++            body = response.content.decode(response.charset)
++            require(response.status_code == 403 and not response.has_header("Location"),
++                    "设备锁等待期间撤权的请求未返回 403。")
++            require(all(text not in body for text in (
++                "<form", equipment.number, equipment.name, equipment.description, *values.values(),
++            )), "撤权响应泄露了设备编辑内容。")
++            require(
++                len(edit_sql) == 1 and "FOR UPDATE" in edit_sql[0]
++                and '"equipment_equipment"."id" =' in edit_sql[0] and authorization_after == [1],
++                "撤权请求未按主键先锁设备、再读取账号，或尝试了额外设备 SQL。",
++            )
++            require(query(observer, "SELECT is_active, role FROM accounts_user WHERE id = %s", [admin_pk])
++                    == (active, role), "观察连接未读到撤权后账号状态。")
++            require(snapshot(observer) == before, "撤权后设备全字段或记录总数变化。")
++            self.stdout.write(f"R1 {case} status=403 wait_verified=true blockers={blockers} pid={pids['B']} "
++                              f"account_reread=1 updates=0 no_leak=true equipment_unchanged=true count={len(before)}")
++            return
+         require(response.status_code == 302
+                 and response["Location"] == reverse("equipment-detail", args=[equipment.pk]), "编辑未成功跳转原设备。")
+         check_edit_sql(edit_sql)

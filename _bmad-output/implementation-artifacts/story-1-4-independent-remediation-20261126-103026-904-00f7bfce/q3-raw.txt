@@ -1,0 +1,18 @@
+Q-3 isolated independent recheck; only 127.0.0.1:5433/test_lab_booking, lab_booking_test
+.\.venv\Scripts\python.exe -B _bmad-output/implementation-artifacts/check-story-1-4-existing-crlf.py
+Found 1 test(s).
+已核验并保留 127.0.0.1:5433/test_lab_booking，角色 lab_booking_test，PostgreSQL 17.12。
+测试前：10 张表、17 条迁移、0 个账号、0 条会话。
+System check identified no issues (0 silenced).
+Q-3 transport=CRLF before_sha256=cc0dfcffb424df75a2e123bc67a3a4c3146a454f8f6b0f36bea96760b59792e7 after_sha256=cc0dfcffb424df75a2e123bc67a3a4c3146a454f8f6b0f36bea96760b59792e7
+Q-3 transport=LF-equivalent before_sha256=cc0dfcffb424df75a2e123bc67a3a4c3146a454f8f6b0f36bea96760b59792e7 after_sha256=cc0dfcffb424df75a2e123bc67a3a4c3146a454f8f6b0f36bea96760b59792e7
+Q-3 stored CRLF preserved: 2 transport variants; identity and escaped detail verified.
+test_other_fields_preserve_stored_crlf_bytes (__main__.ExistingCRLFReview.test_other_fields_preserve_stored_crlf_bytes) ... ok
+System.Management.Automation.RemoteException
+----------------------------------------------------------------------
+Ran 1 test in 0.062s
+System.Management.Automation.RemoteException
+OK
+测试后：10 张表、17 条迁移、0 个账号、0 条会话。
+Q-3 cleanup: full equipment snapshot restored.
+Exit 0

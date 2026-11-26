@@ -1,0 +1,10 @@
+BEGIN
+SET
+SET
+psql:F:/softwork/SE-Management/bmad-lab-booking-system/_bmad-output/implementation-artifacts/story-1-4-runtime-acl-readonly.sql:78: NOTICE:  verified_target=lab_booking endpoint=127.0.0.1:5433 version=17.12 owner=lab_booking_migrator transaction=read-only
+psql:F:/softwork/SE-Management/bmad-lab-booking-system/_bmad-output/implementation-artifacts/story-1-4-runtime-acl-readonly.sql:78: NOTICE:  effective_inherited_roles=[]
+psql:F:/softwork/SE-Management/bmad-lab-booking-system/_bmad-output/implementation-artifacts/story-1-4-runtime-acl-readonly.sql:78: NOTICE:  effective_equipment_acl={"id": {"INSERT": false, "SELECT": true, "UPDATE": false}, "name": {"INSERT": true, "SELECT": true, "UPDATE": false}, "number": {"INSERT": true, "SELECT": true, "UPDATE": false}, "status": {"INSERT": true, "SELECT": true, "UPDATE": false}, "category": {"INSERT": true, "SELECT": true, "UPDATE": false}, "location": {"INSERT": true, "SELECT": true, "UPDATE": false}, "description": {"INSERT": true, "SELECT": true, "UPDATE": false}}
+DO
+psql:F:/softwork/SE-Management/bmad-lab-booking-system/_bmad-output/implementation-artifacts/story-1-4-runtime-acl-readonly.sql:78: NOTICE:  D035_ACL_STATE=NOT_GRANTED
+COMMIT
+Exit 0

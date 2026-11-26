@@ -1,0 +1,14 @@
+actual operator(s), as reported: w
+started=2026-11-26T11:46:02.2629702+08:00
+ended=2026-11-26T11:46:13.2978037+08:00
+target=PostgreSQL 17.12, 127.0.0.1:5433/lab_booking
+python=Python 3.13.17
+node=v24.22.1
+acl=SKIPPED BY -RuntimeOnly; existing ACL must pass independent snapshot
+runtime=PASS; Chrome and independent database readback
+service=REUSED VERIFIED INTERRUPTED-RUN SERVICE
+started-pid=
+service-root-pid=39000
+listener-pid=5364
+login=http://127.0.0.1:8001/login/
+

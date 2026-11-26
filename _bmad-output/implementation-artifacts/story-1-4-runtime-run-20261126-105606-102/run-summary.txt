@@ -1,0 +1,12 @@
+actual operator(s), as reported: w
+started=2026-11-26T10:56:06.1047880+08:00
+ended=2026-11-26T10:56:06.8094620+08:00
+target=PostgreSQL 17.12, 127.0.0.1:5433/lab_booking
+python=Python 3.13.17
+node=v24.22.1
+acl=STARTED; DO NOT REPLAY IF UNCONFIRMED
+runtime=NOT RUN
+started-pid=
+listener-pid=
+login=http://127.0.0.1:8001/login/
+Grant transaction not confirmed. Keep ACL output and independently check before any further action.

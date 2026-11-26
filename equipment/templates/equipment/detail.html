@@ -11,5 +11,8 @@
         <dt>说明</dt><dd id="equipment-description" style="white-space: pre-wrap">{{ equipment.description|default:"暂无说明" }}</dd>
         <dt>当前状态</dt><dd>{{ equipment.status_label }}</dd>
     </dl>
+    {% if edit_pk is not None %}
+        <p><a href="{% url 'equipment-edit' edit_pk %}">编辑设备基础信息</a></p>
+    {% endif %}
     <p><a href="{% url 'equipment-catalog' %}">返回设备目录</a></p>
 {% endblock %}

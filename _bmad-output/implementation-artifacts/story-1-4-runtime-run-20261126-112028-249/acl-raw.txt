@@ -1,0 +1,9 @@
+SET
+psql:F:/softwork/SE-Management/bmad-lab-booking-system/_bmad-output/implementation-artifacts/story-1-4-runtime-grant.sql:75: NOTICE:  verified_target=lab_booking endpoint=127.0.0.1:5433 version=17.12 owner=lab_booking_migrator
+psql:F:/softwork/SE-Management/bmad-lab-booking-system/_bmad-output/implementation-artifacts/story-1-4-runtime-grant.sql:75: NOTICE:  inherited_roles_phase_0=[]
+psql:F:/softwork/SE-Management/bmad-lab-booking-system/_bmad-output/implementation-artifacts/story-1-4-runtime-grant.sql:75: NOTICE:  effective_acl_phase_0={"id": {"INSERT": false, "SELECT": true, "UPDATE": false}, "name": {"INSERT": true, "SELECT": true, "UPDATE": false}, "number": {"INSERT": true, "SELECT": true, "UPDATE": false}, "status": {"INSERT": true, "SELECT": true, "UPDATE": false}, "category": {"INSERT": true, "SELECT": true, "UPDATE": false}, "location": {"INSERT": true, "SELECT": true, "UPDATE": false}, "description": {"INSERT": true, "SELECT": true, "UPDATE": false}}
+psql:F:/softwork/SE-Management/bmad-lab-booking-system/_bmad-output/implementation-artifacts/story-1-4-runtime-grant.sql:75: NOTICE:  inherited_roles_phase_1=[]
+psql:F:/softwork/SE-Management/bmad-lab-booking-system/_bmad-output/implementation-artifacts/story-1-4-runtime-grant.sql:75: NOTICE:  effective_acl_phase_1={"id": {"INSERT": false, "SELECT": true, "UPDATE": false}, "name": {"INSERT": true, "SELECT": true, "UPDATE": true}, "number": {"INSERT": true, "SELECT": true, "UPDATE": false}, "status": {"INSERT": true, "SELECT": true, "UPDATE": false}, "category": {"INSERT": true, "SELECT": true, "UPDATE": true}, "location": {"INSERT": true, "SELECT": true, "UPDATE": true}, "description": {"INSERT": true, "SELECT": true, "UPDATE": true}}
+psql:F:/softwork/SE-Management/bmad-lab-booking-system/_bmad-output/implementation-artifacts/story-1-4-runtime-grant.sql:75: NOTICE:  D035_ACL_ASSERTIONS_PASSED
+DO
+Exit 0

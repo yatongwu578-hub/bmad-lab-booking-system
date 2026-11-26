@@ -1,0 +1,10 @@
+{"stage":"before","row":{"id":1,"name":"课程演示设备","number":"EQ-DEMO-S12-20261125","status":"available","category":"课程演示","location":"课程演示区","description":"软件工程管理课程 Story 1.2 演示档案，可保留。"},"port":5433,"role":"lab_booking_app","version":"17.12","database":"lab_booking","sessions":1,"isolation":"read committed","migrations":17,"device_count":1,"other_devices_sha256":"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"}
+file:///F:/softwork/SE-Management/bmad-lab-booking-system/_bmad-output/implementation-artifacts/story-1-4-runtime-chrome.mjs:52
+if (fields.some(key => before.row[key] === revised[key])) throw Error("One or more planned fields already equal the new values; stop rather than repeat a write.");
+                                                                ^
+System.Management.Automation.RemoteException
+Error: One or more planned fields already equal the new values; stop rather than repeat a write.
+    at file:///F:/softwork/SE-Management/bmad-lab-booking-system/_bmad-output/implementation-artifacts/story-1-4-runtime-chrome.mjs:52:65
+System.Management.Automation.RemoteException
+Node.js v24.22.1
+Exit 1

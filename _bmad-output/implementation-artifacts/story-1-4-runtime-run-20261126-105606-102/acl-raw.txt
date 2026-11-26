@@ -1,0 +1,8 @@
+SET
+psql:F:/softwork/SE-Management/bmad-lab-booking-system/_bmad-output/implementation-artifacts/story-1-4-runtime-grant.sql:75: ERROR:  column reference "app" is ambiguous
+�� 1 ��: ...LECT count(*) FROM public.django_migrations WHERE app='equip...
+                                                            ^
+����:  It could refer to either a PL/pgSQL variable or a table column.
+��ѯ:  (SELECT count(*) FROM public.django_migrations WHERE app='equipment' AND name='0001_initial') <> 1
+������:  PL/pgSQL function inline_code_block line 27 at IF
+Exit 3

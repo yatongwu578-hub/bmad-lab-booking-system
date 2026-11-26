@@ -1,0 +1,3 @@
+pid=39000 executable=F:\softwork\SE-Management\bmad-lab-booking-system\.venv\Scripts\python.exe created_utc=2026-11-26T03:20:28.9653080Z args=manage.py runserver 127.0.0.1:8001 --noreload
+pid=5364 executable=C:\Users\15860\AppData\Local\Programs\Python\Python313\python.exe created_utc=2026-11-26T03:20:29.0762310Z args=manage.py runserver 127.0.0.1:8001 --noreload
+reused_from=F:\softwork\SE-Management\bmad-lab-booking-system\_bmad-output\implementation-artifacts\story-1-4-runtime-run-20261126-112028-249 project=F:\softwork\SE-Management\bmad-lab-booking-system git=e200fee335536941e0705c112aefbf6751b244c3 certified_files=53

@@ -1,0 +1,12 @@
+{% extends "equipment/catalog_base.html" %}
+
+{% block title %}{% if unknown %}提交结果待核查{% else %}设备编辑失败{% endif %}{% endblock %}
+{% block heading %}{% if unknown %}提交结果待核查{% else %}设备编辑失败{% endif %}{% endblock %}
+{% block content %}
+    {% if unknown %}
+        <p>目前无法确认本次修改是否保存。请先核查设备记录。</p>
+    {% else %}
+        <p>本次修改未保存。</p>
+    {% endif %}
+    <p><a href="{% url 'equipment-detail' equipment_pk %}">查看设备详情</a></p>
+{% endblock %}

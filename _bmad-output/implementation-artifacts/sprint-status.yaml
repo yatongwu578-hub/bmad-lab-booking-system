@@ -29,18 +29,18 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 11-17-2026 20:05
-last_updated: 11-25-2026 21:35
+last_updated: 11-26-2026 12:11
 project: bmad-lab-booking-system
 project_key: NOKEY
 tracking_system: file-system
 story_location: _bmad-output/implementation-artifacts
 development_status:
-  epic-1: in-progress
+  epic-1: done
   1-1-使用预置账号登录并获得明确业务身份: done
   1-2-管理员新增具体设备基础档案: done
   1-3-查看设备目录与具体设备详情: done
-  1-4-管理员维护设备基础信息并保护设备身份: backlog
-  epic-1-retrospective: optional
+  1-4-管理员维护设备基础信息并保护设备身份: done
+  epic-1-retrospective: done
 
   epic-2: backlog
   2-1-提交具体设备预约并获得可靠申请结果: backlog
@@ -56,3 +56,22 @@ development_status:
   epic-3: backlog
   3-1-安全变更设备状态并保留预约: backlog
   epic-3-retrospective: optional
+action_items:
+  - id: "epic-1-retro-item-1-windows-preflight"
+    epic: 1
+    action: "集成前把 Windows 原解释器、BMAD 独立渲染、数据库角色／端口及凭据存在性纳入不打印秘密的预检。"
+    owner: "项目组三人共同维护"
+    status: open
+    ref: "_bmad-output\\implementation-artifacts\\epic-1-retro-2026-11-26.md"
+  - id: "epic-1-retro-item-2-verification-evidence"
+    epic: 1
+    action: "验证包装逐阶段留存退出码、精确标记、输入散列及数据基线，已提交后只通过只读证据恢复。"
+    owner: "项目组三人共同维护"
+    status: open
+    ref: "_bmad-output\\implementation-artifacts\\epic-1-retro-2026-11-26.md"
+  - id: "epic-1-retro-item-3-login-return-path"
+    epic: 1
+    action: "权限回归维护时在隔离浏览器跟随匿名跳转，核对管理员回到实际编辑地址及师生仍被拒。"
+    owner: "项目组三人共同维护"
+    status: open
+    ref: "_bmad-output\\implementation-artifacts\\epic-1-retro-2026-11-26.md"

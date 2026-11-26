@@ -1,0 +1,7 @@
+actual operator(s), as reported: w
+started=2026-11-26T11:20:28.0512178+08:00
+ended=2026-11-26T11:20:28.2263761+08:00
+target=PostgreSQL 17.12, 127.0.0.1:5433/lab_booking, lab_booking_migrator, read-only
+psql_exit=0
+acl_state=NOT_GRANTED
+
