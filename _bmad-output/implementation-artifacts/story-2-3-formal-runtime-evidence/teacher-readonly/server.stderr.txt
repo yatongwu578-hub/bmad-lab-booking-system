@@ -1,0 +1,16 @@
+[27/Nov/2026 16:49:31] "GET /login/ HTTP/1.1" 200 922
+[27/Nov/2026 16:49:31] "GET /favicon.ico HTTP/1.1" 404 179
+[27/Nov/2026 16:49:31] "GET /login/ HTTP/1.1" 200 922
+[27/Nov/2026 16:49:32] "GET /favicon.ico HTTP/1.1" 404 179
+[27/Nov/2026 16:49:45] "GET /login/?utm_source=chatgpt.com HTTP/1.1" 200 922
+[27/Nov/2026 16:49:56] "POST /login/?utm_source=chatgpt.com HTTP/1.1" 302 0
+[27/Nov/2026 16:49:56] "GET /identity/ HTTP/1.1" 200 815
+[27/Nov/2026 16:50:12] "GET /reservations/1/result/?utm_source=chatgpt.com HTTP/1.1" 404 336
+[27/Nov/2026 16:50:18] "GET /reservations/4611686018427387904/result/?utm_source=chatgpt.com HTTP/1.1" 404 336
+[27/Nov/2026 16:50:25] "GET /reservations/?utm_source=chatgpt.com HTTP/1.1" 200 362
+[27/Nov/2026 16:50:26] "GET /identity/ HTTP/1.1" 200 815
+[27/Nov/2026 16:50:34] "GET /login/?utm_source=chatgpt.com HTTP/1.1" 200 922
+[27/Nov/2026 16:50:51] "POST /login/?utm_source=chatgpt.com HTTP/1.1" 302 0
+[27/Nov/2026 16:50:51] "GET /identity/ HTTP/1.1" 200 829
+[27/Nov/2026 16:50:55] "GET /identity/?utm_source=chatgpt.com HTTP/1.1" 200 829
+[27/Nov/2026 16:50:58] "GET /reservations/?utm_source=chatgpt.com HTTP/1.1" 403 27

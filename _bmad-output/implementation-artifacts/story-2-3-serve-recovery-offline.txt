@@ -1,0 +1,8 @@
+OFFLINE_SERVEDIR_RECOVERY_OK
+OFFLINE_CHROME_ISOLATION_OK
+OFFLINE_FINISH_RETRY_OK
+MOCKED_NATIVE_APP_DB_AND_CHROME
+
+原 PowerShell 的三阶段分支在隔离临时目录执行，进程、Chrome 和 PostgreSQL 调用均替换为本地模拟。
+失败样本未复用、目录未覆盖、旧进程标识不能冒充当前监听、后置重试使用同一带散列的前置文件。
+输出 STORY23_FORMAL_POSTCHECK_OK 的模拟分支不是任何真实正式回执。

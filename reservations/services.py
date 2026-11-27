@@ -9,7 +9,7 @@ from django.db.models import Q
 
 from accounts.models import Role, User
 from accounts.policies import RESERVATION_ROLES, can_reserve
-from audit.services import append_reservation_expiry
+from audit.services import append_reservation_expiry, read_reservation_reasons
 from equipment.models import Equipment, EquipmentStatus
 from equipment.services import get_equipment_detail, lock_equipment
 from lab_booking.transactions import transaction_rejected
@@ -21,7 +21,10 @@ BEIJING = ZoneInfo("Asia/Shanghai")
 LOCAL_INPUT = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(?::[0-9]{2}(?:\.[0-9]{1,6})?)?")
 # Unlike a lost connection or SQLSTATE 40003, these server responses confirm rejection.
 COMMIT_CANCELLATION_STATES = {"55P03", "57014"}
-RESULT_FIELDS = ("id", "equipment_id", "equipment__number", "equipment__name", "start_at", "end_at", "status")
+RESULT_FIELDS = (
+    "id", "equipment_id", "equipment__number", "equipment__name", "equipment__status",
+    "start_at", "end_at", "status",
+)
 
 
 class ReservationFailed(Exception):
@@ -159,28 +162,58 @@ def submit_reservation(user, equipment_pk, raw_start, raw_end):
     return _durable_operation(submit)
 
 
-def get_reservation_result(user, pk):
+def _read_own_reservations(user, pk=None):
     require_applicant(user)
-    owned = Reservation.objects.filter(pk=pk, applicant_id=user.pk)
+    owned = Reservation.objects.filter(applicant_id=user.pk)
+    if pk is not None:
+        owned = owned.filter(pk=pk)
 
     def read(connection):
-        candidate = owned.values(*RESULT_FIELDS).first()
-        if candidate is None or candidate["status"] != ReservationStatus.PENDING:
-            return candidate
-        equipment_id = candidate["equipment_id"]
-        if lock_equipment(equipment_id) is None:
-            return None
+        # Freeze authorized IDs and their pending-device scope before taking any locks.
+        candidates = list(owned.values_list("pk", "equipment_id", "status"))
+        pending = {row_id: equipment_id for row_id, equipment_id, status in candidates
+                   if status == ReservationStatus.PENDING}
+        locked = {equipment_id for equipment_id in sorted(set(pending.values()))
+                  if lock_equipment(equipment_id) is not None}
+
         _recheck_applicant(user.pk)
-        fixed = owned.filter(equipment_id=equipment_id)
-        current = fixed.values(*RESULT_FIELDS).first()
-        if current is None or current["status"] != ReservationStatus.PENDING:
-            return current
-        decision_at = _decision_time(connection)
-        if _expire(fixed, decision_at):
-            current["status"] = ReservationStatus.EXPIRED
-        return current
+        fixed = owned.filter(pk__in=[row_id for row_id, _, _ in candidates])
+        rows = list(fixed.order_by("-start_at", "-pk").values(*RESULT_FIELDS))
+        if pending:
+            decision_at = _decision_time(connection)
+            # Do not expire a row whose device was not locked or which fell out of scope.
+            eligible = [row["id"] for row in rows
+                        if row["status"] == ReservationStatus.PENDING
+                        and row["equipment_id"] in locked
+                        and pending.get(row["id"]) == row["equipment_id"]]
+            if eligible:
+                expired = set(_expire(fixed.filter(pk__in=eligible), decision_at))
+                for row in rows:
+                    if row["id"] in expired:
+                        row["status"] = ReservationStatus.EXPIRED
+
+        reasons = read_reservation_reasons(
+            connection,
+            [row["id"] for row in rows if row["status"] == ReservationStatus.REJECTED],
+            [row["id"] for row in rows if row["status"] == ReservationStatus.CANCELLED],
+        )
+        for row in rows:
+            row["reason"] = reasons.get(row["id"])
+        return rows
 
     return _durable_operation(read)
+
+
+def get_own_reservations(user):
+    return _read_own_reservations(user)
+
+
+def get_reservation_result(user, pk):
+    if pk is None:
+        require_applicant(user)
+        return None
+    rows = _read_own_reservations(user, pk)
+    return rows[0] if rows else None
 
 
 def _project_daily_occupancy(equipment, day_start, day_end, decision_at, rows):

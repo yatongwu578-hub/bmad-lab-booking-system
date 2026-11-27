@@ -1,0 +1,15 @@
+﻿2026-11-27T12:08:59.6925582+08:00 python-version exit=0
+2026-11-27T12:09:01.0783364+08:00 acl-before-catalog exit=0
+2026-11-27T12:09:01.2483968+08:00 before-app exit=0
+2026-11-27T12:09:02.2777916+08:00 grant exit=0
+2026-11-27T12:09:03.2970648+08:00 acl-after-catalog exit=1
+2026-11-27T12:09:03.3027651+08:00 Acl STOP: acl-after-catalog failed. Preserve the logs; use Recover after uncertain GRANT, never replay blindly.
+2026-11-27T14:50:41.6729565+08:00 recover-20261127145039564-catalog exit=0
+2026-11-27T14:50:41.8365732+08:00 recover-20261127145039564-app exit=0
+2026-11-27T14:51:13.7916912+08:00 Chrome STOP: Expected one 8003 listener
+2026-11-27T14:51:31.0613245+08:00 Chrome STOP: Expected one 8003 listener
+2026-11-27T14:53:40.4648054+08:00 sample-before-catalog exit=1
+2026-11-27T14:53:40.4692954+08:00 Serve STOP: sample-before-catalog failed. Preserve the logs; use Recover after uncertain GRANT, never replay blindly.
+2026-11-27T14:53:54.8153144+08:00 recover-20261127145353762-catalog exit=0
+2026-11-27T14:53:54.9741849+08:00 recover-20261127145353762-app exit=0
+2026-11-27T14:54:21.2629206+08:00 Serve STOP: Evidence already exists for sample-before-catalog

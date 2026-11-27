@@ -1,0 +1,10 @@
+﻿2026-11-27T11:48:14.1856944+08:00 verification-locks exit=0
+2026-11-27T11:48:14.5978506+08:00 preflight exit=0
+2026-11-27T11:48:15.6200900+08:00 baseline-before exit=0
+2026-11-27T11:48:16.6492909+08:00 check exit=0
+2026-11-27T11:48:17.6659139+08:00 migration-drift exit=0
+2026-11-27T11:48:40.9035262+08:00 regression exit=0
+2026-11-27T11:48:41.9872172+08:00 baseline-after-regression exit=0
+2026-11-27T11:49:38.4706475+08:00 independent exit=0
+2026-11-27T11:49:40.5526523+08:00 baseline-after-independent exit=0
+2026-11-27T11:49:40.7817314+08:00 complete exit=0

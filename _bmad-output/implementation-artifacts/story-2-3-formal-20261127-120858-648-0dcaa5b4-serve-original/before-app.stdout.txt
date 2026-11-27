@@ -1,0 +1,16 @@
+﻿identity|lab_booking|lab_booking_app|127.0.0.1|5433|170012
+table_select|f|f
+column|action|f|f
+column|actor_id|f|f
+column|actor_type|f|f
+column|after_status|f|f
+column|before_status|f|f
+column|decision_at|f|f
+column|equipment_id|f|f
+column|id|t|f
+column|object_type|f|f
+column|reason|f|f
+column|recorded_at|f|f
+column|reservation_id|f|f
+ACL_RESULT=NEEDS_FOUR_COLUMN_GRANT
+STORY23_ACL_READONLY_OK

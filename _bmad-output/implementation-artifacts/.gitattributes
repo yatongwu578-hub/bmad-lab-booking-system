@@ -2,3 +2,11 @@
 /story-2-2-run-20261126-224427-552-98c04aee/** -text
 /story-2-2-review-run-50b9a0bc1f4746b59dae49cc5f2ebe44/story-2-2-run-20261126-232700-557-c6cf7cc2/** -text
 /story-2-2-runtime-20261127-000918-77eb9198/** -text
+
+# Preserve original bytes so the archived SHA-256 manifests survive checkout on Windows.
+story-2-3-formal-runtime-evidence/** -text
+story-2-3-formal-20261127-120858-648-0dcaa5b4-acl-original/** -text
+story-2-3-formal-20261127-120858-648-0dcaa5b4-serve-original/** -text
+smoke-20261127-145741-081-70fac945-formal-hold-original/** -text
+story-2-3-independent-run-20261127-114813-950-de7b7f2c/** -text
+story-2-3-run-20261127-111101-492-41d9eb74/** -text

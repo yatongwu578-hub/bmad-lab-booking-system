@@ -1,0 +1,1 @@
+Only SELECT(reservation_id,action,actor_type,reason) on public.audit_operationhistory to lab_booking_app.

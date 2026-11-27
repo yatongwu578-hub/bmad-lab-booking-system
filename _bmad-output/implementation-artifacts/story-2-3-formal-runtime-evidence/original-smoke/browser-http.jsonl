@@ -1,0 +1,32 @@
+{"account_id": null, "at": "2026-11-27T15:41:41.936485+08:00", "method": "GET", "path": "/login/", "role": null, "status": 200, "writes": []}
+{"account_id": null, "at": "2026-11-27T15:41:41.937100+08:00", "method": "GET", "path": "/login/", "role": null, "status": 200, "writes": []}
+{"account_id": null, "at": "2026-11-27T15:41:42.361874+08:00", "method": "GET", "path": "/login/", "role": null, "status": 200, "writes": []}
+{"account_id": null, "at": "2026-11-27T15:41:42.795379+08:00", "method": "GET", "path": "/favicon.ico", "role": null, "status": 404, "writes": []}
+{"account_id": null, "at": "2026-11-27T15:41:43.354365+08:00", "method": "GET", "path": "/favicon.ico", "role": null, "status": 404, "writes": []}
+{"account_id": null, "at": "2026-11-27T15:41:43.359066+08:00", "method": "GET", "path": "/favicon.ico", "role": null, "status": 404, "writes": []}
+{"account_id": 2, "at": "2026-11-27T15:42:23.038820+08:00", "method": "POST", "path": "/login/", "role": "student", "status": 302, "writes": ["session", "last-login"]}
+{"account_id": 2, "at": "2026-11-27T15:42:23.094467+08:00", "method": "GET", "path": "/identity/", "role": "student", "status": 200, "writes": []}
+{"account_id": 2, "at": "2026-11-27T15:42:27.369315+08:00", "method": "GET", "path": "/reservations/", "role": "student", "status": 200, "student_snapshot": {"history_ids": [1], "status": "expired"}, "writes": ["expire-1", "expire-history-1"]}
+{"account_id": 2, "at": "2026-11-27T15:42:36.843773+08:00", "method": "GET", "path": "/reservations/1/result/", "role": "student", "status": 200, "writes": []}
+{"account_id": 2, "at": "2026-11-27T15:42:44.163152+08:00", "method": "GET", "path": "/reservations/", "role": "student", "status": 200, "student_snapshot": {"history_ids": [1], "status": "expired"}, "writes": []}
+{"account_id": 2, "at": "2026-11-27T15:42:45.389346+08:00", "method": "GET", "path": "/reservations/2/result/", "role": "student", "status": 200, "writes": []}
+{"account_id": 2, "at": "2026-11-27T15:42:46.532647+08:00", "method": "GET", "path": "/reservations/", "role": "student", "status": 200, "student_snapshot": {"history_ids": [1], "status": "expired"}, "writes": []}
+{"account_id": 2, "at": "2026-11-27T15:42:58.995791+08:00", "method": "GET", "path": "/identity/", "role": "student", "status": 200, "writes": []}
+{"account_id": null, "at": "2026-11-27T15:42:59.710475+08:00", "method": "POST", "path": "/logout/", "role": null, "status": 302, "writes": ["session"]}
+{"account_id": null, "at": "2026-11-27T15:42:59.716999+08:00", "method": "GET", "path": "/login/", "role": null, "status": 200, "writes": []}
+{"account_id": 3, "at": "2026-11-27T15:43:16.096770+08:00", "method": "POST", "path": "/login/", "role": "teacher", "status": 302, "writes": ["session", "last-login"]}
+{"account_id": 3, "at": "2026-11-27T15:43:16.267370+08:00", "method": "GET", "path": "/identity/", "role": "teacher", "status": 200, "writes": []}
+{"account_id": 3, "at": "2026-11-27T15:43:35.117919+08:00", "method": "GET", "path": "/equipment/", "role": "teacher", "status": 403, "writes": []}
+{"account_id": 3, "at": "2026-11-27T15:43:37.749241+08:00", "method": "GET", "path": "/reservations/", "role": "teacher", "status": 200, "writes": []}
+{"account_id": 3, "at": "2026-11-27T15:43:39.116772+08:00", "method": "GET", "path": "/identity/", "role": "teacher", "status": 200, "writes": []}
+{"account_id": 3, "at": "2026-11-27T15:43:42.842231+08:00", "method": "GET", "path": "/reservations/", "role": "teacher", "status": 200, "writes": []}
+{"account_id": 3, "at": "2026-11-27T15:43:46.588110+08:00", "method": "GET", "path": "/identity/", "role": "teacher", "status": 200, "writes": []}
+{"account_id": 3, "at": "2026-11-27T15:43:48.933902+08:00", "method": "GET", "path": "/equipment/", "role": "teacher", "status": 403, "writes": []}
+{"account_id": 3, "at": "2026-11-27T15:43:50.350012+08:00", "method": "GET", "path": "/identity/", "role": "teacher", "status": 200, "writes": []}
+{"account_id": null, "at": "2026-11-27T15:43:55.020834+08:00", "method": "POST", "path": "/logout/", "role": null, "status": 302, "writes": ["session"]}
+{"account_id": null, "at": "2026-11-27T15:43:55.026191+08:00", "method": "GET", "path": "/login/", "role": null, "status": 200, "writes": []}
+{"account_id": 1, "at": "2026-11-27T15:44:07.465758+08:00", "method": "POST", "path": "/login/", "role": "admin", "status": 302, "writes": ["session", "last-login"]}
+{"account_id": 1, "at": "2026-11-27T15:44:07.635792+08:00", "method": "GET", "path": "/identity/", "role": "admin", "status": 200, "writes": []}
+{"account_id": 1, "at": "2026-11-27T15:44:17.272981+08:00", "method": "GET", "path": "/equipment/", "role": "admin", "status": 403, "writes": []}
+{"account_id": 1, "at": "2026-11-27T15:44:19.392862+08:00", "method": "GET", "path": "/equipment/", "role": "admin", "status": 403, "writes": []}
+{"account_id": 1, "at": "2026-11-27T15:44:21.029874+08:00", "method": "GET", "path": "/equipment/new/", "role": "admin", "status": 403, "writes": []}

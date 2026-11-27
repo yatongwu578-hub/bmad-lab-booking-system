@@ -1,0 +1,6 @@
+﻿2026-11-27T12:08:59.6925582+08:00 python-version exit=0
+2026-11-27T12:09:01.0783364+08:00 acl-before-catalog exit=0
+2026-11-27T12:09:01.2483968+08:00 before-app exit=0
+2026-11-27T12:09:02.2777916+08:00 grant exit=0
+2026-11-27T12:09:03.2970648+08:00 acl-after-catalog exit=1
+2026-11-27T12:09:03.3027651+08:00 Acl STOP: acl-after-catalog failed. Preserve the logs; use Recover after uncertain GRANT, never replay blindly.

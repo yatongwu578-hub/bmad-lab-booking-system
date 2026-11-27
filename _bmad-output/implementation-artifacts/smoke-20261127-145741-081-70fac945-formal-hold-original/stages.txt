@@ -1,0 +1,2 @@
+﻿2026-11-27T15:08:18.8492986+08:00 sample-before-catalog exit=1
+2026-11-27T15:08:18.8528585+08:00 Serve STOP: sample-before-catalog failed. Preserve the logs; use Recover after uncertain GRANT, never replay blindly.

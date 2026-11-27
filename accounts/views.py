@@ -7,6 +7,7 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_safe
 
 from .models import Role
+from .policies import can_reserve
 
 
 class AccountLogoutView(LogoutView):
@@ -21,4 +22,4 @@ def identity(request):
     user = request.user
     if not user.is_active or user.role not in Role.values:
         raise PermissionDenied
-    return render(request, "accounts/identity.html", {"account": user})
+    return render(request, "accounts/identity.html", {"account": user, "can_reserve": can_reserve(user)})

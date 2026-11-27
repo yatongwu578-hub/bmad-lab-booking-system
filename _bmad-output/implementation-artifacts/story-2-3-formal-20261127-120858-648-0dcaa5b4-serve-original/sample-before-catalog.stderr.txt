@@ -1,0 +1,1 @@
+Story 2.3 read-only stopped: RuntimeError [n/a] Authorized student account is absent, inactive or has a different role

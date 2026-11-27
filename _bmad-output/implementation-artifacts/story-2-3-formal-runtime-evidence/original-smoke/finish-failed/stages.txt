@@ -1,0 +1,2 @@
+﻿2026-11-27T16:05:26.3216426+08:00 demo-after-catalog exit=1
+2026-11-27T16:05:26.3265055+08:00 Finish STOP: demo-after-catalog exited 1. Read demo-after-catalog.stderr.txt in this attempt. No automatic retry.

@@ -10,10 +10,16 @@
         <dl>
             <dt>记录编号</dt><dd>{{ record.id|stringformat:"d" }}</dd>
             <dt>设备</dt><dd>{{ record.equipment__number }} · {{ record.equipment__name }}</dd>
+            {% if not created %}<dt>预约日期（北京时间）</dt><dd>{{ record.date_text }}</dd>{% endif %}
             <dt>时段（北京时间）</dt><dd>{{ record.start_text }} 至 {{ record.end_text }}</dd>
-            <dt>{% if created %}提交时状态{% else %}当前状态{% endif %}</dt><dd>{{ record.status_label }}</dd>
+            <dt>{% if created %}提交时状态{% else %}预约状态{% endif %}</dt><dd>{{ record.status_label }}</dd>
+            {% if not created %}
+                <dt>设备当前状态</dt><dd>{{ record.equipment_status_label }}</dd>
+                {% if record.reason %}<dt>处理原因</dt><dd>{{ record.reason }}</dd>{% endif %}
+            {% endif %}
         </dl>
         {% if created %}<p><a href="{% url 'reservation-result' record.id %}">查看本人预约结果</a></p>{% endif %}
+        <p><a href="{% url 'reservation-list' %}">{% if created %}我的预约{% else %}返回我的预约{% endif %}</a></p>
     {% endif %}
 </main></body>
 </html>
