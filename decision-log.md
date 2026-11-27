@@ -501,3 +501,11 @@
 3. **人工决定。** 负责人在本会话明确以证据完整及各项实测通过为条件批准 Story 2.5 最终验收，并授权提交和推送；条件由本次原始回执核对满足。未代表其他组员、未另作 Sprint 整体验收或实际回顾决定。
 4. **结果。** 按 BMAD 6.12.4 收尾关闭 W01；M01 保持关闭；Story 2.5 规格／看板为 `done`。原 17 个非阻塞延期事项、Sprint 8／5、实验 A 及 Sprint 2 待办保持原状。 [最终验收](_bmad-output/implementation-artifacts/story-2-5-final-acceptance.md)
 5. **后验依据。** 22:31 五列精确授权一次提交，22:40 恢复批读回跳过授权。正式 37 条 Chrome／服务端文档匹配，四组业务摘要和 ACL 不变，17 个阶段退出 0，末行 `complete exit=0`，唯一 `STORY25_W01_FORMAL_OK`。外层控制台退出码没有单独入档，不补造。 [正式回执](_bmad-output/implementation-artifacts/story-2-5-w01-final-evidence/verified-receipt.json) · [Sprint 1 汇总](_bmad-output/implementation-artifacts/sprint-1-acceptance-and-retro-prep-2026-11-27.md)
+
+## D-053 2026-11-27 负责人确认 Sprint 1 逐项验收并要求准备 Sprint 2
+
+1. **触发。** Sprint 1 最后一条 2.5 已受 D-052 验收，用户要求汇总八条正式 AC、NFR 实证、开放事项和回顾，准备原定 Sprint 2。
+2. **AI 建议。** 以验收及原始证据结清已交付范围，按实记延迟一天。复用成熟预检、隔离实测、独立读回、定向恢复和自动归档。实验 A 用同一可审定基线并只在确认后冻结。
+3. **负责人实际确认。** “作为项目负责人，我确认Sprint 1原定八条Story均已完成逐项验收。” 指定保留 8／5、五条顺序，实验前冻结，不提前开发 2.4，并授权本轮提交和推送。没有代为确认另外两名成员意见、实验正式分组或实际启动日。
+4. **结果。** Sprint 1 已交付范围证据验收通过，归档回顾与下一 Sprint 准备。86/86 仅适用当前入口，NFR-001 沿用逐轮原证。延期不批量关闭，第二台 Windows 待复现。Sprint 2 五条 backlog，实际启动未登记，实验 A 未执行和未填数值。 [验收](_bmad-output/implementation-artifacts/sprint-1-final-acceptance-2026-11-27.md) · [回顾](retrospective.md) · [预登记和一次确认](_bmad-output/planning-artifacts/sprint-2-startup-and-experiment-a.md)
+5. **后验依据。** 原 JSONL 复算 10 个 201、190 个 409、每轮有效待审恰一；八条状态和 81 个实验候选源文件由原提交核对，不运行新业务测试、不重授。实际团队决定、第二台复现和实验证据随真实事件追加。

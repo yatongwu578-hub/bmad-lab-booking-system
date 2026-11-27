@@ -97,6 +97,10 @@ R-04、Read Committed 和 T-01～T-04 继续按原节点落实。设计决定、
 
 以上统计细则、观察期及执行日须在实验开始前人工确认，不能看结果后选择口径；可补记规划准备工时及整改成本支持净收益讨论，不替代五项必需度量。报告保留两故事、非随机、难度差异、共享代码与人工知情局限，按课程问题讨论差异来源及乘以12故事的假设外推，不把外推当实测。允许净收益为负，实验B仍取消。
 
+### 2026-11-27 源于实际收尾的启动更新
+
+原计划和第 5 节历史预案保留。Sprint 1 八条全部逐项通过，末条实际于 11 月 27 日验收，比原结束日迟一日。Sprint 2 继续按 2.4→2.6→2.7→2.8→3.1 顺序，范围和 11 月 27～29 日计划窗口不变，**实际启动日未登记**，不以写计划视为开工。实验 A 的既有候选、81 文件共同基线、隔离、共同审查及度量已备预登记，需三人一次确认与实测隔离后冻结，2.6/2.7 此前不得开发。原 Y→X 是候选建议，新准备稿按产品顺序提出 X→Y 待确认，不把任何建议当作实际次序。保留 CONCERNS、第二台 Windows 项和现存延期，不改看板。 [Sprint 1 整体验收](../implementation-artifacts/sprint-1-final-acceptance-2026-11-27.md) · [Sprint 2 准备](sprint-2-startup-and-experiment-a.md)
+
 ## 6. 初始状态生成结果与状态证据要求
 
 已用安装版sprint_plan.py，以唯一正式epics.md作输入，先dry-run再实际generate：[sprint-status.yaml](../implementation-artifacts/sprint-status.yaml)。生成时间为本机实际11-17-2026 20:05（Asia/Shanghai）；脚本返回ok=true，3 Epic/13 Story，16 backlog及3 optional；无非法状态、孤立丢弃或磁盘升级。生成时报告in_sync=false表示初次运行前有19个新条目待写，不当作写后验证失败；独立validate结果在下方记录。
