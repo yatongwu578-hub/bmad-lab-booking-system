@@ -463,3 +463,41 @@
 3. **人类判断及依据。** 负责人明确批准最终验收。依据为独立 113/113 Django、15/15 PostgreSQL 探针、四视角评审及八条 AC、五项 Finish 断言、正式四列精确 SELECT 和学生按需失效及幂等原证。负责人实际确认教师异主及不存在详情均为 404，管理员身份页无「我的预约」且直访列表 403。明确接受教师本人详情未在正式 Chrome 执行，由独立隔离实测支持该功能。不代签三位成员、不推断其他体验。
 4. **结果。** 按 Step 5 关闭 W1，将实施规格与 Sprint Story 2.3 更新为 `done`。Epic 2 保持 `in-progress`，Story 2.5 `backlog`。保留 P01～P08、W2、原九项驳回、Sprint 8／5 和实验 A。负责人授权以指定消息提交和推送，不改业务源码。 [最终验收](_bmad-output/implementation-artifacts/story-2-3-final-acceptance.md) · [中央延期台账](_bmad-output/implementation-artifacts/deferred-work.md)
 5. **后验依据。** 16 条补证请求与 Django 日志一致，两个 404 响应体同散列，正式前后业务行散列相等，学生 #1 仅有原系统历史，独立运行角色前后都只有原 `id` 及获批四列 SELECT，无表级 SELECT 或转授。早先 Finish 失败、教师 POST 403 和恢复如实归档，均不重放。不把本次核对记为新测试，不宣称正式教师本人详情或 201 通过。 [机器回执](_bmad-output/implementation-artifacts/story-2-3-formal-runtime-evidence/teacher-readonly/post-8a49872cb2be/result.json)
+
+## D-049 2026-11-27 Checkpoint 1 批准 Story 2.5 实施
+
+1. **触发。** BMAD 6.12.4 Build Step 2 的单 Story 实施规格及 AC-1～8 验收设计已提交人工确认。 [Checkpoint 1](_bmad-output/implementation-artifacts/story-2-5-checkpoint-1.md)
+2. **AI 建议。** 仅开发管理员详情／历史、全量及筛选，复用先授权、固定候选、设备升序锁、锁后复核及 FR-018 原子提交。在正式库按缺口另批历史五列 SELECT，不扩大服务角色。
+3. **人工决定及边界。** 用户在本会话明确回复「批准并继续」，适用已确认的正式 AC 和本次规格。未批准正式授权或发布，本条不代签其他成员，不作最终验收。Sprint 8／5 和实验 A 不变。
+4. **结果。** 实施规格经 ready-for-dev 进入 in-progress，仅同步 Sprint 2.5，代码与隔离验证入口已准备，其中设备原谓词共享策略因沙箱拒写交付单文件增量补丁。 [规格](_bmad-output/implementation-artifacts/spec-2-5-admin-reservation-query.md)
+5. **后验依据。** 补丁静态应用检查、脚本语法及测试清单核对已完成。原 Python 在沙箱不可启动，实际预检未通过，没有运行 Django／PostgreSQL 验证。待团队在普通 PowerShell 一次实跑，再依据原始结果决定是否进入 review。 [验证交接](_bmad-output/implementation-artifacts/story-2-5-verification-handoff.md)
+
+   **2026-11-27 Story 2.5 真实回归首批。** 团队在普通 PowerShell 应用了共享权限补丁并运行隔离回归。125 项中 124 项通过（12 项 2.5、40 项设备用例全过），Story 2.3 本人导航断言把管理路由公共前缀误认作本人链接，回归真实退出 1，未启动探针。按用户本次要求修正精确链接与双角色对照，保留同名用例和实际失败日志；业务及权限代码不再变更。整改复验仍待普通 PowerShell 实跑，状态保持 in-progress。 [故障证据及命令](_bmad-output/implementation-artifacts/story-2-5-regression-remediation.md)
+
+   **2026-11-27 Story 2.5 整改复测通过。** 团队报告已在普通 PowerShell 执行整改版。只读核对实际原始结果为 5/5 针对性、125/125 Django、17/17 PostgreSQL 探针、12 个阶段退出 0、87 项输入、四份隔离基线及清理一致。首批单项失败原证保留，原权限验证未放宽。按本次用户有条件授权，规格与 Sprint 仅推进 2.5 至评审，下一会话独立 Code Review。本轮不代填最终验收或正式运行，不改原 8／5 与实验 A。 [开发证据](_bmad-output/implementation-artifacts/story-2-5-dev-evidence.md) · [评审交接](_bmad-output/implementation-artifacts/story-2-5-code-review-handoff.md)
+
+## D-050 2026-11-27 负责人批准 Story 2.5 独立评审处置
+
+1. **触发。** BMAD 6.12.4 full 独立 Code Review 完成四视角及 23 条逐项裁决，实施规格列出 13 个 Patch 候选、5 个 Defer 和 3 条驳回，另有 W01 正式发布门槛。 [评审](_bmad-output/implementation-artifacts/story-2-5-independent-review.md) · [裁决](_bmad-output/implementation-artifacts/story-2-5-review-triage.md)
+2. **AI 建议。** 选 2 保留行动项。只修 M01：管理员详情遇无效设备参数仍可进入 FR-018 失效事务，违反 AC-8 无效输入无业务变化。其他 Patch 是非阻塞的可读性、集成或取证事项。W01 与代码整改分开，必须在独立复验后按 AC-6 实际 ACL 缺量最小处理。
+3. **人类判断及依据。** 负责人在本会话明确回复「选择2：保留为行动项。」批准 M01 交回原 Build，P01～P12 以不影响正式 AC、安全性、数据一致性为条件延期，保留五项 Defer 和三项驳回原裁决。W01 为 High 正式发布门槛，不批准延期；仅在整改后的独立复验通过后另行批准实际缺少的五列 SELECT。保留原 Sprint 8／5、实验 A 及已独立核验的 NFR-001 标准组，三人共同操作、共同审阅，不代签其他成员。本轮不改业务代码、不访问正式库、不开迁移或授权窗口、不标 done、不自动提交推送。
+4. **结果。** 实施规格和看板仅将 Story 2.5 退回 in-progress；0 修复，M01 仍开放，原 5 项与批准 12 项延期进入中央台账，三条驳回不变。W01 不纳入延期。 [人工处置](_bmad-output/implementation-artifacts/story-2-5-review-disposition.md) · [整改交接](_bmad-output/implementation-artifacts/story-2-5-remediation-handoff.md) · [中央台账](_bmad-output/implementation-artifacts/deferred-work.md)
+5. **后验依据。** 台账回执验证原字节前缀、17 个唯一条目和幂等读回，前后散列已归档。原 5/5 专项、125/125 Django、17/17 PostgreSQL 探针及首次 124/125 导航失败、整改仍为开发执行证据，评审曾离线复算，不代替整改后的独立运行。新回执待 M01 完成后取得，当前未执行。 [合并回执](_bmad-output/implementation-artifacts/story-2-5-review-support/deferred-merge-receipt.txt) · [开发证据](_bmad-output/implementation-artifacts/story-2-5-dev-evidence.md) · [首次失败与整改](_bmad-output/implementation-artifacts/story-2-5-regression-remediation.md)
+
+   **2026-11-27 Story 2.5 M01 真实开发专项通过。** 团队已在普通 PowerShell 执行，原证为 3/3 Django、1/1 真实 HTTP/PostgreSQL、10 阶段零退出、87 项散列与三份隔离基线及夹具清理一致。实际五个 400 无业务读取、锁、取时或写入，同一预约随后合法查询只写一条系统历史，重复不写。依本次有条件授权，规格／Sprint 仅推进 2.5 回评审，就 M01 交回原 Code Review 会话。其余裁决、W01、Sprint 8／5 及实验 A 不变，不计作独立复验或正式验收。 [M01 开发原证](_bmad-output/implementation-artifacts/story-2-5-m01-dev-evidence.md)
+
+## D-051 2026-11-27 负责人关闭 Story 2.5 M01 并有条件批准 W01
+
+1. **触发。** BMAD 6.12.4 原独立复验保留 5/5 专项、125/125 Django、17/17 PostgreSQL 探针及 M01 的真实可复算原证。团队普通 PowerShell 的正式只读预检显示历史五列全缺、已有安全样本。 [独立复验](_bmad-output/implementation-artifacts/story-2-5-m01-independent-run-result.md)
+2. **AI 建议。** 分开关闭 AC-8 的代码问题和 W01 正式权限门槛。只以刷新后实际差集授权，查看现有预约且阻断业务写。缺少现场状态时沿用独立隔离原证，不为取证新增数据。
+3. **负责人决定。** 本会话接受独立复验并正式批准关闭 M01。有条件批准仅为 lab_booking_app 增加 public.audit_operationhistory 实缺的 actor_id、before_status、after_status、decision_at、recorded_at 列 SELECT 及安全正式运行。不批准其他授权、迁移或业务变化。不代签成员个人意见。
+4. **结果。** 规格勾选 M01。W01 有条件批准但不关闭，规格／Sprint 仍为 in-review／review。准备一次自动化权限与浏览器取证入口，只使用现有预置账户及预约。 [执行单](_bmad-output/implementation-artifacts/story-2-5-w01-authorized-run.md)
+5. **后验依据。** 已复算 21:19 原只读 ACL、样本、来源散列及退出 0；原独立批的外层控制台标记与进程退出未单独留档，不补造、不重跑。沙箱受保护 passfile 拒绝访问，未执行正式权限和浏览器步骤，不声称正式通过。不改业务源码、Sprint 8／5 或实验 A，不标 done、不提交或推送。
+
+## D-052 2026-11-27 负责人最终验收 Story 2.5
+
+1. **触发。** 负责人报告执行 W01 正式恢复，要求核对实际回执、标记、权限、四角色 Chrome、后置快照及 AC-1～AC-8。
+2. **AI 建议。** 按正式回执关闭发布门槛，保留早期失败、实际一次授权、工具专项、隔离与正式证据边界；准备 Sprint 1 整体验收和回顾，不提前填写团队意见。
+3. **人工决定。** 负责人在本会话明确以证据完整及各项实测通过为条件批准 Story 2.5 最终验收，并授权提交和推送；条件由本次原始回执核对满足。未代表其他组员、未另作 Sprint 整体验收或实际回顾决定。
+4. **结果。** 按 BMAD 6.12.4 收尾关闭 W01；M01 保持关闭；Story 2.5 规格／看板为 `done`。原 17 个非阻塞延期事项、Sprint 8／5、实验 A 及 Sprint 2 待办保持原状。 [最终验收](_bmad-output/implementation-artifacts/story-2-5-final-acceptance.md)
+5. **后验依据。** 22:31 五列精确授权一次提交，22:40 恢复批读回跳过授权。正式 37 条 Chrome／服务端文档匹配，四组业务摘要和 ACL 不变，17 个阶段退出 0，末行 `complete exit=0`，唯一 `STORY25_W01_FORMAL_OK`。外层控制台退出码没有单独入档，不补造。 [正式回执](_bmad-output/implementation-artifacts/story-2-5-w01-final-evidence/verified-receipt.json) · [Sprint 1 汇总](_bmad-output/implementation-artifacts/sprint-1-acceptance-and-retro-prep-2026-11-27.md)

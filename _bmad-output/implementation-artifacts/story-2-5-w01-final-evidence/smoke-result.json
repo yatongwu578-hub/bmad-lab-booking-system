@@ -1,0 +1,34 @@
+{
+  "w01_scope": "formal smoke machine evidence, not team acceptance",
+  "role_coverage": {
+    "anonymous": [
+      "full",
+      "filter",
+      "detail"
+    ],
+    "student": [
+      "full",
+      "filter",
+      "detail"
+    ],
+    "teacher": [
+      "full",
+      "filter",
+      "detail"
+    ],
+    "admin": [
+      "full",
+      "filter",
+      "detail",
+      "filtered-detail"
+    ]
+  },
+  "full_page_skipped_due_candidate_risk": false,
+  "sample_status_counts": {
+    "expired": 1,
+    "pending": 1
+  },
+  "matched_documents": 37,
+  "business_and_acl_unchanged": true,
+  "automated_dom": true
+}

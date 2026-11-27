@@ -42,3 +42,41 @@ def append_reservation_expiry(reservation_id, decision_at):
         decision_at=decision_at,
         recorded_at=Now(),
     )
+
+
+def read_admin_reservation_reasons(connection, reservation_ids):
+    """Read the latest nonblank reason from a stored transition for each scoped ID."""
+    if not reservation_ids:
+        return {}
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT DISTINCT ON (h.reservation_id) h.reservation_id, h.reason
+            FROM public.audit_operationhistory AS h
+            WHERE h.reservation_id = ANY(%s::bigint[])
+              AND h.action IN (%s, %s, %s, %s)
+              AND h.reason ~ '[^[:space:]]'
+            ORDER BY h.reservation_id, h.id DESC
+            """,
+            [reservation_ids, "approve", "reject", "cancel", "expire"],
+        )
+        return dict(cursor.fetchall())
+
+
+def read_reservation_history(connection, reservation_id):
+    """Project exactly the columns needed for one already-authorized reservation."""
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT h.id, h.reservation_id, h.action, h.before_status, h.after_status,
+                   h.actor_type, h.actor_id, a.username AS actor_username, h.reason,
+                   h.decision_at, h.recorded_at
+            FROM public.audit_operationhistory AS h
+            LEFT JOIN public.accounts_user AS a ON a.id = h.actor_id
+            WHERE h.reservation_id = %s
+            ORDER BY h.recorded_at, h.id
+            """,
+            [reservation_id],
+        )
+        names = [column[0] for column in cursor.description]
+        return [dict(zip(names, row, strict=True)) for row in cursor.fetchall()]

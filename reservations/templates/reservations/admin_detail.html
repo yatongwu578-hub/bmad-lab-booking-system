@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>预约详情 · 实验室设备预约</title>
+</head>
+<body>
+<main>
+    <h1>预约详情</h1>
+    <p><a href="{{ back_url }}">返回预约管理</a></p>
+    {% if error %}
+        <p role="alert">{{ error }}</p>
+    {% else %}
+        <dl>
+            <dt>预约编号</dt><dd>{{ record.id }}</dd>
+            <dt>申请人</dt><dd>{{ record.applicant__username }}</dd>
+            <dt>设备</dt><dd>{{ record.equipment__number }} · {{ record.equipment__name }}</dd>
+            <dt>日期（北京时间）</dt><dd>{{ record.date_text }}</dd>
+            <dt>时段（北京时间）</dt><dd>{{ record.start_text }} 至 {{ record.end_text }}</dd>
+            <dt>预约状态</dt><dd>{{ record.status_label }}</dd>
+            <dt>设备当前状态</dt><dd>{{ record.equipment_status_label }}</dd>
+            <dt>处理原因</dt><dd>{{ record.reason|default_if_none:"" }}</dd>
+        </dl>
+        <h2>操作历史</h2>
+        {% if history %}
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">预约编号</th><th scope="col">执行者</th><th scope="col">动作</th>
+                        <th scope="col">变更前状态</th><th scope="col">变更后状态</th>
+                        <th scope="col">记录时间（北京时间）</th><th scope="col">判定时刻（北京时间）</th>
+                        <th scope="col">原因</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for entry in history %}
+                    <tr>
+                        <td>{{ entry.reservation_id }}</td>
+                        <td>{{ entry.actor_label }}{% if entry.actor_id is not None %} · {{ entry.actor_username }}（账号 ID {{ entry.actor_id }}）{% endif %}</td>
+                        <td>{{ entry.action_label }}</td>
+                        <td>{{ entry.before_label }}</td>
+                        <td>{{ entry.after_label }}</td>
+                        <td>{{ entry.recorded_text }}</td>
+                        <td>{{ entry.decision_text }}</td>
+                        <td>{{ entry.reason }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>暂无操作记录。</p>
+        {% endif %}
+    {% endif %}
+</main>
+</body>
+</html>

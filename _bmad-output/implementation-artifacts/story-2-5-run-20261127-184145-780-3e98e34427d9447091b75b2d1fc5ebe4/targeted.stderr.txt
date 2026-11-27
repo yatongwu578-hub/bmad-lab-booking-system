@@ -1,0 +1,10 @@
+test_ac1_role_navigation_and_actual_201_contract (reservations.test_own_reservations.OwnReservationsTests.test_ac1_role_navigation_and_actual_201_contract) ... ok
+test_ac6_unauthorized_and_tampered_requests_never_touch_foreign_rows (reservations.test_own_reservations.OwnReservationsTests.test_ac6_unauthorized_and_tampered_requests_never_touch_foreign_rows) ... ok
+test_identity_navigation_uses_business_role (reservations.test_admin_reservations.AdminReservationTests.test_identity_navigation_uses_business_role) ... ok
+test_active_admin_can_follow_create_link_from_identity_and_catalog (equipment.test_create_navigation.EquipmentCreateNavigationTests.test_active_admin_can_follow_create_link_from_identity_and_catalog) ... ok
+test_service_enforces_active_admin_and_allowlist_before_database_access (equipment.test_edit.EquipmentEditTests.test_service_enforces_active_admin_and_allowlist_before_database_access) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.601s
+
+OK

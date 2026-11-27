@@ -1,0 +1,99 @@
+{
+    "kind":  "read-only cross-check of actual isolated developer run; no replay",
+    "run":  "story-2-5-run-20261127-184145-780-3e98e34427d9447091b75b2d1fc5ebe4",
+    "prior_failed_run":  "story-2-5-run-20261127-183352-994-46675338857946d49b0469ce105ed1e6",
+    "db":  [
+               "test_lab_booking",
+               "lab_booking_test",
+               "lab_booking_test",
+               "127.0.0.1",
+               5433,
+               "170012",
+               "read committed",
+               false,
+               false
+           ],
+    "targets_passed":  5,
+    "legacy_passed":  113,
+    "new_passed":  12,
+    "total_passed":  125,
+    "skips":  0,
+    "prior_passed":  124,
+    "prior_failed_id":  "reservations.test_own_reservations.OwnReservationsTests.test_ac1_role_navigation_and_actual_201_contract",
+    "exits":  [
+                  "verification-locks",
+                  "preflight",
+                  "baseline-before",
+                  "check",
+                  "migration-drift",
+                  "targeted",
+                  "baseline-after-targeted",
+                  "regression",
+                  "baseline-after-regression",
+                  "independent",
+                  "baseline-after-independent",
+                  "complete"
+              ],
+    "success_marker":  "verified script emits terminal marker immediately after archived complete exit=0; outer console is not separately archived",
+    "probe_names":  [
+                        "navigation-history",
+                        "filtered-affected",
+                        "ordered-locks",
+                        "no-pending-clock",
+                        "edge-input",
+                        "permissions",
+                        "revoked-while-waiting",
+                        "frozen-concurrent-additions",
+                        "crossed-start",
+                        "submit-first",
+                        "query-first",
+                        "commit-after-end",
+                        "late-projection-failed",
+                        "history-second",
+                        "commit-rejected",
+                        "commit-disconnected",
+                        "confirmation-lost"
+                    ],
+    "baseline_images":  [
+                            "baseline-before.json",
+                            "baseline-after-targeted.json",
+                            "baseline-after-regression.json",
+                            "baseline-after-independent.json"
+                        ],
+    "baseline_equal":  true,
+    "probe_cleanup_equal":  true,
+    "inputs_verified_before_docs_update":  87,
+    "input_hashes":  {
+                         "stages.txt":  "9E3DAB6761B5D8E786D914BCC0C50B208481957CCA10CD8C44E43CE0B8FBC326",
+                         "targeted.stderr.txt":  "6FC41112C3403B5E06095014D1EB96B5A9956BE0E07D3DC12C1B904544E52973",
+                         "regression.stderr.txt":  "0D58474126B3F64377B2D833106C70F1BA8E572CFA084C933BE3C87FE2BB0471",
+                         "independent.jsonl":  "449A2541A804099DE4737E935D49E40846C33D05FE605F609785F4AF1F562F34",
+                         "before.sha256":  "6A31BFF6826DA45E0553677A8141CF8EB55C1FEBFC2D4BBCE7DB47A46C4A9E97",
+                         "after.sha256":  "6A31BFF6826DA45E0553677A8141CF8EB55C1FEBFC2D4BBCE7DB47A46C4A9E97",
+                         "baseline-before.json":  "6EDF380E544390AC1B975BE960C34049EBB73494111DDA3DED12086C259AC7F8"
+                     },
+    "permission_role_denials":  {
+                                    "redirect_302":  8,
+                                    "post_lock_revocation":  1,
+                                    "legal_control":  200,
+                                    "forbidden_403":  12
+                                },
+    "lock_order":  [
+                       906,
+                       908,
+                       910,
+                       911
+                   ],
+    "fault_groups":  {
+                         "projection":  "42703",
+                         "commit_rejection":  "23505",
+                         "ack_loss":  "persisted, simulated driver confirmation loss",
+                         "disconnect":  "not persisted",
+                         "second_history":  "23514"
+                     },
+    "nfr001_reused":  {
+                          "requests":  200,
+                          "historical_sha256":  "3364EDF809D5F11C2E865C6608636C6A80FA16736D16C74CA4E1C759D9A7AEC1",
+                          "rounds":  10
+                      }
+}

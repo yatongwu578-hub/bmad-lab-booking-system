@@ -1,0 +1,118 @@
+{
+    "kind":  "read-only audit of actual M01 developer batch; no test or database replay",
+    "run":  "story-2-5-run-20261127-203252-421-ad7cfd4fb78242f796769e9dff0f6331",
+    "marker":  "STORY25_M01_DEV_OK",
+    "probe_marker":  "STORY25_PROBE_OK cases=1",
+    "tests":  [
+                  "reservations.test_admin_reservations.AdminReservationTests.test_detail_keeps_history_order_actor_identity_and_validated_navigation",
+                  "reservations.test_admin_reservations.AdminReservationTests.test_due_detail_expires_once_with_persisted_system_reason",
+                  "reservations.test_admin_reservations.AdminReservationTests.test_unauthorized_requests_never_touch_business_tables"
+              ],
+    "skips":  0,
+    "zero_exit_stages":  [
+                             "verification-locks",
+                             "preflight",
+                             "baseline-before",
+                             "check",
+                             "migration-drift",
+                             "targeted",
+                             "baseline-after-targeted",
+                             "independent",
+                             "baseline-after-independent",
+                             "complete"
+                         ],
+    "inputs_verified":  87,
+    "baseline_sha256":  "6EDF380E544390AC1B975BE960C34049EBB73494111DDA3DED12086C259AC7F8",
+    "equal_baselines":  3,
+    "cleanup":  true,
+    "isolation":  "test_lab_booking|lab_booking_test|lab_booking_test|127.0.0.1|5433|170012|read committed|False|False",
+    "reservation_id":  1069,
+    "invalid":  [
+                    {
+                        "query":  "?equipment=",
+                        "http":  400,
+                        "business_sql":  0,
+                        "locks":  0,
+                        "decisions":  0,
+                        "commits":  0,
+                        "history_writes":  0,
+                        "status":  "pending",
+                        "effective":  0
+                    },
+                    {
+                        "query":  "?equipment=%20",
+                        "http":  400,
+                        "business_sql":  0,
+                        "locks":  0,
+                        "decisions":  0,
+                        "commits":  0,
+                        "history_writes":  0,
+                        "status":  "pending",
+                        "effective":  0
+                    },
+                    {
+                        "query":  "?equipment=a\u0026equipment=b",
+                        "http":  400,
+                        "business_sql":  0,
+                        "locks":  0,
+                        "decisions":  0,
+                        "commits":  0,
+                        "history_writes":  0,
+                        "status":  "pending",
+                        "effective":  0
+                    },
+                    {
+                        "query":  "?equipment=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                        "http":  400,
+                        "business_sql":  0,
+                        "locks":  0,
+                        "decisions":  0,
+                        "commits":  0,
+                        "history_writes":  0,
+                        "status":  "pending",
+                        "effective":  0
+                    },
+                    {
+                        "query":  "?equipment=%00",
+                        "http":  400,
+                        "business_sql":  0,
+                        "locks":  0,
+                        "decisions":  0,
+                        "commits":  0,
+                        "history_writes":  0,
+                        "status":  "pending",
+                        "effective":  0
+                    }
+                ],
+    "legal":  {
+                  "http":  200,
+                  "locks":  1,
+                  "decision_at":  "2026-11-27 12:33:03.406767+00:00",
+                  "history_id":  515,
+                  "actor":  "system",
+                  "history_rows":  1,
+                  "status":  "expired"
+              },
+    "repeat":  {
+                   "http":  200,
+                   "locks":  0,
+                   "decisions":  0,
+                   "history_writes":  0,
+                   "history_rows":  1
+               },
+    "raw_sha256":  {
+                       "batch-marker.txt":  "1FB9CB020BA9512052F96614D2D8123D8AD7E28E62A60A861405D65AE0A5C1DE",
+                       "stages.txt":  "D9E2D4E8898F5D650C8FC93DE7610B09463ECDEE24C7E4478C8594384DBA6546",
+                       "targeted.stderr.txt":  "1C71433FD5557439742C8D904BD4340B483B934ABF4368C1FEA085B8EFE368CC",
+                       "independent.jsonl":  "6E6E92025E5DCF739BAFBA0AA1A5A0F31E587B28D80B944B0847F910AC3503FB",
+                       "before.sha256":  "65BA306B07465004E3DF391AE5F94A50CD9F08D462EEFB7055726D0FBA1C408E",
+                       "after.sha256":  "65BA306B07465004E3DF391AE5F94A50CD9F08D462EEFB7055726D0FBA1C408E",
+                       "baseline-before.json":  "6EDF380E544390AC1B975BE960C34049EBB73494111DDA3DED12086C259AC7F8"
+                   },
+    "preserved_review_sha256":  {
+                                    "story-2-5-review-raw.md":  "B339CD54D927AF4A9ACB524244118AF66DA568B49AC2C88DF02479B4EFA7F310",
+                                    "story-2-5-review-triage.md":  "EBB22E01CD9652435ADCDC3F7E953A5356802CA937641047608833AAEF9DF4E4",
+                                    "story-2-5-review-disposition.md":  "D71BDBE446D283F66636E8D4393C562EDF1D453F51CEC7751C1AABD1F4F3C82C",
+                                    "deferred-work.md":  "4A0D05B9EC455E7195D2EABC7B77DB847E70866D960971C0070451F260EF0C82"
+                                }
+}

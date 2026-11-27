@@ -8,4 +8,4 @@
 
 ## 尚未完成的课程回顾
 
-Epic 1 收尾不代表 Sprint 1 完成。Sprint 1 和 Sprint 2 的实际回顾、实验 A 五项真实度量与讨论仍按原计划留档。实验 A 的候选和对照条件没有改变，本轮没有实验数据，不提前填写指标或结论。 [Sprint 计划](_bmad-output/planning-artifacts/sprint-plan.md) · [课程要求](docs/course-requirements.md#5-必做实验-a规划深度对照ppt-第34页度量模板第29页)
+2026-11-27 已核对 Sprint 1 八条 Story 逐项验收，并整理可运行增量、NFR 分母和待讨论问题。此日期是材料准备日，不是已举行的团队回顾；尚无团队意见、整体验收决定或获批行动项。Sprint 2 回顾与实验 A 按原计划，不提前填写指标或结论。 [Sprint 1 准备材料](_bmad-output/implementation-artifacts/sprint-1-acceptance-and-retro-prep-2026-11-27.md) · [Sprint 计划](_bmad-output/planning-artifacts/sprint-plan.md) · [课程要求](docs/course-requirements.md#5-必做实验-a规划深度对照ppt-第34页度量模板第29页)

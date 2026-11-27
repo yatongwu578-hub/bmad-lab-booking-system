@@ -1,0 +1,20 @@
+diff --git a/equipment/services.py b/equipment/services.py
+--- a/equipment/services.py
++++ b/equipment/services.py
+@@ -2,6 +2,7 @@
+ from django.db import Error, transaction
+ 
+ from accounts.models import Role, User
++from accounts.policies import is_business_admin
+ from lab_booking.transactions import transaction_rejected
+ 
+ from .models import Equipment, EquipmentStatus
+@@ -34,7 +35,7 @@ EQUIPMENT_EDIT_FIELDS = ("name", "category", "location", "description")
+ 
+ 
+ def is_equipment_admin(user):
+-    return user.is_authenticated and user.is_active and user.role == Role.ADMIN
++    return is_business_admin(user)
+ 
+ 
+ def _require_catalog_reader(user):

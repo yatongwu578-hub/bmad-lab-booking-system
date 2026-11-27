@@ -8,8 +8,13 @@ from django.db import Error, transaction
 from django.db.models import Q
 
 from accounts.models import Role, User
-from accounts.policies import RESERVATION_ROLES, can_reserve
-from audit.services import append_reservation_expiry, read_reservation_reasons
+from accounts.policies import RESERVATION_ROLES, can_reserve, is_business_admin
+from audit.services import (
+    append_reservation_expiry,
+    read_admin_reservation_reasons,
+    read_reservation_history,
+    read_reservation_reasons,
+)
 from equipment.models import Equipment, EquipmentStatus
 from equipment.services import get_equipment_detail, lock_equipment
 from lab_booking.transactions import transaction_rejected
@@ -213,6 +218,77 @@ def get_reservation_result(user, pk):
         require_applicant(user)
         return None
     rows = _read_own_reservations(user, pk)
+    return rows[0] if rows else None
+
+
+def require_reservation_admin(user):
+    if not is_business_admin(user):
+        raise PermissionDenied
+
+
+def _recheck_reservation_admin(pk):
+    account = User.objects.filter(pk=pk).values_list("is_active", "role").first()
+    if account != (True, Role.ADMIN):
+        raise PermissionDenied
+
+
+def _read_admin_reservations(user, *, equipment_number=None, pk=None):
+    require_reservation_admin(user)
+
+    def read(connection):
+        _recheck_reservation_admin(user.pk)
+        scoped = Reservation.objects.all()
+        if equipment_number is not None:
+            equipment_id = Equipment.objects.filter(number=equipment_number).values_list("pk", flat=True).first()
+            if equipment_id is None:
+                return []
+            scoped = scoped.filter(equipment_id=equipment_id)
+        if pk is not None:
+            scoped = scoped.filter(pk=pk)
+
+        # Freeze only the authorized candidates, including pending rows that have ended.
+        candidates = list(scoped.values_list("pk", "equipment_id", "status"))
+        pending = {row_id: device for row_id, device, status in candidates if status == ReservationStatus.PENDING}
+        locked = {device for device in sorted(set(pending.values())) if lock_equipment(device) is not None}
+
+        _recheck_reservation_admin(user.pk)
+        fixed = scoped.filter(pk__in=[row_id for row_id, _, _ in candidates])
+        rows = list(fixed.order_by("-start_at", "-pk").values(*RESULT_FIELDS, "applicant__username"))
+        if pending or equipment_number is not None:
+            decision_at = _decision_time(connection)
+            eligible = [row["id"] for row in rows
+                        if row["status"] == ReservationStatus.PENDING and row["equipment_id"] in locked
+                        and pending.get(row["id"]) == row["equipment_id"]]
+            if eligible:
+                expired = set(_expire(fixed.filter(pk__in=eligible), decision_at))
+                for row in rows:
+                    if row["id"] in expired:
+                        row["status"] = ReservationStatus.EXPIRED
+            if equipment_number is not None:
+                rows = [row for row in rows if row["end_at"] > decision_at and (
+                    row["status"] == ReservationStatus.APPROVED
+                    or (row["status"] == ReservationStatus.PENDING and row["start_at"] > decision_at)
+                )]
+
+        reasons = read_admin_reservation_reasons(connection, [row["id"] for row in rows])
+        for row in rows:
+            row["reason"] = reasons.get(row["id"])
+        if pk is not None and rows:
+            rows[0]["history"] = read_reservation_history(connection, pk)
+        return rows
+
+    return _durable_operation(read)
+
+
+def get_admin_reservations(user, equipment_number=None):
+    return _read_admin_reservations(user, equipment_number=equipment_number)
+
+
+def get_admin_reservation(user, pk):
+    if pk is None:
+        require_reservation_admin(user)
+        return None
+    rows = _read_admin_reservations(user, pk=pk)
     return rows[0] if rows else None
 
 

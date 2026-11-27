@@ -1,0 +1,24 @@
+{
+  "kind": "independent offline audit of developer execution, not a new run",
+  "developer_batch": "story-2-5-run-20261127-203252-421-ad7cfd4fb78242f796769e9dff0f6331",
+  "django_targets": 3,
+  "postgresql_probes": 1,
+  "zero_exit_stages": 10,
+  "inputs": 87,
+  "preserved_review_artifacts": 4,
+  "pre_m01_manifest_changed": [
+    "_bmad-output/implementation-artifacts/spec-2-5-admin-reservation-query.md",
+    "_bmad-output/implementation-artifacts/verify-story-2-5.ps1",
+    "reservations/management/commands/verify_admin_reservations.py",
+    "reservations/test_admin_reservations.py",
+    "reservations/views.py"
+  ],
+  "isolated_before_after_match": true,
+  "baseline_sha256": "6EDF380E544390AC1B975BE960C34049EBB73494111DDA3DED12086C259AC7F8",
+  "invalid_400_no_business_effect": 5,
+  "legal_200_single_system_expiry": 1,
+  "repeat_200_no_write": 1,
+  "validator_accepts_archived_nested_payload": true,
+  "sole_product_delta": "reservations/views.py: admin_reservation_detail",
+  "independent_runtime": "not run"
+}

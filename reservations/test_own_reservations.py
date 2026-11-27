@@ -97,14 +97,20 @@ class OwnReservationsTests(TestCase):
         self.assertNotContains(response, foreign.equipment.number)
 
     def test_ac1_role_navigation_and_actual_201_contract(self):
+        admin_list_url = reverse("admin-reservation-list")
         for role, user in ((Role.STUDENT, self.owner), (Role.TEACHER, self.teacher), (Role.ADMIN, self.admin)):
             with self.subTest(role=role):
                 self.client.force_login(user)
                 identity = self.client.get(reverse("identity"))
                 if role == Role.ADMIN:
-                    self.assertNotContains(identity, self.list_url)
+                    # The administrator route shares a prefix, but must not expose the personal link.
+                    self.assertNotContains(identity, f'href="{self.list_url}"')
+                    self.assertNotContains(identity, "我的预约")
+                    self.assertContains(identity, f'<a href="{admin_list_url}">预约管理</a>', count=1, html=True)
+                    self.assertEqual(self.client.get(self.list_url).status_code, 403)
                     continue
                 self.assertContains(identity, f'<a href="{self.list_url}">我的预约</a>', html=True)
+                self.assertNotContains(identity, f'href="{admin_list_url}"')
                 start = self.decision + timedelta(days=1)
                 device = self.devices[0 if role == Role.STUDENT else 1]
                 with patch.object(services, "_decision_time", return_value=self.decision):
@@ -114,7 +120,7 @@ class OwnReservationsTests(TestCase):
                     })
                     row = Reservation.objects.get(applicant=user)
                     self.assertContains(submitted, self.result(row), status_code=201)
-                    self.assertContains(submitted, self.list_url, status_code=201)
+                    self.assertContains(submitted, f'href="{self.list_url}"', status_code=201)
                     self.assertContains(submitted, "<dt>提交时状态</dt><dd>待审核</dd>", html=True, status_code=201)
                     self.assertNotContains(submitted, "设备当前状态", status_code=201)
                     self.assert_list_row(self.client.get(self.list_url), row)

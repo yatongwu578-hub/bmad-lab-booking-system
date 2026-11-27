@@ -1,0 +1,8 @@
+test_detail_keeps_history_order_actor_identity_and_validated_navigation (reservations.test_admin_reservations.AdminReservationTests.test_detail_keeps_history_order_actor_identity_and_validated_navigation) ... ok
+test_due_detail_expires_once_with_persisted_system_reason (reservations.test_admin_reservations.AdminReservationTests.test_due_detail_expires_once_with_persisted_system_reason) ... ok
+test_unauthorized_requests_never_touch_business_tables (reservations.test_admin_reservations.AdminReservationTests.test_unauthorized_requests_never_touch_business_tables) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.329s
+
+OK

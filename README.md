@@ -122,6 +122,10 @@ Story 2.2 已按 D-045 验收。独立复验为 103/103 Django、21/21 真实 Po
 
 负责人按 D-048 完成最终验收。独立回归 113/113 Django、15/15 PostgreSQL 探针及四视角评审支持 AC-1～8。正式补证的五项机器断言通过，W1 的历史四列最小 SELECT 精确核验后关闭。教师没有正式可复用预约，正式 Chrome 未验证其本人详情，功能依据为隔离独立实测。 [最终验收](_bmad-output/implementation-artifacts/story-2-3-final-acceptance.md) · [原始证据索引](_bmad-output/implementation-artifacts/story-2-3-formal-runtime-evidence/README.md)
 
+### Story 2.5 · 管理员预约查询及设备筛选（已验收）
+
+用业务管理员登录，从「我的身份 → 预约管理」进入 `/reservations/manage/`，可按设备编号筛选，打开详情及真实处理历史，再返回原筛选。匿名重定向登录，学生、教师直访被拒。这里只查询，不提供批准、拒绝、取消或设备状态操作。D-052 依据八条 AC、独立隔离及正式 Chrome／ACL／后置快照批准验收。 [最终验收](_bmad-output/implementation-artifacts/story-2-5-final-acceptance.md)
+
 ### 隔离库自动化测试
 
 使用已迁移的预建隔离库运行完整自动化测试。入口先核验连接与角色权限，检查无待迁移项且账号和会话为空。随后在单进程运行回滚式测试，并比较前后表清单、迁移记录、账号数和会话数。库不存在或核验失败时停止。此入口保留隔离库，不访问维护库，不执行建库、迁移、清库或删库。
@@ -143,7 +147,7 @@ $env:LAB_BOOKING_DB_MODE = 'test'
 
 罗思婕、周何馨于 2026-11-19 完成业务与质量审核。吴亚彤于 2026-11-21 批准两轮范围和逐项处置，随后确认排期并正式批准 Sprint 1 启动。Sprint 1 为 11 月 22 日至 26 日，保留 1.1～1.4、2.1、2.2、2.3、2.5。Sprint 2 为 11 月 27 日至 29 日，保留 2.4、2.6、2.7、2.8、3.1。2.1 首次验收保留 NFR-001 的 20 个独立授权请求 × 10 轮，实验 A 的 2.6／2.7 保留为候选。R-01、R-03 沿用批准和验收证据，R-04、Read Committed 与 T-01～T-04 按既定节点落实。 [Sprint 启动交接](_bmad-output/planning-artifacts/sprint-plan.md#9-sprint-1-启动确认与-story-11-交接) · [D-017](decision-log.md#d-017-2026-11-21-负责人正式批准-sprint-1-启动)
 
-正式开发一条 Story 一个独立 bmad-build 会话，代码实现后新开会话执行 bmad-code-review。真实测试、问题处置及负责人验收满足后才能标为 done。实验 Y 的一句需求干净对照路径须实验前确认。Story 1.1～1.4 已经负责人最终验收。Epic 1 登录、设备新增、目录详情和编辑增量完成，并已按证据回顾收尾。Story 2.1～2.3 已通过最终验收。Epic 2 保持 `in-progress`，Story 2.5 保持 `backlog`，Sprint 1 未全部完成。 [Sprint 跟踪](_bmad-output/implementation-artifacts/sprint-status.yaml) · [Story 1.4 验收](_bmad-output/implementation-artifacts/story-1-4-final-acceptance.md) · [Epic 1 回顾](_bmad-output/implementation-artifacts/epic-1-retro-2026-11-26.md) · [项目回顾索引](retrospective.md)
+正式开发与独立评审分会话，真实测试、问题处置及负责人验收后才标 done。Sprint 1 八条 Story 均已最终验收，末项实际日期为 2026-11-27。可运行增量为设备管理、申请和查询，已准备整体验收与回顾材料，不把逐项验收当作已召开团队回顾。Epic 2 保持 `in-progress`，Sprint 2 五项仍为 backlog。实验 Y 的干净对照路径须实验前确认。 [Sprint 跟踪](_bmad-output/implementation-artifacts/sprint-status.yaml) · [Sprint 1 材料](_bmad-output/implementation-artifacts/sprint-1-acceptance-and-retro-prep-2026-11-27.md) · [项目回顾](retrospective.md)
 
 ## 项目与当前进度
 
@@ -273,11 +277,11 @@ bmad-lab-booking-system/
 | --- | --- |
 | M1 | 两轮Product Brief和PRD及内部审核、负责人确认已完成，第二轮定稿已提交main，可进入M2架构 |
 | M2 | Architecture及8条ADR、[project-context](_bmad-output/planning-artifacts/project-context.md)及14条PC已定稿；Epic/Story文档已final，3 Epic/13 Story的Story状态仍draft，组员5项意见已按负责人决定修改，见[本轮汇总](docs/team/m2-epics-summary.md)。第三次Step-04复核已获负责人批准并完成Finalize。随后完成就绪检查及 Sprint 计划，CONCERNS 经负责人有条件接受。 [就绪证据](_bmad-output/planning-artifacts/implementation-readiness.md) |
-| M3 | Sprint 1 的 Story 1.1～1.4、2.1、2.2 已验收。其他故事、完整核心 Demo 继续按 Sprint 计划推进。实验 B 已取消。 [Sprint 状态](_bmad-output/implementation-artifacts/sprint-status.yaml) |
-| M4 | 根目录 retrospective.md 已登记 Epic 1。Sprint 2、必做实验 A、课程回顾最终汇总、剩余源码和测试、第二台 Windows 复现、10 分钟录屏及最终版本证据待完成。 |
-| 人机决策 | 根目录日志已记录 D-001～D-027，Story 1.2 对应 D-024～D-027。课程要求的否决或实质修改按原始人工判断核对。 [决策日志](decision-log.md) |
+| M3 | Sprint 1 八条 Story 已逐项验收，团队整体回顾待发生。实验 B 已取消。 [Sprint 状态](_bmad-output/implementation-artifacts/sprint-status.yaml) |
+| M4 | 根目录 retrospective.md 已登记 Epic 1 和 Sprint 1 回顾准备。Sprint 2、实验 A、第二台 Windows 复现、10 分钟录屏及最终版本证据待完成。 |
+| 人机决策 | 根目录日志已记录至 D-052，课程要求的否决或实质修改以真实团队判断为准。 [决策日志](decision-log.md) |
 | FR追溯 | 18 条 FR 已映射至 ADR／PC 与 Story／AC。Story 1.2 的 FR-016／FR-002 已链接到独立测试和业务库证据。 [追溯与验收](_bmad-output/implementation-artifacts/story-1-2-final-acceptance.md) |
-| NFR | 已有两条可测 NFR。Story 1.2 提供 NFR-002 的设备新增入口证据，NFR-001 的预约并发验收仍按原计划取证。 [正式 PRD](_bmad-output/planning-artifacts/PRD.md) |
+| NFR | NFR-001 保留 20 独立请求 × 10 轮实证。NFR-002 已交付入口主矩阵 86/86，合法对照另列，未交付操作不计入。 [Sprint 1 分母与追溯](_bmad-output/implementation-artifacts/sprint-1-acceptance-and-retro-prep-2026-11-27.md) |
 | Architecture 及 project-context 后续待办 | R-03 已完成本机环境核验，D-024 的 Read Committed 和 D-026 的设备迁移、授权及业务库运行已留证。第二台 Windows 复现仍待执行，其他待办按既定节点推进。 [运行证据](_bmad-output/implementation-artifacts/story-1-2-runtime-evidence.md) · [延期台账](_bmad-output/implementation-artifacts/deferred-work.md) |
 
 ## AI使用声明与证据限制

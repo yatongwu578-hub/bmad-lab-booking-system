@@ -16,6 +16,7 @@
         </dl>
         <p><a href="{% url 'equipment-catalog' %}">查看设备目录</a></p>
         {% if can_reserve %}<p><a href="{% url 'reservation-list' %}">我的预约</a></p>{% endif %}
+        {% if is_business_admin %}<p><a href="{% url 'admin-reservation-list' %}">预约管理</a></p>{% endif %}
         {% include "equipment/_create_link.html" %}
         <form method="post" action="{% url 'logout' %}">
             {% csrf_token %}

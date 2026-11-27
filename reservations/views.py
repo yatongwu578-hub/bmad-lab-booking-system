@@ -2,23 +2,28 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import render
+from django.urls import reverse
+from django.utils.http import urlencode
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_http_methods
 
 from equipment.models import EquipmentStatus
 from equipment.services import get_equipment_detail
 
-from .forms import OccupancyDateForm, ReservationForm
+from .forms import AdminReservationFilterForm, OccupancyDateForm, ReservationForm
 from .models import ReservationStatus
 from .services import (
     BEIJING,
     ReservationFailed,
     ReservationUnknown,
+    get_admin_reservation,
+    get_admin_reservations,
     get_daily_occupancy,
     get_own_reservations,
     get_reservation_result,
     require_applicant,
     require_occupancy_reader,
+    require_reservation_admin,
     submit_reservation,
 )
 
@@ -30,6 +35,10 @@ READ_FAILED = "本次结果读取未成功，数据库事务已回滚。"
 READ_UNKNOWN = "结果待核查，暂勿重复查询。"
 READ_FORBIDDEN = "无权查询本人预约。"
 RESULT_NOT_FOUND = "预约记录不存在或不可访问。"
+ADMIN_FORBIDDEN = "无权查询管理员预约记录。"
+HISTORY_ACTION_LABELS = {"approve": "批准", "reject": "拒绝", "cancel": "取消", "expire": "失效"}
+HISTORY_ACTOR_LABELS = {"system": "系统", "admin": "业务管理员", "student": "学生", "teacher": "教师",
+                        "applicant": "申请人"}
 
 
 def _beijing_text(value):
@@ -146,3 +155,71 @@ def equipment_occupancy(request, pk):
     if result is None:
         return render(request, "reservations/occupancy.html", {"error": "设备不存在。"}, status=404)
     return render(request, "reservations/occupancy.html", {**context, "day": day, "result": result})
+
+
+def _filter_query(number):
+    return "?" + urlencode({"equipment": number}) if number is not None else ""
+
+
+def _display_history(entries):
+    status_labels = dict(ReservationStatus.choices)
+    return [dict(
+        entry,
+        action_label=HISTORY_ACTION_LABELS.get(entry["action"], entry["action"]),
+        actor_label=HISTORY_ACTOR_LABELS.get(entry["actor_type"], entry["actor_type"]),
+        before_label=status_labels.get(entry["before_status"], entry["before_status"]),
+        after_label=status_labels.get(entry["after_status"], entry["after_status"]),
+        decision_text=_beijing_text(entry["decision_at"]),
+        recorded_text=_beijing_text(entry["recorded_at"]),
+    ) for entry in entries]
+
+
+@never_cache
+@require_GET
+@login_required
+def admin_reservation_list(request):
+    template = "reservations/admin_list.html"
+    form = AdminReservationFilterForm(request.GET)
+    context = {"form": form}
+    try:
+        require_reservation_admin(request.user)
+        if not form.is_valid():
+            return render(request, template, context, status=400)
+        number = form.cleaned_data["equipment"]
+        records = get_admin_reservations(request.user, number)
+    except PermissionDenied:
+        return HttpResponseForbidden(ADMIN_FORBIDDEN)
+    except ReservationFailed:
+        return render(request, template, {**context, "error": READ_FAILED}, status=503)
+    except ReservationUnknown:
+        return render(request, template, {**context, "error": READ_UNKNOWN}, status=503)
+    return render(request, template, {
+        **context, "equipment_number": number, "filter_query": _filter_query(number),
+        "records": [_display_record(row) for row in records],
+    })
+
+
+@never_cache
+@require_GET
+@login_required
+def admin_reservation_detail(request, pk):
+    template = "reservations/admin_detail.html"
+    form = AdminReservationFilterForm(request.GET)
+    try:
+        require_reservation_admin(request.user)
+        back_url = reverse("admin-reservation-list")
+        if not form.is_valid():
+            return render(request, template, {"back_url": back_url, "error": "设备编号参数无效。"}, status=400)
+        back_url += _filter_query(form.cleaned_data["equipment"])
+        record = get_admin_reservation(request.user, pk)
+    except PermissionDenied:
+        return HttpResponseForbidden(ADMIN_FORBIDDEN)
+    except ReservationFailed:
+        return render(request, template, {"back_url": back_url, "error": READ_FAILED}, status=503)
+    except ReservationUnknown:
+        return render(request, template, {"back_url": back_url, "error": READ_UNKNOWN}, status=503)
+    if record is None:
+        return render(request, template, {"back_url": back_url, "error": RESULT_NOT_FOUND}, status=404)
+    return render(request, template, {
+        "back_url": back_url, "record": _display_record(record), "history": _display_history(record["history"]),
+    })
