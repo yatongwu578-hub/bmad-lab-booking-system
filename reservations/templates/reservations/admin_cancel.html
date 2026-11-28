@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>取消预约 · 实验室设备预约</title>
+</head>
+<body>
+<main>
+    <h1>{% if form %}确认取消预约{% else %}取消预约{% endif %}</h1>
+    <p><a href="{{ back_url }}">返回预约管理</a></p>
+    {% if detail_url %}<p><a href="{{ detail_url }}">返回预约详情</a></p>{% endif %}
+    {% if error %}<p role="alert">{{ error }}</p>{% endif %}
+    {% if message %}<p role="status">{{ message }}</p>{% endif %}
+    {% if record %}
+        <dl>
+            <dt>预约编号</dt><dd>{{ record.id }}</dd>
+            <dt>申请人</dt><dd>{{ record.applicant__username }}</dd>
+            <dt>设备</dt><dd>{{ record.equipment__number }} · {{ record.equipment__name }}</dd>
+            <dt>时段（北京时间）</dt><dd>{{ record.start_text }} 至 {{ record.end_text }}</dd>
+            <dt>预约状态</dt><dd>{{ record.status_label }}</dd>
+        </dl>
+    {% endif %}
+    {% if form %}
+        <p>取消后将释放预约占用，原记录保留，取消原因对申请人可见。</p>
+        <form method="post" action="{{ cancel_url }}">
+            {% csrf_token %}
+            {{ form.reason.errors }}
+            <p>{{ form.reason.label_tag }}<br>{{ form.reason }}</p>
+            <button type="submit">确认取消</button>
+        </form>
+    {% endif %}
+</main>
+</body>
+</html>

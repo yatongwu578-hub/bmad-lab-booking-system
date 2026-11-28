@@ -572,3 +572,33 @@
 3. **负责人真实决定。** 本轮明确授权在正式验证通过、AC 证据完整且无新增阻塞后，直接验收两条 Story、更新 done、记录证据并提交推送。按正式 AC、FR-012/013/015/018、相应 ADR/PC 与实际回执核对。未代签其他组员。
 4. **后验核验。** 恢复原生标记 STORY26_27_FORMAL_DETAIL_OK；21:06:03.0626023 +08:00 完成运行，守卫与 Chrome 16 条文档匹配、业务 POST 为 0、前后 ACL 和四类业务投影等价。无合适安全待审核样本，不造样。组合 149 通过/150（可选旧 Chrome 跳过一项），双序真实竞争只写一次。
 5. **结果。** 2026-11-28T21:10:43.0878369+08:00 为实际验收登记及主线 done 的时间，不回填为 Chrome 完成时间或 X Step 05。记录主线规格、Sprint 与 README，保持原 S0、R1、D-058/059、X 原延期和 Y 的 S0 后偏差。两组各 3 个已开启且符合计数口径的 Story 会话，R1 各 0/1（0%），C 未到的指标留空。2.8 仅交接，Sprint 8/5 不变。 [联合验收](_bmad-output/implementation-artifacts/story-2-6-2-7-final-acceptance.md) · [实验索引](docs/team/experiment-a-implementation-evidence.md)
+
+## D-061 2026-11-28 负责人批准 Story 2.8 实施
+
+1. **触发与建议。** 发现已有历史日志及产物后暂停 Git 检查，建议保留原件并以 `2c6380ac608b356df5f0be8251fa4882327e3eab` 为唯一基线。Checkpoint 1 提出复用现有取消与审核事务，逐项验证正式 AC-1～8，不增迁移或授权。 [Checkpoint 1](_bmad-output/implementation-artifacts/story-2-8-checkpoint-1.md)
+2. **真实决定。** 负责人先批准仅在当前工作区继续规划，保留并排除原 1 个已修改日志和 118 个未跟踪记录。看到 Checkpoint 1 后明确回复「批准继续」。不代签其他成员，也不将该回复解释为正式业务库操作、最终验收或版本发布授权。
+3. **结果和待验。** 规格冻结，Story 进入 `in-progress`。实现及测试源码已落盘，原项目解释器在沙箱中退出 103，Django 和 PostgreSQL 结果待普通 PowerShell 批次。未进入 review，不标 done。Sprint 8/5 和实验 A 原件、口径、观察截止不变。 [规格](_bmad-output/implementation-artifacts/spec-2-8-admin-cancellation.md) · [隔离批次](_bmad-output/implementation-artifacts/run-story-2-8-isolated.ps1)
+
+## D-062 2026-11-28 负责人批准 Story 2.8 评审处置
+
+1. **触发。** BMAD 6.12.4 full 独立 `bmad-code-review` 的四视角首评为「有变更请求」，以 `2c6380ac608b356df5f0be8251fa4882327e3eab` 对照正式 AC-1～AC-8，形成 2 个行动项、9 项延期建议、2 项不采纳。真实决定原件为当前会话负责人发送的「选择2：保留为行动项」和随后「作为项目负责人，我批准以下Story 2.8评审处置方案」消息。不虚构可分享的对话 URL 或其他成员意见。 [首评原件](_bmad-output/implementation-artifacts/story-2-8-independent-code-review.md)
+2. **AI 建议及依据。** 采用选项 2。P01 是实施规格的畸形请求零副作用约束与 AC-6 输入闸口有关的阻塞，严格拒绝格式失败并保留 FR-018 合法空白原因路径（FR-002/014/018，ADR-002/005，PC-008/011）。P02 是 AC-8 共享设备锁下的必要实证缺口，不等同发现实施错误；补实际双向竞争，而非重写锁（FR-008/010/014/015，ADR-003/004/006/008，PC-003/004/014）。其余风险当前不阻塞正式 AC、安全性及数据一致性，分开跟踪，不扩大整改轮次。
+3. **负责人真实判断。** 明确选择保留行动项并批准 P01 交回原 Build 最小修复、P02 仅补管理员和本人取消两个真实 POST 的双序证据。在无共享锁业务缺陷实证时不改共享锁。批准 D01～D09 在不影响正式 AC、安全性和一致性的前提下延期，要求保留编号、理由、风险及跟踪节点。两项原始不采纳依据保持。明确整改完成后一次独立复验，不重复跑整改前批次，复用有效历史 NFR-001。此决定不是验收、发布或其他成员签审。
+4. **结果。** Step 4 同步实施规格与 Sprint 的 2.8 到 `in-progress`，P01/P02 保持未勾选；中央台账原有九条就地补充负责人处置、残余风险与跟踪节点，不重复追加。仅交回原 Build 的整改材料，不宣称另一会话已接收或开始实施。未变更业务代码、正式 AC、FR/NFR、ADR、Sprint 8/5、实验 A 原件与口径、共同观察截止或 3.1 状态。未访问正式库、未标 done、未暂存、提交或推送。 [实施规格](_bmad-output/implementation-artifacts/spec-2-8-admin-cancellation.md) · [Sprint 状态](_bmad-output/implementation-artifacts/sprint-status.yaml) · [中央延期台账](_bmad-output/implementation-artifacts/deferred-work.md) · [原 Build 整改交接](_bmad-output/implementation-artifacts/story-2-8-remediation-handoff.md)
+5. **事后验证。** 本轮仅核对记录、范围和历史档，未运行整改前重复测试。原开发通过批仍为 Django 158/159、9/9 新增、34/34 探针、22/22 角色拒绝及另计的 14/14 CSRF／非法请求，均非整改验证结果。两项材料齐备后，按现有工具在 `127.0.0.1:5433/test_lab_booking` 统一独立复验一次，保留新分母、原生退出码、原始日志、隔离基线与清理；按申请机制不变继续复用历史 NFR-001 20 请求 × 10 轮。整改成功和独立复验结果待实际证据，不提前关闭行动项。 [原开发归档](_bmad-output/implementation-artifacts/story-2-8-run-20261128-220430-872/archive.sha256) · [历史 NFR-001 原件](_bmad-output/implementation-artifacts/story-2-1-recheck-2ee949f8d8014388a2d9792c86a4978c/story-2-1-run-20261126-173610-155-37026c15/nfr001-standard.jsonl)
+
+
+## D-063 2026-11-28 负责人按完整独立复验关闭 Story 2.8 P01/P02
+
+1. **触发。** 原独立评审按 D-062 接回整改，指出 P01/P02 可进入一次全量。负责人在本次会话报告自己已在普通 PowerShell 运行整改后完整独立复验；实际新目录为 `story-2-8-run-20261128-234855-694`。没有伪造外层回执、会话 URL 或组员签审。 [原始归档](_bmad-output/implementation-artifacts/story-2-8-run-20261128-234855-694/archive.sha256)
+2. **AI 建议及依据。** 绑定实跑输入，核对正式 AC-1～AC-8、T-01～T-04、Story 范围 NFR-002 及真实前后快照后关闭行动项。P01 查 FR-002/014/018、AC-6 原始输入闸口和合法 FR-018 对照；P02 查 FR-008/010/014/015、AC-8 和 ADR-003/004/006 下的两真实 POST。单次现场最小 smoke 只查已核验安全样本的管理员取消确认及放弃返回，不造样、不写预约或历史。
+3. **负责人真实判断。** 本次用户消息明确批准「若全部通过……关闭P01、P02」，其余已批准 9 项延期保持原决定，并指示保留 D-062、原始评审、整改和独立复验证据，准备最小正式运行方案，不操作正式库或标 done。这是两项关闭的条件授权，不是后续正式运行或发布授权，不代签他人。
+4. **实际结果。** 条件成立，规格仅勾选 P01/P02 并补记历史；保持规格 `in-review`、Sprint `review`。D-062 原有文字、原首评及两项不采纳、D01～D09 中央台账不变。阶段只读核验后已备最小正式运行方案，预计无新增迁移或授权，未执行。业务代码、正式 AC、FR/NFR、ADR、Sprint 8/5、实验 A 原始材料、度量和共同观察截止、3.1 状态无变化；未暂存、提交或推送。 [关闭记录](_bmad-output/implementation-artifacts/story-2-8-independent-run-result.md) · [正式运行方案](_bmad-output/implementation-artifacts/story-2-8-minimal-formal-run.md)
+5. **事后验证。** 独立核对 Django 158/159（仅既有可选 Chrome 跳过）、新增 9/9、36/36 PostgreSQL 组、7 阶段原生退出 0、总标记正确。P01 通过方法的 28 个 400 子请求无业务 SQL、锁、判时或数据变化；P02 每序先手 200、后手真实等锁后 409，仅一条正确归属的取消历史、零残留占用。22/22 角色拒绝、另计 14/14 CSRF／非法及 P01 用例，15 个实跑输入前后相符、快照与夹具清理一致。NFR-001 复用历史 20 请求 × 10 轮，本轮未重复运行任何测试。正式现场结果待实际回执，仅记录可核验事实。
+
+## D-064 2026-11-29 负责人批准 Story 2.8 最小正式运行与条件验收
+
+1. **触发与建议。** 独立复验已完成，建议按现有方案只读核对迁移、ACL、账号、样本及前后状态，使用一个安全详情的取消确认和放弃返回，不在正式库制造数据。 [独立复验](_bmad-output/implementation-artifacts/story-2-8-independent-run-result.md) · [正式运行方案](_bmad-output/implementation-artifacts/story-2-8-minimal-formal-run.md)
+2. **负责人真实决定。** 本次确认 D-063 以及 P01/P02 正式关闭，原 9 项延期不改；批准按方案运行。若正式验证通过、AC-1～AC-8 证据完整且无新阻塞，则授权最终验收、更新追溯资料、核对敏感和暂存范围、提交推送，并准备 3.1 交接。不代签其他成员，也不在条件未完成时登记验收。
+3. **当前结果。** 已完成现有工具的路由适配和不连库准备检查。沙箱版本探针原生退出 103，受保护账号文件访问被拒，未访问正式库。交普通 PowerShell 单批执行，正式结果待原始回执。规格仍为 `in-review`、Sprint 仍为 `review`，未标 done、未暂存、提交或推送，未启动 3.1。 [已填路径的执行入口](_bmad-output/implementation-artifacts/run-story-2-8-minimal-formal.ps1)
+4. **正式运行及条件验收（2026-11-29）。** 负责人报告在普通 PowerShell 实跑；只读复算实际正式批次 61 个散列、10 个顶层和 2 个内层原生退出码、17 条 Chrome／守卫匹配、19 条迁移与前后 ACL/业务快照。无安全正向样本，仅验终态详情和确认拒绝，业务 POST、业务写入、迁移及授权均为 0。以既有独立批 AC-1～8 承接未现场覆盖的正向与复杂分支，保留 Django 158 通过、0 失败、原可选跳过 1 和 PostgreSQL 36/36。D-064 条件满足，采用负责人已给授权同步 Story 与规格为 `done`，P01/P02 保持关闭、9 项延期不改。仅准备 3.1 交接，不开工。 [最终验收与追溯](_bmad-output/implementation-artifacts/story-2-8-final-acceptance.md)

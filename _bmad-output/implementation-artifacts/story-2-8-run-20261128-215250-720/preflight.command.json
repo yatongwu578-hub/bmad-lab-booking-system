@@ -1,0 +1,18 @@
+﻿{
+    "executable":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+    "argv":  [
+                 "-NoProfile",
+                 "-ExecutionPolicy",
+                 "Bypass",
+                 "-File",
+                 "F:\\softwork\\SE-Management\\bmad-lab-booking-system\\_bmad-output\\implementation-artifacts\\preflight-story-2-1.ps1",
+                 "-ProbeIsolatedDatabase",
+                 "-Passfile",
+                 "C:\\Users\\15860\\AppData\\Local\\LabBooking\\PostgreSQL17\\pgpass.conf",
+                 "-Psql",
+                 "C:\\Program Files\\PostgreSQL\\17\\bin\\psql.exe",
+                 "-Chrome",
+                 "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+             ],
+    "cwd":  "F:\\softwork\\SE-Management\\bmad-lab-booking-system"
+}

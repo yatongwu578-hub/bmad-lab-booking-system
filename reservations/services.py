@@ -10,6 +10,7 @@ from django.db.models import Q
 from accounts.models import Role, User
 from accounts.policies import RESERVATION_ROLES, can_reserve, is_business_admin
 from audit.services import (
+    append_admin_reservation_cancellation,
     append_reservation_approval,
     append_reservation_cancellation,
     append_reservation_expiry,
@@ -290,6 +291,67 @@ def _recheck_reservation_admin(pk):
     account = User.objects.filter(pk=pk).values_list("is_active", "role").first()
     if account != (True, Role.ADMIN):
         raise PermissionDenied
+
+
+def can_admin_cancel(row, at):
+    if row["status"] == ReservationStatus.PENDING:
+        return at < row["start_at"]
+    if row["status"] == ReservationStatus.APPROVED:
+        return at < row["end_at"]
+    return False
+
+
+def get_admin_cancellation_candidate(user, pk):
+    """Read the confirmation target without taking locks or triggering FR-018."""
+    require_reservation_admin(user)
+    try:
+        _recheck_reservation_admin(user.pk)
+        return Reservation.objects.filter(pk=pk).values(*RESULT_FIELDS, "applicant__username").first()
+    except Error:
+        raise ReservationFailed from None
+
+
+def cancel_admin_reservation(user, pk, reason):
+    require_reservation_admin(user)
+    if reason is None:
+        reason = ""
+    if not isinstance(reason, str) or "\0" in reason:
+        raise ValueError("必须提供有效的取消原因。")
+    reason = reason.strip()
+
+    def cancel(connection):
+        _recheck_reservation_admin(user.pk)
+        scoped = Reservation.objects.filter(pk=pk)
+        equipment_id = scoped.values_list("equipment_id", flat=True).first()
+        if equipment_id is None or lock_equipment(equipment_id) is None:
+            return Cancellation("missing")
+
+        _recheck_reservation_admin(user.pk)
+        target = scoped.filter(equipment_id=equipment_id)
+        row = target.values(*RESULT_FIELDS, "applicant__username").first()
+        if row is None:
+            return Cancellation("missing")
+        decision_at = _decision_time(connection)
+        before_status = row["status"]
+        if before_status == ReservationStatus.PENDING and decision_at >= row["start_at"]:
+            if _expire(target, decision_at) != [pk]:
+                raise ReservationFailed
+            row["status"] = ReservationStatus.EXPIRED
+            # Commit the valid expiry even though the cancellation is rejected.
+            return Cancellation("expired" if reason else "expired_reason_required", row)
+        if before_status not in CANCELLATION_STATUSES:
+            return Cancellation("terminal", row)
+        if not can_admin_cancel(row, decision_at):
+            return Cancellation("ended", row)
+        if not reason:
+            return Cancellation("reason_required", row)
+        if target.filter(status=before_status).update(status=ReservationStatus.CANCELLED) != 1:
+            raise ReservationFailed
+        append_admin_reservation_cancellation(pk, user.pk, before_status, reason, decision_at)
+        row["status"] = ReservationStatus.CANCELLED
+        return Cancellation("cancelled", row)
+
+    return _durable_operation(cancel)
 
 
 def approve_reservation(user, pk):

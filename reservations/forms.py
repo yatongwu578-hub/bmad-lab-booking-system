@@ -54,13 +54,7 @@ class AdminReservationFilterForm(forms.Form):
         return cleaned
 
 
-class AdminReservationRejectForm(forms.Form):
-    reason = forms.CharField(
-        # A blank reason still reaches the locked decision, which may expire a due booking.
-        label="拒绝原因", required=False, widget=forms.Textarea(attrs={"rows": 4, "required": True}),
-        error_messages={"required": "请输入拒绝原因。"},
-    )
-
+class _AdminReservationReasonForm(forms.Form):
     def clean(self):
         cleaned = super().clean()
         if self.files or self.data.keys() - {"reason", "csrfmiddlewaretoken"}:
@@ -68,3 +62,19 @@ class AdminReservationRejectForm(forms.Form):
         if isinstance(self.data, MultiValueDict) and any(len(values) != 1 for _, values in self.data.lists()):
             raise forms.ValidationError("提交包含重复字段。")
         return cleaned
+
+
+class AdminReservationRejectForm(_AdminReservationReasonForm):
+    reason = forms.CharField(
+        # A blank reason still reaches the locked decision, which may expire a due booking.
+        label="拒绝原因", required=False, widget=forms.Textarea(attrs={"rows": 4, "required": True}),
+        error_messages={"required": "请输入拒绝原因。"},
+    )
+
+
+class AdminReservationCancelForm(_AdminReservationReasonForm):
+    reason = forms.CharField(
+        # Blank is a business outcome, so a due target can still expire under its lock.
+        label="取消原因", required=False, widget=forms.Textarea(attrs={"rows": 4, "required": True}),
+        error_messages={"required": "请输入取消原因。"},
+    )

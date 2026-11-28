@@ -60,6 +60,22 @@ def append_reservation_cancellation(reservation_id, applicant_id, before_status,
     )
 
 
+def append_admin_reservation_cancellation(reservation_id, admin_id, before_status, reason, decision_at):
+    """Append an administrator cancellation within the device-locked transaction."""
+    OperationHistory.objects.create(
+        object_type=HistoryObject.RESERVATION,
+        reservation_id=reservation_id,
+        action="cancel",
+        before_status=before_status,
+        after_status=ReservationStatus.CANCELLED,
+        actor_type="admin",
+        actor_id=admin_id,
+        reason=reason,
+        decision_at=decision_at,
+        recorded_at=Now(),
+    )
+
+
 def append_reservation_approval(reservation_id, admin_id, decision_at):
     """Append approval within the reservation service's device-locked transaction."""
     OperationHistory.objects.create(

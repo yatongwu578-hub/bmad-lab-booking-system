@@ -1,0 +1,10 @@
+﻿{
+    "executable":  "F:\\softwork\\SE-Management\\bmad-lab-booking-system\\.venv\\Scripts\\python.exe",
+    "argv":  [
+                 "manage.py",
+                 "verify_admin_cancellation",
+                 "--evidence",
+                 "F:\\softwork\\SE-Management\\bmad-lab-booking-system\\_bmad-output\\implementation-artifacts\\story-2-8-run-20261128-234855-694\\probe.jsonl"
+             ],
+    "cwd":  "F:\\softwork\\SE-Management\\bmad-lab-booking-system"
+}

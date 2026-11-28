@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>预约管理 · 实验室设备预约</title>
+    <style>.reservation-actions { white-space: nowrap; }</style>
 </head>
 <body>
 <main>
@@ -33,6 +34,7 @@
                             <th scope="col">预约编号</th><th scope="col">申请人</th><th scope="col">设备</th>
                             <th scope="col">日期（北京时间）</th><th scope="col">时段（北京时间）</th>
                             <th scope="col">预约状态</th><th scope="col">设备当前状态</th><th scope="col">处理原因</th>
+                            <th scope="col">操作</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -46,6 +48,7 @@
                             <td>{{ record.status_label }}</td>
                             <td>{{ record.equipment_status_label }}</td>
                             <td>{{ record.reason|default_if_none:"" }}</td>
+                            <td class="reservation-actions">{% if record.cancel_url %}<a href="{{ record.cancel_url }}">取消预约</a>{% endif %}</td>
                         </tr>
                     {% endfor %}
                     </tbody>

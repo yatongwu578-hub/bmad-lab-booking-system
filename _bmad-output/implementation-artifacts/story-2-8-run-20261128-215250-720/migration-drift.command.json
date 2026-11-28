@@ -1,0 +1,10 @@
+﻿{
+    "executable":  "F:\\softwork\\SE-Management\\bmad-lab-booking-system\\.venv\\Scripts\\python.exe",
+    "argv":  [
+                 "manage.py",
+                 "makemigrations",
+                 "--check",
+                 "--dry-run"
+             ],
+    "cwd":  "F:\\softwork\\SE-Management\\bmad-lab-booking-system"
+}

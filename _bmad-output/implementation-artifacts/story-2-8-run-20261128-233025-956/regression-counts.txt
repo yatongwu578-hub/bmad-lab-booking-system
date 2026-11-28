@@ -1,0 +1,1 @@
+﻿discovered=1 passed=1 skipped=0 story28_passed=1

@@ -1,0 +1,8 @@
+﻿{
+    "executable":  "F:\\softwork\\SE-Management\\bmad-lab-booking-system\\.venv\\Scripts\\python.exe",
+    "argv":  [
+                 "manage.py",
+                 "check"
+             ],
+    "cwd":  "F:\\softwork\\SE-Management\\bmad-lab-booking-system"
+}

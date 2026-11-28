@@ -1,0 +1,14 @@
+﻿{
+    "executable":  "F:\\softwork\\SE-Management\\bmad-lab-booking-system\\.venv\\Scripts\\python.exe",
+    "argv":  [
+                 "manage.py",
+                 "test",
+                 "--keepdb",
+                 "--parallel",
+                 "1",
+                 "-v",
+                 "2",
+                 "reservations.test_admin_cancellation.AdminCancellationTests.test_malformed_submissions_and_methods_do_not_expire_target"
+             ],
+    "cwd":  "F:\\softwork\\SE-Management\\bmad-lab-booking-system"
+}

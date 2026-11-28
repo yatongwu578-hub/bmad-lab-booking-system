@@ -33,6 +33,9 @@
             <p>拒绝原因将对申请人可见。</p>
             {% include "reservations/_reject_form.html" %}
         {% endif %}
+        {% if cancel_url %}
+            <p><a href="{{ cancel_url }}">取消预约</a></p>
+        {% endif %}
         <h2>操作历史</h2>
         {% if history %}
             <table>

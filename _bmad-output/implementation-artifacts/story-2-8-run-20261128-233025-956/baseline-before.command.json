@@ -1,0 +1,11 @@
+﻿{
+    "executable":  "F:\\softwork\\SE-Management\\bmad-lab-booking-system\\.venv\\Scripts\\python.exe",
+    "argv":  [
+                 "manage.py",
+                 "verify_admin_reservations",
+                 "--baseline-only",
+                 "--evidence",
+                 "F:\\softwork\\SE-Management\\bmad-lab-booking-system\\_bmad-output\\implementation-artifacts\\story-2-8-run-20261128-233025-956\\baseline-before.json"
+             ],
+    "cwd":  "F:\\softwork\\SE-Management\\bmad-lab-booking-system"
+}

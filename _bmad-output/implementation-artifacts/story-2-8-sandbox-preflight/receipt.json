@@ -1,0 +1,7 @@
+﻿{
+    "command":  "F:/softwork/SE-Management/bmad-lab-booking-system/.venv/Scripts/python.exe --version",
+    "exit":  103,
+    "database_contacted":  false,
+    "stdout_sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+    "stderr_sha256":  "903CED2C52453CEC236FBF288D2377DB2DF46A1A3098D28EEE1219C3A8B619C8"
+}

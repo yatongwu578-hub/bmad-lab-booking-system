@@ -124,11 +124,15 @@ Story 2.2 已按 D-045 验收。独立复验为 103/103 Django、21/21 真实 Po
 
 ### Story 2.5 · 管理员预约查询及设备筛选（已验收）
 
-用业务管理员登录，从「我的身份 → 预约管理」进入 `/reservations/manage/`，可按设备编号筛选，打开详情及真实处理历史，再返回原筛选。匿名重定向登录，学生、教师直访被拒。这里只查询，不提供批准、拒绝、取消或设备状态操作。D-052 依据八条 AC、独立隔离及正式 Chrome／ACL／后置快照批准验收。 [最终验收](_bmad-output/implementation-artifacts/story-2-5-final-acceptance.md)
+用业务管理员登录，从「我的身份 → 预约管理」进入 `/reservations/manage/`，可按设备编号筛选，打开详情及真实处理历史，再返回原筛选。匿名重定向登录，学生、教师直访被拒。Story 2.5 交付查询，批准、拒绝和取消由后续 Story 交付。D-052 依据八条 AC、独立隔离及正式 Chrome／ACL／后置快照批准验收。 [最终验收](_bmad-output/implementation-artifacts/story-2-5-final-acceptance.md)
 
 ### Story 2.6 / 2.7 · 管理员批准与拒绝（已验收）
 
 业务管理员可从单条待审核预约详情使用独立批准或拒绝表单。批准保留原时段占用，拒绝需非空原因并释放占用；到期只按 FR-018 处理，不重复写入。组合全量 149/150，唯一跳过是既有设备描述的可选 Chrome 检查。两种真实等锁顺序均通过。正式只实测已失效详情、角色与历史展示，没有安全待审核正例；批准和拒绝的正向操作已有隔离实证。 [负责人验收](_bmad-output/implementation-artifacts/story-2-6-2-7-final-acceptance.md) · [FR→AC→证据](docs/team/experiment-a-implementation-evidence.md)
+
+### Story 2.8 · 管理员取消预约（已验收）
+
+管理员可从预约管理或详情进入单条取消确认。待审核须尚未开始，已批准须尚未结束，两者都必须填原因。取消保留原预约，并在同一事务释放占用、保存历史，申请人可查本人取消原因。独立复验为 158 通过、0 失败、1 项既有可选 Chrome 检查跳过，36/36 PostgreSQL 探针。正式批次只有终态样本，未提交取消或现场验证正向输入及返回，正向行为由隔离实测支持。未新增迁移或授权。 [D-064 最终验收与 FR→ADR→AC→证据](_bmad-output/implementation-artifacts/story-2-8-final-acceptance.md)
 
 ### 隔离库自动化测试
 
@@ -151,7 +155,7 @@ $env:LAB_BOOKING_DB_MODE = 'test'
 
 罗思婕、周何馨于 2026-11-19 完成业务与质量审核。吴亚彤于 2026-11-21 批准两轮范围和逐项处置，随后确认排期并正式批准 Sprint 1 启动。Sprint 1 为 11 月 22 日至 26 日，保留 1.1～1.4、2.1、2.2、2.3、2.5。Sprint 2 为 11 月 27 日至 29 日，保留 2.4、2.6、2.7、2.8、3.1。2.1 首次验收保留 NFR-001 的 20 个独立授权请求 × 10 轮，实验 A 的 2.6／2.7 保留为候选。R-01、R-03 沿用批准和验收证据，R-04、Read Committed 与 T-01～T-04 按既定节点落实。 [Sprint 启动交接](_bmad-output/planning-artifacts/sprint-plan.md#9-sprint-1-启动确认与-story-11-交接) · [D-017](decision-log.md#d-017-2026-11-21-负责人正式批准-sprint-1-启动)
 
-正式开发与独立评审分会话，真实测试、问题处置及负责人验收后才标 done。Sprint 1 八条已逐项验收，末项日期 2026-11-27，可运行增量为设备管理、申请和查询。Sprint 2 的 Story 2.4 已于 2026-11-28 验收，师生可从「我的预约」取消尚未开始的本人待审核或已批准预约。Epic 2 保持 in-progress。2.6 与 2.7 已验收，2.8、3.1 尚未开发。实验 A 已记录 D1 和实际实施差异，期末指标等待共同观察截止 C。 [Sprint 跟踪](_bmad-output/implementation-artifacts/sprint-status.yaml) · [Sprint 1 验收](_bmad-output/implementation-artifacts/sprint-1-final-acceptance-2026-11-27.md) · [Story 2.4 验收](_bmad-output/implementation-artifacts/story-2-4-final-acceptance.md) · [项目回顾](retrospective.md) · [实验 A](_bmad-output/planning-artifacts/sprint-2-startup-and-experiment-a.md)
+正式开发与独立评审分会话，真实测试、问题处置及负责人验收后才标 done。Sprint 1 八条已逐项验收，末项日期 2026-11-27，可运行增量为设备管理、申请和查询。Sprint 2 的 Story 2.4、2.6、2.7、2.8 已验收。3.1 保持 backlog，仅准备交接，尚未开发。实验 A 已记录 D1 和实际实施差异，期末指标等待共同观察截止 C。 [Sprint 跟踪](_bmad-output/implementation-artifacts/sprint-status.yaml) · [Sprint 1 验收](_bmad-output/implementation-artifacts/sprint-1-final-acceptance-2026-11-27.md) · [3.1 开发交接](_bmad-output/implementation-artifacts/story-3-1-build-handoff.md) · [项目回顾](retrospective.md) · [实验 A](_bmad-output/planning-artifacts/sprint-2-startup-and-experiment-a.md)
 
 ## 项目与当前进度
 
@@ -282,10 +286,10 @@ bmad-lab-booking-system/
 | M1 | 两轮Product Brief和PRD及内部审核、负责人确认已完成，第二轮定稿已提交main，可进入M2架构 |
 | M2 | Architecture及8条ADR、[project-context](_bmad-output/planning-artifacts/project-context.md)及14条PC已定稿；Epic/Story文档已final，3 Epic/13 Story的Story状态仍draft，组员5项意见已按负责人决定修改，见[本轮汇总](docs/team/m2-epics-summary.md)。第三次Step-04复核已获负责人批准并完成Finalize。随后完成就绪检查及 Sprint 计划，CONCERNS 经负责人有条件接受。 [就绪证据](_bmad-output/planning-artifacts/implementation-readiness.md) |
 | M3 | Sprint 1 八条 Story 均完成逐项验收，整体验收范围和真实回顾材料已归档。实验 B 已取消。 [验收证据](_bmad-output/implementation-artifacts/sprint-1-final-acceptance-2026-11-27.md) |
-| M4 | Sprint 2 已验收 Story 2.4、2.6、2.7。实验 A 已有实证与 D1 截面，C 封账、2.8/3.1、第二台 Windows 复现及演示录屏仍待完成。 [启动准备](_bmad-output/planning-artifacts/sprint-2-startup-and-experiment-a.md) |
-| 人机决策 | 根目录日志已记录至 D-057，未代填团队意见，课程要求的否决或实质修改以真实团队判断为准。 [决策日志](decision-log.md) |
-| FR追溯 | 18 条 FR 已映射至 ADR／PC 与 Story／AC。Story 1.2 的 FR-016／FR-002 与 Story 2.4 的 FR-002／010／015／018 均有独立测试及正式验证证据。 [创建设备](_bmad-output/implementation-artifacts/story-1-2-final-acceptance.md) · [本人取消](_bmad-output/implementation-artifacts/story-2-4-final-acceptance.md) |
-| NFR | NFR-001 实证 20 独立请求 × 10 轮。NFR-002 的 Sprint 1 已交付入口主矩阵 86/86，Story 2.4 新入口独立 16/16，M01 补例及合法对照另计，未交付操作不计入。 [Sprint 1 分母与追溯](_bmad-output/implementation-artifacts/sprint-1-final-acceptance-2026-11-27.md) · [Story 2.4 独立复验](_bmad-output/implementation-artifacts/story-2-4-m01-independent-run-result.md) |
+| M4 | Sprint 2 已验收 Story 2.4、2.6、2.7、2.8。实验 A 已有实证与 D1 截面，C 封账、3.1、第二台 Windows 复现及演示录屏仍待完成。 [2.8 验收](_bmad-output/implementation-artifacts/story-2-8-final-acceptance.md) |
+| 人机决策 | 根目录日志已记录至 D-064，未代填团队意见，课程要求的否决或实质修改以真实团队判断为准。 [决策日志](decision-log.md) |
+| FR追溯 | 18 条 FR 已映射至 ADR／PC 与 Story／AC。Story 1.2 的 FR-016／FR-002、Story 2.4 的本人取消及 Story 2.8 的 FR-014 等均有独立测试和正式验证证据，现场未覆盖项另列。 [创建设备](_bmad-output/implementation-artifacts/story-1-2-final-acceptance.md) · [本人取消](_bmad-output/implementation-artifacts/story-2-4-final-acceptance.md) · [管理员取消](_bmad-output/implementation-artifacts/story-2-8-final-acceptance.md) |
+| NFR | NFR-001 实证 20 独立请求 × 10 轮。NFR-002 的 Sprint 1 已交付入口主矩阵 86/86，Story 2.4 新入口独立 16/16，Story 2.8 为 22/22 角色拒绝，CSRF、非法请求与合法对照另计。 [Sprint 1 分母与追溯](_bmad-output/implementation-artifacts/sprint-1-final-acceptance-2026-11-27.md) · [Story 2.4 独立复验](_bmad-output/implementation-artifacts/story-2-4-m01-independent-run-result.md) · [Story 2.8 独立复验](_bmad-output/implementation-artifacts/story-2-8-independent-run-result.md) |
 | Architecture 及 project-context 后续待办 | R-03 已完成本机环境核验，D-024 的 Read Committed 和 D-026 的设备迁移、授权及业务库运行已留证。第二台 Windows 复现仍待执行，其他待办按既定节点推进。 [运行证据](_bmad-output/implementation-artifacts/story-1-2-runtime-evidence.md) · [延期台账](_bmad-output/implementation-artifacts/deferred-work.md) |
 
 ## AI使用声明与证据限制

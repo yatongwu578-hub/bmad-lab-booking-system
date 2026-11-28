@@ -8,6 +8,7 @@ from django.http.request import RawPostDataException, UnreadablePostError
 from django.middleware.csrf import CSRF_SECRET_LENGTH, CSRF_TOKEN_LENGTH
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.http import urlencode
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
@@ -16,7 +17,10 @@ from django.views.decorators.http import require_GET, require_POST, require_http
 from equipment.models import EquipmentStatus
 from equipment.services import get_equipment_detail
 
-from .forms import AdminReservationFilterForm, AdminReservationRejectForm, OccupancyDateForm, ReservationForm
+from .forms import (
+    AdminReservationCancelForm, AdminReservationFilterForm, AdminReservationRejectForm,
+    OccupancyDateForm, ReservationForm,
+)
 from .models import ReservationStatus
 from .services import (
     BEIJING,
@@ -24,7 +28,10 @@ from .services import (
     ReservationFailed,
     ReservationUnknown,
     approve_reservation,
+    can_admin_cancel,
+    cancel_admin_reservation,
     cancel_own_reservation,
+    get_admin_cancellation_candidate,
     get_admin_reservation,
     get_admin_reservations,
     get_cancellation_candidate,
@@ -56,6 +63,14 @@ APPROVAL_RESULTS = {
 }
 APPROVAL_FAILED = "本次批准操作未成功，数据库事务已回滚。"
 APPROVAL_UNKNOWN = "批准结果待核查，请勿重复提交。可主动返回预约详情核查。"
+ADMIN_CANCELLATION_RESULTS = {
+    "cancelled": (200, "预约已取消，原记录已保留，占用已释放。"),
+    "missing": (404, RESULT_NOT_FOUND),
+    "terminal": (409, "预约当前状态不允许取消，未执行取消。"),
+    "ended": (409, "已批准预约的结束时间已到，未执行取消。"),
+    "expired": (409, "预约开始时间已到，该待审核预约已失效，未执行取消。"),
+    "expired_reason_required": (400, "请输入取消原因。预约开始时间已到，该待审核预约已失效，未执行取消。"),
+}
 CANCELLATION_MESSAGES = {
     "cancelled": "预约已取消，原记录已保留。",
     "terminal": "预约当前状态不允许取消。",
@@ -251,6 +266,12 @@ def _filter_query(number):
     return "?" + urlencode({"equipment": number}) if number is not None else ""
 
 
+def _admin_cancel_link(row, filter_query, at):
+    if can_admin_cancel(row, at):
+        return reverse("admin-reservation-cancel", args=[row["id"]]) + filter_query
+    return None
+
+
 def _display_history(entries):
     status_labels = dict(ReservationStatus.choices)
     return [dict(
@@ -283,9 +304,11 @@ def admin_reservation_list(request):
         return render(request, template, {**context, "error": READ_FAILED}, status=503)
     except ReservationUnknown:
         return render(request, template, {**context, "error": READ_UNKNOWN}, status=503)
+    # UI hints use server time and never affect the existing read transaction or a later POST.
+    at, filter_query = timezone.now(), _filter_query(number)
     return render(request, template, {
-        **context, "equipment_number": number, "filter_query": _filter_query(number),
-        "records": [_display_record(row) for row in records],
+        **context, "equipment_number": number, "filter_query": filter_query,
+        "records": [dict(_display_record(row), cancel_url=_admin_cancel_link(row, filter_query, at)) for row in records],
     })
 
 
@@ -313,6 +336,7 @@ def admin_reservation_detail(request, pk):
         return render(request, template, {"back_url": back_url, "error": RESULT_NOT_FOUND}, status=404)
     context = {
         "back_url": back_url, "record": _display_record(record), "history": _display_history(record["history"]),
+        "cancel_url": _admin_cancel_link(record, filter_query, timezone.now()),
         "approval_candidate": (record["status"] == ReservationStatus.PENDING
                                and record["equipment__status"] == EquipmentStatus.AVAILABLE),
     }
@@ -388,3 +412,96 @@ def admin_reservation_reject(request, pk):
         "expired": (409, "预约开始时间已到，该待审核预约已失效，未执行拒绝。"),
     }[outcome]
     return render(request, template, {**context, "error": error}, status=status)
+
+
+def _valid_admin_cancel_query(request):
+    # WSGI represents the original query bytes as ISO-8859-1 text. Validate those
+    # bytes before QueryDict can preserve bad escapes or replace invalid UTF-8.
+    try:
+        raw = request.META.get("QUERY_STRING", "").encode("iso-8859-1")
+        if re.search(rb"%(?![0-9A-Fa-f]{2})", raw):
+            return False
+        unquote_to_bytes(raw).decode("utf-8")
+    except UnicodeError:
+        return False
+    return True
+
+
+def _admin_cancel_form(request):
+    # The confirmation page uses the native URL-encoded form. Do not let a parser's
+    # recovery from invalid syntax turn a malformed request into a blank reason.
+    if request.content_type != "application/x-www-form-urlencoded":
+        return None
+    try:
+        body = request.body
+        if re.search(rb"%(?![0-9A-Fa-f]{2})", body):
+            return None
+        for field in body.split(b"&") if body else ():
+            name, separator, value = field.partition(b"=")
+            if not name or not separator:
+                return None
+            unquote_to_bytes(name).decode("utf-8")
+            unquote_to_bytes(value).decode("utf-8")
+        return AdminReservationCancelForm(request.POST)
+    except (RawPostDataException, UnreadablePostError, RequestDataTooBig, UnicodeError):
+        return None
+
+
+@never_cache
+@require_http_methods(["GET", "POST"])
+@login_required
+@csrf_protect
+def admin_reservation_cancel(request, pk):
+    template = "reservations/admin_cancel.html"
+    context = {"back_url": reverse("admin-reservation-list")}
+    try:
+        require_reservation_admin(request.user)
+        if not _valid_admin_cancel_query(request):
+            return render(request, template, {**context, "error": "设备编号参数无效。"}, status=400)
+        filter_form = AdminReservationFilterForm(request.GET)
+        if not filter_form.is_valid():
+            return render(request, template, {**context, "error": "设备编号参数无效。"}, status=400)
+        filter_query = _filter_query(filter_form.cleaned_data["equipment"])
+        context["back_url"] += filter_query
+        detail_url = reverse("admin-reservation-detail", args=[pk]) + filter_query
+        cancel_url = reverse("admin-reservation-cancel", args=[pk]) + filter_query
+        if request.method == "GET":
+            record = get_admin_cancellation_candidate(request.user, pk)
+            if record is None:
+                return render(request, template, {**context, "error": RESULT_NOT_FOUND}, status=404)
+            context.update(record=_display_record(record), detail_url=detail_url)
+            if can_admin_cancel(record, timezone.now()):
+                context.update(form=AdminReservationCancelForm(), cancel_url=cancel_url)
+                return render(request, template, context)
+            return render(request, template, {
+                **context, "error": "预约当前状态或时间不允许取消。",
+            }, status=409)
+
+        form = _admin_cancel_form(request)
+        if form is None or not form.is_valid():
+            # Malformed submissions are rejected without a target lookup or any FR-018 write.
+            return render(request, template, {**context, "error": "取消预约请求格式无效。"}, status=400)
+        reason = form.cleaned_data["reason"]
+        result = cancel_admin_reservation(request.user, pk, reason)
+    except PermissionDenied:
+        return HttpResponseForbidden("无权取消管理员预约记录。")
+    except ReservationFailed:
+        error = ("无法读取取消确认信息，预约未更改。" if request.method == "GET"
+                 else "本次取消未成功，数据库事务已回滚。")
+        return render(request, template, {**context, "error": error}, status=503)
+    except ReservationUnknown:
+        return render(request, template, {
+            **context, "error": "取消结果待核查，请勿重复提交。",
+        }, status=503)
+
+    if result.record is not None:
+        context.update(record=_display_record(result.record), detail_url=detail_url)
+    if result.outcome == "reason_required":
+        form.add_error("reason", form.fields["reason"].error_messages["required"])
+        return render(request, template, {**context, "form": form, "cancel_url": cancel_url}, status=400)
+    status, message = ADMIN_CANCELLATION_RESULTS[result.outcome]
+    if not reason and result.outcome in {"terminal", "ended"}:
+        message = form.fields["reason"].error_messages["required"] + message
+    return render(request, template, {
+        **context, "message" if status == 200 else "error": message,
+    }, status=status)

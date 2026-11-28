@@ -1,0 +1,21 @@
+Found 159 test(s).
+已核验并保留 127.0.0.1:5433/test_lab_booking，角色 lab_booking_test，PostgreSQL 17.12。
+测试前：12 张表、19 条迁移、0 个账号、0 条会话。
+System check identified no issues (0 silenced).
+合法对照（非 T-03 拒绝分母）：admin GET 200、有效 CSRF POST 302，重读四字段与身份一致。
+CSRF 单列（非 T-03 角色拒绝分母）：admin missing 403，无设备读取或变更。
+CSRF 单列（非 T-03 角色拒绝分母）：admin mismatch 403，无设备读取或变更。
+T-03 record {"actual_status": 302, "after": {"count": 2, "sha256": "9143afc97d18d91c6820c0d1134c25264276d1a91199d77793926b9939f64b5a"}, "before": {"count": 2, "sha256": "9143afc97d18d91c6820c0d1134c25264276d1a91199d77793926b9939f64b5a"}, "denied": true, "expected_status": 302, "method": "GET", "no_leak": true, "request": {}, "role": "anonymous", "route": "/equipment/1651/edit/", "target": "EDIT-001"}
+T-03 anonymous GET 302，无设备读取或泄露，2 行全字段不变。
+T-03 record {"actual_status": 302, "after": {"count": 2, "sha256": "9143afc97d18d91c6820c0d1134c25264276d1a91199d77793926b9939f64b5a"}, "before": {"count": 2, "sha256": "9143afc97d18d91c6820c0d1134c25264276d1a91199d77793926b9939f64b5a"}, "denied": true, "expected_status": 302, "method": "POST", "no_leak": true, "request": {"category": "\u65b0\u7c7b\u522b", "csrf": "valid-redacted", "description": "\u65b0\u8bf4\u660e\u7b2c\u4e00\u884c\n\u7b2c\u4e8c\u884c", "location": "\u65b0\u4f4d\u7f6e", "name": "\u65b0\u8bbe\u5907\u540d\u79f0"}, "role": "anonymous", "route": "/equipment/1651/edit/", "target": "EDIT-001"}
+T-03 anonymous POST 302，无设备读取或泄露，2 行全字段不变。
+T-03 record {"actual_status": 403, "after": {"count": 2, "sha256": "9143afc97d18d91c6820c0d1134c25264276d1a91199d77793926b9939f64b5a"}, "before": {"count": 2, "sha256": "9143afc97d18d91c6820c0d1134c25264276d1a91199d77793926b9939f64b5a"}, "denied": true, "expected_status": 403, "method": "GET", "no_leak": true, "request": {}, "role": "student", "route": "/equipment/1651/edit/", "target": "EDIT-001"}
+T-03 student GET 403，无设备读取或泄露，2 行全字段不变。
+T-03 record {"actual_status": 403, "after": {"count": 2, "sha256": "9143afc97d18d91c6820c0d1134c25264276d1a91199d77793926b9939f64b5a"}, "before": {"count": 2, "sha256": "9143afc97d18d91c6820c0d1134c25264276d1a91199d77793926b9939f64b5a"}, "denied": true, "expected_status": 403, "method": "POST", "no_leak": true, "request": {"category": "\u65b0\u7c7b\u522b", "csrf": "valid-redacted", "description": "\u65b0\u8bf4\u660e\u7b2c\u4e00\u884c\n\u7b2c\u4e8c\u884c", "location": "\u65b0\u4f4d\u7f6e", "name": "\u65b0\u8bbe\u5907\u540d\u79f0"}, "role": "student", "route": "/equipment/1651/edit/", "target": "EDIT-001"}
+T-03 student POST 403，无设备读取或泄露，2 行全字段不变。
+T-03 record {"actual_status": 403, "after": {"count": 2, "sha256": "9143afc97d18d91c6820c0d1134c25264276d1a91199d77793926b9939f64b5a"}, "before": {"count": 2, "sha256": "9143afc97d18d91c6820c0d1134c25264276d1a91199d77793926b9939f64b5a"}, "denied": true, "expected_status": 403, "method": "GET", "no_leak": true, "request": {}, "role": "teacher", "route": "/equipment/1651/edit/", "target": "EDIT-001"}
+T-03 teacher GET 403，无设备读取或泄露，2 行全字段不变。
+T-03 record {"actual_status": 403, "after": {"count": 2, "sha256": "9143afc97d18d91c6820c0d1134c25264276d1a91199d77793926b9939f64b5a"}, "before": {"count": 2, "sha256": "9143afc97d18d91c6820c0d1134c25264276d1a91199d77793926b9939f64b5a"}, "denied": true, "expected_status": 403, "method": "POST", "no_leak": true, "request": {"category": "\u65b0\u7c7b\u522b", "csrf": "valid-redacted", "description": "\u65b0\u8bf4\u660e\u7b2c\u4e00\u884c\n\u7b2c\u4e8c\u884c", "location": "\u65b0\u4f4d\u7f6e", "name": "\u65b0\u8bbe\u5907\u540d\u79f0"}, "role": "teacher", "route": "/equipment/1651/edit/", "target": "EDIT-001"}
+T-03 teacher POST 403，无设备读取或泄露，2 行全字段不变。
+R2 whitespace preserved: new description and unchanged textarea with CRLF; detail auto-escaped.
+测试后：12 张表、19 条迁移、0 个账号、0 条会话。

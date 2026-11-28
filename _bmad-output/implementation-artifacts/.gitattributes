@@ -17,3 +17,8 @@ story-2-3-run-20261127-111101-492-41d9eb74/** -text
 /story-2-4-m01-dev-run-20261128-093324/** -text
 /story-2-4-formal-recovery-20261128/** -text
 /story-2-4-independent-run-20261128-094455/** -text
+
+# Raw Story 2.8 receipts are hashed byte-for-byte, including native line endings.
+story-2-8-run-*/** -text whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
+story-2-8-independent-preflight/** -text whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
+story-2-8-sandbox-preflight/** -text whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof

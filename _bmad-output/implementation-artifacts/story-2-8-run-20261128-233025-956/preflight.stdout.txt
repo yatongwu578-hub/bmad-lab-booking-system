@@ -1,0 +1,6 @@
+python=Python 3.13.17 django=5.2.19
+protected_passfile_exists=true
+chrome_exists=true
+isolated_identity=test_lab_booking|lab_booking_test|127.0.0.1|5433|170012
+isolated_probe_requested=true
+STORY21_PREFLIGHT_OK

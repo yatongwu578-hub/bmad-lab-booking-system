@@ -1,0 +1,1 @@
+STORY28_PROBE_OK cases=34 (F4 simulates confirmation loss after real COMMIT)

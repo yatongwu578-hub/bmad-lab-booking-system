@@ -2,6 +2,7 @@ from django.urls import path
 
 from .views import (
     admin_reservation_approve,
+    admin_reservation_cancel,
     admin_reservation_detail,
     admin_reservation_list,
     admin_reservation_reject,
@@ -21,6 +22,7 @@ urlpatterns = [
     path("reservations/manage/<int:pk>/", admin_reservation_detail, name="admin-reservation-detail"),
     path("reservations/manage/<int:pk>/approve/", admin_reservation_approve, name="admin-reservation-approve"),
     path("reservations/manage/<int:pk>/reject/", admin_reservation_reject, name="admin-reservation-reject"),
+    path("reservations/manage/<int:pk>/cancel/", admin_reservation_cancel, name="admin-reservation-cancel"),
     path("reservations/<int:pk>/result/", reservation_result, name="reservation-result"),
     path("reservations/<int:pk>/cancel/", reservation_cancel, name="reservation-cancel"),
 ]
