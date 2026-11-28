@@ -1,0 +1,1 @@
+﻿powershell.exe -NoProfile -File preflight-story-2-1.ps1 -ProbeIsolatedDatabase (local paths omitted)

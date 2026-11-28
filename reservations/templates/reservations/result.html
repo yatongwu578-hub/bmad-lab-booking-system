@@ -19,6 +19,9 @@
             {% endif %}
         </dl>
         {% if created %}<p><a href="{% url 'reservation-result' record.id %}">查看本人预约结果</a></p>{% endif %}
+        {% if not created and record.cancellation_candidate %}
+            <p><a href="{% url 'reservation-cancel' record.id %}">取消预约</a>（仅限开始前）</p>
+        {% endif %}
         <p><a href="{% url 'reservation-list' %}">{% if created %}我的预约{% else %}返回我的预约{% endif %}</a></p>
     {% endif %}
 </main></body>

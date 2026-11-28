@@ -10,6 +10,7 @@ from django.db.models import Q
 from accounts.models import Role, User
 from accounts.policies import RESERVATION_ROLES, can_reserve, is_business_admin
 from audit.services import (
+    append_reservation_cancellation,
     append_reservation_expiry,
     read_admin_reservation_reasons,
     read_reservation_history,
@@ -30,6 +31,7 @@ RESULT_FIELDS = (
     "id", "equipment_id", "equipment__number", "equipment__name", "equipment__status",
     "start_at", "end_at", "status",
 )
+CANCELLATION_STATUSES = frozenset({ReservationStatus.PENDING, ReservationStatus.APPROVED})
 
 
 class ReservationFailed(Exception):
@@ -45,6 +47,12 @@ class Submission:
     outcome: str
     record: dict | None = None
     equipment: dict | None = None
+
+
+@dataclass(frozen=True)
+class Cancellation:
+    outcome: str
+    record: dict | None = None
 
 
 @dataclass(frozen=True)
@@ -219,6 +227,56 @@ def get_reservation_result(user, pk):
         return None
     rows = _read_own_reservations(user, pk)
     return rows[0] if rows else None
+
+
+def get_cancellation_candidate(user, pk):
+    """Read an owned confirmation projection without taking locks or expiring rows."""
+    require_applicant(user)
+    try:
+        _recheck_applicant(user.pk)
+        return Reservation.objects.filter(pk=pk, applicant_id=user.pk).values(*RESULT_FIELDS).first()
+    except Error:
+        raise ReservationFailed from None
+
+
+def cancel_own_reservation(user, pk):
+    require_applicant(user)
+    owned = Reservation.objects.filter(pk=pk, applicant_id=user.pk)
+    try:
+        _recheck_applicant(user.pk)
+        equipment_id = owned.values_list("equipment_id", flat=True).first()
+    except Error:
+        raise ReservationFailed from None
+    if equipment_id is None:
+        return Cancellation("missing")
+
+    def cancel(connection):
+        if lock_equipment(equipment_id) is None:
+            return Cancellation("missing")
+        _recheck_applicant(user.pk)
+        target = owned.filter(equipment_id=equipment_id)
+        row = target.values(*RESULT_FIELDS).first()
+        if row is None:
+            return Cancellation("missing")
+        decision_at = _decision_time(connection)
+        before_status = row["status"]
+        if before_status not in CANCELLATION_STATUSES:
+            return Cancellation("terminal", row)
+        if decision_at >= row["start_at"]:
+            if before_status == ReservationStatus.PENDING:
+                if _expire(target, decision_at) != [row["id"]]:
+                    raise ReservationFailed
+                row["status"] = ReservationStatus.EXPIRED
+                # Business rejection is returned normally so expiry and its audit can commit.
+                return Cancellation("expired", row)
+            return Cancellation("started", row)
+        if target.filter(status=before_status).update(status=ReservationStatus.CANCELLED) != 1:
+            raise ReservationFailed
+        append_reservation_cancellation(row["id"], user.pk, before_status, decision_at)
+        row["status"] = ReservationStatus.CANCELLED
+        return Cancellation("cancelled", row)
+
+    return _durable_operation(cancel)
 
 
 def require_reservation_admin(user):

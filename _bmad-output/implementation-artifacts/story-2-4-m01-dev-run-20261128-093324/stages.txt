@@ -1,0 +1,8 @@
+﻿2026-11-28T09:33:27.9098950+08:00 preflight exit=0
+2026-11-28T09:33:31.0222179+08:00 baseline-before exit=0
+2026-11-28T09:33:32.0695631+08:00 check exit=0
+2026-11-28T09:33:33.0976476+08:00 migration-drift exit=0
+2026-11-28T09:33:36.1696840+08:00 m01-targeted exit=0
+2026-11-28T09:33:38.2272804+08:00 baseline-after-m01-targeted exit=0
+2026-11-28T09:33:50.4212242+08:00 independent exit=0
+2026-11-28T09:33:52.5630958+08:00 baseline-after-independent exit=0

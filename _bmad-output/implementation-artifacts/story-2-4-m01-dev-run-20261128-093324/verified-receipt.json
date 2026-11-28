@@ -1,0 +1,384 @@
+{
+    "status":  "STORY24_M01_RECEIPT_AUDIT_OK",
+    "source":  "story-2-4-run-20261128-093324-529-61fd0ea2d3034839a2d9567cf9016e3d",
+    "versions":  {
+                     "django":  "5.2.19",
+                     "python":  "3.13.17"
+                 },
+    "identity":  [
+                     "test_lab_booking",
+                     "lab_booking_test",
+                     "lab_booking_test",
+                     "127.0.0.1",
+                     5433,
+                     "170012",
+                     "read committed",
+                     false,
+                     false,
+                     32352
+                 ],
+    "inputs":  91,
+    "native":  [
+                   {
+                       "name":  "preflight",
+                       "exit":  0,
+                       "stdout_bytes":  217,
+                       "stderr_bytes":  0
+                   },
+                   {
+                       "name":  "baseline-before",
+                       "exit":  0,
+                       "stdout_bytes":  21,
+                       "stderr_bytes":  0
+                   },
+                   {
+                       "name":  "check",
+                       "exit":  0,
+                       "stdout_bytes":  49,
+                       "stderr_bytes":  0
+                   },
+                   {
+                       "name":  "migration-drift",
+                       "exit":  0,
+                       "stdout_bytes":  21,
+                       "stderr_bytes":  0
+                   },
+                   {
+                       "name":  "m01-targeted",
+                       "exit":  0,
+                       "stdout_bytes":  305,
+                       "stderr_bytes":  997
+                   },
+                   {
+                       "name":  "baseline-after-m01-targeted",
+                       "exit":  0,
+                       "stdout_bytes":  21,
+                       "stderr_bytes":  0
+                   },
+                   {
+                       "name":  "independent",
+                       "exit":  0,
+                       "stdout_bytes":  26,
+                       "stderr_bytes":  0
+                   },
+                   {
+                       "name":  "baseline-after-independent",
+                       "exit":  0,
+                       "stdout_bytes":  21,
+                       "stderr_bytes":  0
+                   }
+               ],
+    "changed_since_prior":  [
+                                "_bmad-output/implementation-artifacts/spec-2-4-cancel-own-reservation.md",
+                                "_bmad-output/implementation-artifacts/verify-story-2-4.ps1",
+                                "reservations/management/commands/verify_own_cancellation.py",
+                                "reservations/test_own_cancellation.py",
+                                "reservations/views.py"
+                            ],
+    "baseline_sha256":  "6EDF380E544390AC1B975BE960C34049EBB73494111DDA3DED12086C259AC7F8",
+    "passed":  [
+                   "reservations.test_own_cancellation.OwnCancellationTests.test_request_guards_and_same_shape_missing_responses",
+                   "reservations.test_own_cancellation.OwnCancellationTests.test_csrf_and_expiry_and_retry_feedback",
+                   "reservations.test_own_cancellation.OwnCancellationTests.test_database_failure_responses_have_no_success_or_replay",
+                   "reservations.test_own_cancellation.OwnCancellationTests.test_m01_rejects_non_native_or_incomplete_forms_before_business_queries",
+                   "reservations.test_own_cancellation.OwnCancellationTests.test_m01_native_confirmation_form_cancels_with_django_csrf"
+               ],
+    "probe_cases":  [
+                        "V01-M01",
+                        "Chrome"
+                    ],
+    "details":  [
+                    {
+                        "state":  "future",
+                        "invalid":  10,
+                        "csrf_denied":  2,
+                        "legal":  200,
+                        "repeat":  409,
+                        "transition":  "cancel",
+                        "history":  1
+                    },
+                    {
+                        "state":  "due",
+                        "invalid":  10,
+                        "csrf_denied":  2,
+                        "legal":  409,
+                        "repeat":  409,
+                        "transition":  "expire",
+                        "history":  1
+                    }
+                ],
+    "chrome":  {
+                   "product":  "Chrome/159.0.8154.34",
+                   "roles":  [
+                                 "student",
+                                 "teacher"
+                             ],
+                   "documents":  12
+               },
+    "cleanup":  true,
+    "next_independent":  {
+                             "django_expected":  135,
+                             "probe_expected":  [
+                                                    "A01-A05",
+                                                    "A06",
+                                                    "P01-P07-V01",
+                                                    "P08-off",
+                                                    "P08-role",
+                                                    "I01",
+                                                    "I02",
+                                                    "I03",
+                                                    "I04",
+                                                    "I05",
+                                                    "I06",
+                                                    "I07",
+                                                    "I08",
+                                                    "I09",
+                                                    "A08",
+                                                    "V01-M01",
+                                                    "Chrome"
+                                                ],
+                             "wrapper_sha256":  "71140E67C4BBB69F8C12F29C5F4CFBCD4E4EC12AA71E670BBDBE7D31344CC465"
+                         },
+    "archived":  [
+                     {
+                         "name":  "after.sha256",
+                         "bytes":  9458,
+                         "sha256":  "511D481F3C3175B0D7536029B487E9A8F050BC975615BBA44423E0157144D739"
+                     },
+                     {
+                         "name":  "baseline-after-independent.command.txt",
+                         "bytes":  271,
+                         "sha256":  "774FCD5FC24E9AA7E1CA4165EF081836BA9AB1065F67BC7ACA004813C23A8266"
+                     },
+                     {
+                         "name":  "baseline-after-independent.json",
+                         "bytes":  11966,
+                         "sha256":  "6EDF380E544390AC1B975BE960C34049EBB73494111DDA3DED12086C259AC7F8"
+                     },
+                     {
+                         "name":  "baseline-after-independent.native.json",
+                         "bytes":  264,
+                         "sha256":  "2C4B89597636D6D23A0955037E938041D96C02C158E881FE822D0D2C0B20A06D"
+                     },
+                     {
+                         "name":  "baseline-after-independent.stderr.txt",
+                         "bytes":  0,
+                         "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                     },
+                     {
+                         "name":  "baseline-after-independent.stdout.txt",
+                         "bytes":  21,
+                         "sha256":  "069F6268DCDD6EA6B1B7DE491E6AE058992640078F616E20CB692B9F0DC613AD"
+                     },
+                     {
+                         "name":  "baseline-after-m01-targeted.command.txt",
+                         "bytes":  272,
+                         "sha256":  "D11399A332EEAD86709A2F939D12E414A3368D1F4780186BDD45BAB614C7E684"
+                     },
+                     {
+                         "name":  "baseline-after-m01-targeted.json",
+                         "bytes":  11966,
+                         "sha256":  "6EDF380E544390AC1B975BE960C34049EBB73494111DDA3DED12086C259AC7F8"
+                     },
+                     {
+                         "name":  "baseline-after-m01-targeted.native.json",
+                         "bytes":  264,
+                         "sha256":  "2C4B89597636D6D23A0955037E938041D96C02C158E881FE822D0D2C0B20A06D"
+                     },
+                     {
+                         "name":  "baseline-after-m01-targeted.stderr.txt",
+                         "bytes":  0,
+                         "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                     },
+                     {
+                         "name":  "baseline-after-m01-targeted.stdout.txt",
+                         "bytes":  21,
+                         "sha256":  "069F6268DCDD6EA6B1B7DE491E6AE058992640078F616E20CB692B9F0DC613AD"
+                     },
+                     {
+                         "name":  "baseline-before.command.txt",
+                         "bytes":  260,
+                         "sha256":  "C1BD012D81045C6D1857D5D252B97736C1C818E4816EDEA82416CEC0D77E4BD8"
+                     },
+                     {
+                         "name":  "baseline-before.json",
+                         "bytes":  11966,
+                         "sha256":  "6EDF380E544390AC1B975BE960C34049EBB73494111DDA3DED12086C259AC7F8"
+                     },
+                     {
+                         "name":  "baseline-before.native.json",
+                         "bytes":  264,
+                         "sha256":  "2C4B89597636D6D23A0955037E938041D96C02C158E881FE822D0D2C0B20A06D"
+                     },
+                     {
+                         "name":  "baseline-before.stderr.txt",
+                         "bytes":  0,
+                         "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                     },
+                     {
+                         "name":  "baseline-before.stdout.txt",
+                         "bytes":  21,
+                         "sha256":  "069F6268DCDD6EA6B1B7DE491E6AE058992640078F616E20CB692B9F0DC613AD"
+                     },
+                     {
+                         "name":  "batch-marker.txt",
+                         "bytes":  23,
+                         "sha256":  "C346BDF66CCED43FF2745B9F332376DC02C721F9683F236C06A2C55BD289B621"
+                     },
+                     {
+                         "name":  "before.sha256",
+                         "bytes":  9458,
+                         "sha256":  "511D481F3C3175B0D7536029B487E9A8F050BC975615BBA44423E0157144D739"
+                     },
+                     {
+                         "name":  "check.command.txt",
+                         "bytes":  99,
+                         "sha256":  "6AC5B782B950063DF5F29FC3116D8E6B9F685747A69C3C8EA5305760D133CFB0"
+                     },
+                     {
+                         "name":  "check.native.json",
+                         "bytes":  264,
+                         "sha256":  "CE2D1FA898816DDAF01EE7DFA644F128ACFFEC07B4CE6298EFEAFD752FBCC4F6"
+                     },
+                     {
+                         "name":  "check.stderr.txt",
+                         "bytes":  0,
+                         "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                     },
+                     {
+                         "name":  "check.stdout.txt",
+                         "bytes":  49,
+                         "sha256":  "F87CEB15410BDE28FF826CE26228E0576558258FA64D145847921A593A61EE63"
+                     },
+                     {
+                         "name":  "chrome-student-confirm.png",
+                         "bytes":  42023,
+                         "sha256":  "BD3A0352E6B32D2D629A22FF943E7E99471A3939CBF3BB7E63E85447A3E357A5"
+                     },
+                     {
+                         "name":  "chrome-student-result.png",
+                         "bytes":  31553,
+                         "sha256":  "68E5B506FE1A8AFD8AD5175E84AFF6140443EB365B4DC21CF1D2EBEC8CA51923"
+                     },
+                     {
+                         "name":  "chrome-teacher-confirm.png",
+                         "bytes":  42284,
+                         "sha256":  "02534D88666547C14D09E6C40702DC5F61D166E37DB2E52F425D0D3BD68958AE"
+                     },
+                     {
+                         "name":  "chrome-teacher-result.png",
+                         "bytes":  31801,
+                         "sha256":  "6ACA14E5EB106A1FC6D331997628BC307D86F4939910C2892FE03814D35499E7"
+                     },
+                     {
+                         "name":  "independent.command.txt",
+                         "bytes":  250,
+                         "sha256":  "265FADF0D1BCB71868C2ADA8207995B449B41ED6ECBC35643E1D1D2F3F87447C"
+                     },
+                     {
+                         "name":  "independent.jsonl",
+                         "bytes":  98812,
+                         "sha256":  "89E337BFF764A9D1FF23241BAB1802404F90B5DBCA1C75C203F2D8F882BA1790"
+                     },
+                     {
+                         "name":  "independent.native.json",
+                         "bytes":  264,
+                         "sha256":  "D1A4B193DABD7F8C1EC3DECBD1523587ED782EDF9AF4DD15EFEC8BDFF9F8C9A7"
+                     },
+                     {
+                         "name":  "independent.stderr.txt",
+                         "bytes":  0,
+                         "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                     },
+                     {
+                         "name":  "independent.stdout.txt",
+                         "bytes":  26,
+                         "sha256":  "0737122F08F21ED10E0B6F0DF18D8DB5B4AE48F4BD9830DE5BA8049D9C4711DE"
+                     },
+                     {
+                         "name":  "legacy-125-passed-tests.txt",
+                         "bytes":  13097,
+                         "sha256":  "F5C1F361C28EA77BD5AF2D9D0A0559FCBE8C00833FB50934551D4279D5B39928"
+                     },
+                     {
+                         "name":  "m01-counts.txt",
+                         "bytes":  61,
+                         "sha256":  "36E8FB9E41E3B5F79C4075FE0D824492F6385D8415147960E19D8307E07E05C0"
+                     },
+                     {
+                         "name":  "m01-targeted-counts.txt",
+                         "bytes":  57,
+                         "sha256":  "ACEBCFC5D14D37E31567552F5F4ED084FE3196EF5D1DA0B1C1620C937AFECB7E"
+                     },
+                     {
+                         "name":  "m01-targeted.command.txt",
+                         "bytes":  707,
+                         "sha256":  "A3F8051407059612C23E633314A0B97252CDDEF73CB2DE72B87239FE567D3101"
+                     },
+                     {
+                         "name":  "m01-targeted.native.json",
+                         "bytes":  267,
+                         "sha256":  "1625D790F8229A4D64D097CB05D3AE935356E15310D05B5D6987BE624A92B410"
+                     },
+                     {
+                         "name":  "m01-targeted.stderr.txt",
+                         "bytes":  997,
+                         "sha256":  "BE699066206DBB028AA14845F82CFF2869ECC4F1AA80BF8E469EA7BFC2B206C3"
+                     },
+                     {
+                         "name":  "m01-targeted.stdout.txt",
+                         "bytes":  305,
+                         "sha256":  "816004CB0BE06A8561D3CDFCBEC7786B2D2520D4C4DCC3060AD6F20CC25F6BF0"
+                     },
+                     {
+                         "name":  "migration-drift.command.txt",
+                         "bytes":  130,
+                         "sha256":  "4413E8866217D0E1F20BB62E385C59D2EC7EB8B02D77B1A5BA6ED1BD0F48BC1B"
+                     },
+                     {
+                         "name":  "migration-drift.native.json",
+                         "bytes":  264,
+                         "sha256":  "58C85443EF2FB2CD0BB317F992A4C6BE22D13845267EC72B019EED3B9F73AB12"
+                     },
+                     {
+                         "name":  "migration-drift.stderr.txt",
+                         "bytes":  0,
+                         "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                     },
+                     {
+                         "name":  "migration-drift.stdout.txt",
+                         "bytes":  21,
+                         "sha256":  "93E6E2D5BE3C054ADD80C0F19101608803F7CA8A7DF1FA41F76BBB9A1F570F4A"
+                     },
+                     {
+                         "name":  "passed-tests.txt",
+                         "bytes":  570,
+                         "sha256":  "7EA0E287D546C1801B638C1B578C9CE66F66744AA89ACCF8FF43276DAD9B76D7"
+                     },
+                     {
+                         "name":  "preflight.command.txt",
+                         "bytes":  105,
+                         "sha256":  "2EAEE019F691E63C86678B5EC7E72BF3ED7A381884F52919615E5EDE2DD8EAB8"
+                     },
+                     {
+                         "name":  "preflight.native.json",
+                         "bytes":  278,
+                         "sha256":  "FCEE29E5D41EF0CFD71C37116B71B00489E9E9B26F3F0EFE8F8C69A9E605FFF8"
+                     },
+                     {
+                         "name":  "preflight.stderr.txt",
+                         "bytes":  0,
+                         "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                     },
+                     {
+                         "name":  "preflight.stdout.txt",
+                         "bytes":  217,
+                         "sha256":  "C3C6683B97F76D57419AF011188CF35328D2B7FE24F5B6FDAE89B89EE25D0FFF"
+                     },
+                     {
+                         "name":  "stages.txt",
+                         "bytes":  467,
+                         "sha256":  "0D1DD6C635E2ED41FD1AC8BF594C82B6A2031E2D26E8D1F7680157E2F5F916C3"
+                     }
+                 ]
+}

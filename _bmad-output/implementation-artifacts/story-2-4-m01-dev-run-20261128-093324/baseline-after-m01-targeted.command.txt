@@ -1,0 +1,1 @@
+﻿F:\softwork\SE-Management\bmad-lab-booking-system\.venv\Scripts\python.exe "manage.py" "verify_admin_reservations" "--baseline-only" "--evidence" "F:\softwork\outputs\story-2-4-run-20261128-093324-529-61fd0ea2d3034839a2d9567cf9016e3d\baseline-after-m01-targeted.json"

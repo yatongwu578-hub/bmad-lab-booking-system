@@ -7,6 +7,7 @@
         <p role="alert">{{ error }}</p>
     {% elif records %}
         <p>此列表仅包含本次查询开始时确定的本人预约。</p>
+        <p>只有尚未开始且待审核或已批准的预约才可由本人取消。</p>
         <table>
             <thead><tr>
                 <th scope="col">记录编号</th>
@@ -31,6 +32,14 @@
             {% endfor %}
             </tbody>
         </table>
+        {% if cancellation_candidates %}
+            <h2>取消预约</h2>
+            <ul>
+                {% for record in cancellation_candidates %}
+                    <li><a href="{% url 'reservation-cancel' record.id %}">取消预约 {{ record.id|stringformat:"d" }} · {{ record.equipment__name }} · {{ record.start_text }}</a></li>
+                {% endfor %}
+            </ul>
+        {% endif %}
     {% else %}
         <p>暂无本人预约记录。</p>
     {% endif %}

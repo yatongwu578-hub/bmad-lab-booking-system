@@ -1,0 +1,482 @@
+{
+    "status":  "STORY24_RECEIPT_AUDIT_OK",
+    "source":  "story-2-4-run-20261127-234701-350-82341f5be92a40969b6d2e98fef79be1",
+    "versions":  {
+                     "django":  "5.2.19",
+                     "python":  "3.13.17"
+                 },
+    "identity":  [
+                     "test_lab_booking",
+                     "lab_booking_test",
+                     "lab_booking_test",
+                     "127.0.0.1",
+                     5433,
+                     "170012",
+                     "read committed",
+                     false,
+                     false,
+                     6736
+                 ],
+    "inputs":  91,
+    "native":  [
+                   {
+                       "name":  "preflight",
+                       "exit":  0,
+                       "stdout_bytes":  217,
+                       "stderr_bytes":  0
+                   },
+                   {
+                       "name":  "baseline-before",
+                       "exit":  0,
+                       "stdout_bytes":  21,
+                       "stderr_bytes":  0
+                   },
+                   {
+                       "name":  "check",
+                       "exit":  0,
+                       "stdout_bytes":  49,
+                       "stderr_bytes":  0
+                   },
+                   {
+                       "name":  "migration-drift",
+                       "exit":  0,
+                       "stdout_bytes":  21,
+                       "stderr_bytes":  0
+                   },
+                   {
+                       "name":  "regression",
+                       "exit":  0,
+                       "stdout_bytes":  4222,
+                       "stderr_bytes":  23359
+                   },
+                   {
+                       "name":  "baseline-after-regression",
+                       "exit":  0,
+                       "stdout_bytes":  21,
+                       "stderr_bytes":  0
+                   },
+                   {
+                       "name":  "independent",
+                       "exit":  0,
+                       "stdout_bytes":  27,
+                       "stderr_bytes":  0
+                   },
+                   {
+                       "name":  "baseline-after-independent",
+                       "exit":  0,
+                       "stdout_bytes":  21,
+                       "stderr_bytes":  0
+                   }
+               ],
+    "baseline_sha256":  "6EDF380E544390AC1B975BE960C34049EBB73494111DDA3DED12086C259AC7F8",
+    "tests":  {
+                  "legacy":  125,
+                  "added":  [
+                                "reservations.test_own_cancellation.OwnCancellationTests.test_confirmation_is_read_only_and_exposes_actions_only_for_candidates",
+                                "reservations.test_own_cancellation.OwnCancellationTests.test_csrf_and_expiry_and_retry_feedback",
+                                "reservations.test_own_cancellation.OwnCancellationTests.test_database_failure_responses_have_no_success_or_replay",
+                                "reservations.test_own_cancellation.OwnCancellationTests.test_elapsed_pending_expiry_is_target_only_and_repeat_does_not_write",
+                                "reservations.test_own_cancellation.OwnCancellationTests.test_legal_cancellation_retains_record_and_history_and_releases_slot",
+                                "reservations.test_own_cancellation.OwnCancellationTests.test_locked_status_and_exact_start_boundary",
+                                "reservations.test_own_cancellation.OwnCancellationTests.test_request_guards_and_same_shape_missing_responses",
+                                "reservations.test_own_cancellation.OwnCancellationTests.test_stale_account_stops_before_business_query"
+                            ],
+                  "passed":  133,
+                  "skipped":  0
+              },
+    "cases":  [
+                  "A01-A05",
+                  "A06",
+                  "P01-P07-V01",
+                  "P08-off",
+                  "P08-role",
+                  "I01",
+                  "I02",
+                  "I03",
+                  "I04",
+                  "I05",
+                  "I06",
+                  "I07",
+                  "I08",
+                  "I09",
+                  "A08",
+                  "Chrome"
+              ],
+    "permission":  {
+                       "denied":  16,
+                       "invalid":  12,
+                       "missing_controls":  6,
+                       "csrf_fields_redacted":  6
+                   },
+    "timings":  {
+                    "I08":  [
+                                {
+                                    "state":  "pending",
+                                    "start":  "2026-11-27 15:48:50.451433+00:00",
+                                    "crossed":  "2026-11-27 15:48:50.469946+00:00",
+                                    "decision":  "2026-11-27 15:48:50.475640+00:00",
+                                    "status":  409,
+                                    "final":  "expired"
+                                },
+                                {
+                                    "state":  "approved",
+                                    "start":  "2026-11-27 15:48:56.079403+00:00",
+                                    "crossed":  "2026-11-27 15:48:56.092850+00:00",
+                                    "decision":  "2026-11-27 15:48:56.098170+00:00",
+                                    "status":  409,
+                                    "final":  "approved"
+                                }
+                            ],
+                    "I09":  [
+                                {
+                                    "state":  "pending",
+                                    "start":  "2026-11-27 15:49:02.315346+00:00",
+                                    "crossed":  "2026-11-27 15:49:02.331784+00:00",
+                                    "decision":  "2026-11-27 15:48:57.383376+00:00",
+                                    "status":  200,
+                                    "final":  "cancelled"
+                                },
+                                {
+                                    "state":  "approved",
+                                    "start":  "2026-11-27 15:49:08.538919+00:00",
+                                    "crossed":  "2026-11-27 15:49:08.544978+00:00",
+                                    "decision":  "2026-11-27 15:49:03.607810+00:00",
+                                    "status":  200,
+                                    "final":  "cancelled"
+                                }
+                            ]
+                },
+    "faults":  [
+                   {
+                       "branch":  "cancel",
+                       "scenario":  "status",
+                       "http":  503,
+                       "sqlstate":  "23514",
+                       "final":  "pending",
+                       "history":  0
+                   },
+                   {
+                       "branch":  "cancel",
+                       "scenario":  "F1-history",
+                       "http":  503,
+                       "sqlstate":  "23514",
+                       "final":  "pending",
+                       "history":  0
+                   },
+                   {
+                       "branch":  "cancel",
+                       "scenario":  "F2",
+                       "http":  503,
+                       "sqlstate":  "23505",
+                       "final":  "pending",
+                       "history":  0
+                   },
+                   {
+                       "branch":  "cancel",
+                       "scenario":  "F3",
+                       "http":  503,
+                       "sqlstate":  null,
+                       "final":  "pending",
+                       "history":  0
+                   },
+                   {
+                       "branch":  "cancel",
+                       "scenario":  "F4",
+                       "http":  503,
+                       "sqlstate":  null,
+                       "final":  "cancelled",
+                       "history":  1
+                   },
+                   {
+                       "branch":  "expire",
+                       "scenario":  "status",
+                       "http":  503,
+                       "sqlstate":  "23514",
+                       "final":  "pending",
+                       "history":  0
+                   },
+                   {
+                       "branch":  "expire",
+                       "scenario":  "F1-history",
+                       "http":  503,
+                       "sqlstate":  "23514",
+                       "final":  "pending",
+                       "history":  0
+                   },
+                   {
+                       "branch":  "expire",
+                       "scenario":  "F2",
+                       "http":  503,
+                       "sqlstate":  "23505",
+                       "final":  "pending",
+                       "history":  0
+                   },
+                   {
+                       "branch":  "expire",
+                       "scenario":  "F3",
+                       "http":  503,
+                       "sqlstate":  null,
+                       "final":  "pending",
+                       "history":  0
+                   },
+                   {
+                       "branch":  "expire",
+                       "scenario":  "F4",
+                       "http":  503,
+                       "sqlstate":  null,
+                       "final":  "expired",
+                       "history":  1
+                   }
+               ],
+    "chrome":  {
+                   "product":  "Chrome/159.0.8154.34",
+                   "roles":  [
+                                 "student",
+                                 "teacher"
+                             ],
+                   "documents":  12
+               },
+    "cleanup":  true,
+    "archived":  [
+                     {
+                         "name":  "after.sha256",
+                         "bytes":  9458,
+                         "sha256":  "97A820F52B69AD25F62C9F65141D0CAEE8581F5DB8B6296C13719115A2504AE2"
+                     },
+                     {
+                         "name":  "baseline-after-independent.command.txt",
+                         "bytes":  271,
+                         "sha256":  "919A88E5316B6E25F9E6BE8038DDBBE27ECA56402197C063FE63AEF8FBCEC8DA"
+                     },
+                     {
+                         "name":  "baseline-after-independent.json",
+                         "bytes":  11966,
+                         "sha256":  "6EDF380E544390AC1B975BE960C34049EBB73494111DDA3DED12086C259AC7F8"
+                     },
+                     {
+                         "name":  "baseline-after-independent.native.json",
+                         "bytes":  264,
+                         "sha256":  "2C4B89597636D6D23A0955037E938041D96C02C158E881FE822D0D2C0B20A06D"
+                     },
+                     {
+                         "name":  "baseline-after-independent.stderr.txt",
+                         "bytes":  0,
+                         "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                     },
+                     {
+                         "name":  "baseline-after-independent.stdout.txt",
+                         "bytes":  21,
+                         "sha256":  "069F6268DCDD6EA6B1B7DE491E6AE058992640078F616E20CB692B9F0DC613AD"
+                     },
+                     {
+                         "name":  "baseline-after-regression.command.txt",
+                         "bytes":  270,
+                         "sha256":  "C9A66C398A449A7D59DA4EE54584C43658A150DAEE87CC25476E284532D98321"
+                     },
+                     {
+                         "name":  "baseline-after-regression.json",
+                         "bytes":  11966,
+                         "sha256":  "6EDF380E544390AC1B975BE960C34049EBB73494111DDA3DED12086C259AC7F8"
+                     },
+                     {
+                         "name":  "baseline-after-regression.native.json",
+                         "bytes":  264,
+                         "sha256":  "2C4B89597636D6D23A0955037E938041D96C02C158E881FE822D0D2C0B20A06D"
+                     },
+                     {
+                         "name":  "baseline-after-regression.stderr.txt",
+                         "bytes":  0,
+                         "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                     },
+                     {
+                         "name":  "baseline-after-regression.stdout.txt",
+                         "bytes":  21,
+                         "sha256":  "069F6268DCDD6EA6B1B7DE491E6AE058992640078F616E20CB692B9F0DC613AD"
+                     },
+                     {
+                         "name":  "baseline-before.command.txt",
+                         "bytes":  260,
+                         "sha256":  "E3532B37A42393E43AAD0F8BDFD89139832BFD40242EC838DC0D0A9BA7072BED"
+                     },
+                     {
+                         "name":  "baseline-before.json",
+                         "bytes":  11966,
+                         "sha256":  "6EDF380E544390AC1B975BE960C34049EBB73494111DDA3DED12086C259AC7F8"
+                     },
+                     {
+                         "name":  "baseline-before.native.json",
+                         "bytes":  264,
+                         "sha256":  "2C4B89597636D6D23A0955037E938041D96C02C158E881FE822D0D2C0B20A06D"
+                     },
+                     {
+                         "name":  "baseline-before.stderr.txt",
+                         "bytes":  0,
+                         "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                     },
+                     {
+                         "name":  "baseline-before.stdout.txt",
+                         "bytes":  21,
+                         "sha256":  "069F6268DCDD6EA6B1B7DE491E6AE058992640078F616E20CB692B9F0DC613AD"
+                     },
+                     {
+                         "name":  "batch-marker.txt",
+                         "bytes":  28,
+                         "sha256":  "6BFAC46046117DA889D365ED711AD63A41E29540B3576DC053943F478C6277D6"
+                     },
+                     {
+                         "name":  "before.sha256",
+                         "bytes":  9458,
+                         "sha256":  "97A820F52B69AD25F62C9F65141D0CAEE8581F5DB8B6296C13719115A2504AE2"
+                     },
+                     {
+                         "name":  "check.command.txt",
+                         "bytes":  99,
+                         "sha256":  "6AC5B782B950063DF5F29FC3116D8E6B9F685747A69C3C8EA5305760D133CFB0"
+                     },
+                     {
+                         "name":  "check.native.json",
+                         "bytes":  264,
+                         "sha256":  "CE2D1FA898816DDAF01EE7DFA644F128ACFFEC07B4CE6298EFEAFD752FBCC4F6"
+                     },
+                     {
+                         "name":  "check.stderr.txt",
+                         "bytes":  0,
+                         "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                     },
+                     {
+                         "name":  "check.stdout.txt",
+                         "bytes":  49,
+                         "sha256":  "F87CEB15410BDE28FF826CE26228E0576558258FA64D145847921A593A61EE63"
+                     },
+                     {
+                         "name":  "chrome-student-confirm.png",
+                         "bytes":  41999,
+                         "sha256":  "7EE8274EEF6A8A60F0C4C11CFAA2637E98A5B0168B15EA4B56DD74F3CAC38970"
+                     },
+                     {
+                         "name":  "chrome-student-result.png",
+                         "bytes":  31529,
+                         "sha256":  "0BD4FE28662C5349B32B1B197312874DCEC8A9A02FCDFC38282E5941A8053D95"
+                     },
+                     {
+                         "name":  "chrome-teacher-confirm.png",
+                         "bytes":  42171,
+                         "sha256":  "462F199A15778573EB25583064B9187D6ED67A0C8D217E26927C8FF900AAF22F"
+                     },
+                     {
+                         "name":  "chrome-teacher-result.png",
+                         "bytes":  31675,
+                         "sha256":  "CB54A6E60957D75E52C15ACDEA3AFA523454F63D015378244494C04DE91E8D72"
+                     },
+                     {
+                         "name":  "independent.command.txt",
+                         "bytes":  237,
+                         "sha256":  "C6D30AF1DC3E49BE085EC8C9FA1486DC1F1BB9BCC5D5570EF3CE2CDCD9D93EEB"
+                     },
+                     {
+                         "name":  "independent.jsonl",
+                         "bytes":  735488,
+                         "sha256":  "8D1717B293B7E4C4A921FD6A3F82CFB610E715F44167E51C8E9F23A4BCC56866"
+                     },
+                     {
+                         "name":  "independent.native.json",
+                         "bytes":  264,
+                         "sha256":  "DD06E749714D67C068F6CDDA275EEE99F6C93B172928AB0F419CB873CFC752A7"
+                     },
+                     {
+                         "name":  "independent.stderr.txt",
+                         "bytes":  0,
+                         "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                     },
+                     {
+                         "name":  "independent.stdout.txt",
+                         "bytes":  27,
+                         "sha256":  "A182BEE69D57A31DF0BFAA888A11573FC5319B62953F17787FA434326248EAE9"
+                     },
+                     {
+                         "name":  "legacy-125-passed-tests.txt",
+                         "bytes":  13097,
+                         "sha256":  "F5C1F361C28EA77BD5AF2D9D0A0559FCBE8C00833FB50934551D4279D5B39928"
+                     },
+                     {
+                         "name":  "migration-drift.command.txt",
+                         "bytes":  130,
+                         "sha256":  "4413E8866217D0E1F20BB62E385C59D2EC7EB8B02D77B1A5BA6ED1BD0F48BC1B"
+                     },
+                     {
+                         "name":  "migration-drift.native.json",
+                         "bytes":  264,
+                         "sha256":  "58C85443EF2FB2CD0BB317F992A4C6BE22D13845267EC72B019EED3B9F73AB12"
+                     },
+                     {
+                         "name":  "migration-drift.stderr.txt",
+                         "bytes":  0,
+                         "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                     },
+                     {
+                         "name":  "migration-drift.stdout.txt",
+                         "bytes":  21,
+                         "sha256":  "93E6E2D5BE3C054ADD80C0F19101608803F7CA8A7DF1FA41F76BBB9A1F570F4A"
+                     },
+                     {
+                         "name":  "passed-tests.txt",
+                         "bytes":  14004,
+                         "sha256":  "2786F5B1C152D9501AF6014BFAA6308C0B901DA59A7ED0EA33F179476933E015"
+                     },
+                     {
+                         "name":  "permissions-counts.txt",
+                         "bytes":  44,
+                         "sha256":  "C445AA621EF8C1FC1E9C4E1151422738FAA7C74F662DA707AB70B6D6C86C4389"
+                     },
+                     {
+                         "name":  "preflight.command.txt",
+                         "bytes":  105,
+                         "sha256":  "2EAEE019F691E63C86678B5EC7E72BF3ED7A381884F52919615E5EDE2DD8EAB8"
+                     },
+                     {
+                         "name":  "preflight.native.json",
+                         "bytes":  278,
+                         "sha256":  "FCEE29E5D41EF0CFD71C37116B71B00489E9E9B26F3F0EFE8F8C69A9E605FFF8"
+                     },
+                     {
+                         "name":  "preflight.stderr.txt",
+                         "bytes":  0,
+                         "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                     },
+                     {
+                         "name":  "preflight.stdout.txt",
+                         "bytes":  217,
+                         "sha256":  "C3C6683B97F76D57419AF011188CF35328D2B7FE24F5B6FDAE89B89EE25D0FFF"
+                     },
+                     {
+                         "name":  "regression-counts.txt",
+                         "bytes":  67,
+                         "sha256":  "285D3EFCFCFEF9DEFC5B2FFBE4D1D60397837FBE49AC487D3EEC892F9D3E0579"
+                     },
+                     {
+                         "name":  "regression.command.txt",
+                         "bytes":  135,
+                         "sha256":  "804FE557F77D54B4024F2BE1C19D1C6DAC70318A19BBDE7F463268A3868B9311"
+                     },
+                     {
+                         "name":  "regression.native.json",
+                         "bytes":  270,
+                         "sha256":  "658FC4FB3D585722BFD4FF1B85BF7EF4BE3B0FFEAF4430A3C70B3EA71AF459D5"
+                     },
+                     {
+                         "name":  "regression.stderr.txt",
+                         "bytes":  23359,
+                         "sha256":  "4F8C7831F171DA4FB0A8188C9206B1CD3EF8004BEA192A27C99A4B63E124C960"
+                     },
+                     {
+                         "name":  "regression.stdout.txt",
+                         "bytes":  4222,
+                         "sha256":  "245C578F3D05185084907830204EED07D8A91059519A7BFD55C7A2C5315465F9"
+                     },
+                     {
+                         "name":  "stages.txt",
+                         "bytes":  463,
+                         "sha256":  "46DBA6B22CC14DCC8C9217C1320519946CAF41DF8BC230F75B31FC0A0FDA7FA2"
+                     }
+                 ]
+}

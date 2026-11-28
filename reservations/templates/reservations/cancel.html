@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>取消预约 · 实验室设备预约</title></head>
+<body><main>
+    <h1>{% if confirmation %}确认取消预约{% elif cancelled %}预约已取消{% else %}取消预约结果{% endif %}</h1>
+    {% if error %}<p role="alert">{{ error }}</p>{% endif %}
+    {% if message %}<p role="{% if cancelled %}status{% else %}alert{% endif %}">{{ message }}</p>{% endif %}
+    {% if record %}
+        <dl>
+            <dt>记录编号</dt><dd>{{ record.id|stringformat:"d" }}</dd>
+            <dt>设备</dt><dd>{{ record.equipment__number }} · {{ record.equipment__name }}</dd>
+            <dt>时段（北京时间）</dt><dd>{{ record.start_text }} 至 {{ record.end_text }}</dd>
+            <dt>预约状态</dt><dd>{{ record.status_label }}</dd>
+        </dl>
+        {% if confirmation %}
+            {% if record.cancellation_candidate %}
+                <p>只有尚未开始的预约才可取消。取消后将释放该时段，原记录仍会保留。</p>
+                <form method="post" action="{% url 'reservation-cancel' record.id %}">
+                    {% csrf_token %}
+                    <button type="submit">确认取消</button>
+                </form>
+            {% else %}
+                <p>预约当前状态不允许取消。</p>
+            {% endif %}
+        {% endif %}
+        <p><a href="{% url 'reservation-result' record.id %}">{% if confirmation %}不取消，返回详情{% else %}返回详情{% endif %}</a></p>
+    {% endif %}
+    <p><a href="{% url 'reservation-list' %}">{% if confirmation %}不取消，返回我的预约{% else %}返回我的预约{% endif %}</a></p>
+</main></body>
+</html>

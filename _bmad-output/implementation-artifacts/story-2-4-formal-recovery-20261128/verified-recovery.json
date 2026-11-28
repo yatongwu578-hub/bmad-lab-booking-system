@@ -1,0 +1,858 @@
+{
+    "outcome":  "FORMAL_EVIDENCE_RECOVERED_OFFLINE",
+    "source":  "story-2-4-formal-20261128-101408-123-a5e9d0b4b7d94da3a0fe83d3c9600557",
+    "native_exits":  [
+                         {
+                             "name":  "python",
+                             "exit":  0
+                         },
+                         {
+                             "name":  "django",
+                             "exit":  0
+                         },
+                         {
+                             "name":  "driver-syntax",
+                             "exit":  0
+                         },
+                         {
+                             "name":  "browser-renderer",
+                             "exit":  0
+                         },
+                         {
+                             "name":  "before-readonly",
+                             "exit":  0
+                         },
+                         {
+                             "name":  "sample-and-migrations-readonly",
+                             "exit":  0
+                         },
+                         {
+                             "name":  "browser-anonymous",
+                             "exit":  0
+                         },
+                         {
+                             "name":  "browser-teacher",
+                             "exit":  0
+                         },
+                         {
+                             "name":  "browser-admin",
+                             "exit":  0
+                         },
+                         {
+                             "name":  "browser-student",
+                             "exit":  0
+                         },
+                         {
+                             "name":  "server",
+                             "exit":  0
+                         },
+                         {
+                             "name":  "after-readonly",
+                             "exit":  0
+                         }
+                     ],
+    "outer_exit_reported_by_owner":  1,
+    "original_completion_marker_present":  false,
+    "root_cause":  "two legitimate ownership-scoped GET 404 SELECTs incorrectly rejected by summary predicate",
+    "guarded_pid":  8164,
+    "port":  8006,
+    "closed_at":  "2026-11-28T02:14:38.809444+00:00",
+    "port_listener_after":  false,
+    "document_count":  27,
+    "role_results":  {
+                         "anonymous":  {
+                                           "documents":  2,
+                                           "assertions":  [
+
+                                                          ],
+                                           "endpoints":  [
+                                                             {
+                                                                 "at":  "2026-11-28T02:14:24.693643+00:00",
+                                                                 "method":  "GET",
+                                                                 "path":  "/reservations/{existing}/cancel/",
+                                                                 "status":  302,
+                                                                 "business":  [
+
+                                                                              ],
+                                                                 "technical":  [
+
+                                                                               ],
+                                                                 "blocked":  [
+
+                                                                             ]
+                                                             },
+                                                             {
+                                                                 "at":  "2026-11-28T02:14:24.714382+00:00",
+                                                                 "method":  "GET",
+                                                                 "path":  "/login/",
+                                                                 "status":  200,
+                                                                 "business":  [
+
+                                                                              ],
+                                                                 "technical":  [
+
+                                                                               ],
+                                                                 "blocked":  [
+
+                                                                             ]
+                                                             }
+                                                         ]
+                                       },
+                         "teacher":  {
+                                         "documents":  8,
+                                         "assertions":  [
+                                                            "signed-in role",
+                                                            "denied response does not project reservation fields",
+                                                            "denied response does not project reservation fields",
+                                                            "foreign and missing equal"
+                                                        ],
+                                         "endpoints":  [
+                                                           {
+                                                               "at":  "2026-11-28T02:14:27.156002+00:00",
+                                                               "method":  "GET",
+                                                               "path":  "/login/",
+                                                               "status":  200,
+                                                               "business":  [
+
+                                                                            ],
+                                                               "technical":  [
+
+                                                                             ],
+                                                               "blocked":  [
+
+                                                                           ]
+                                                           },
+                                                           {
+                                                               "at":  "2026-11-28T02:14:27.912463+00:00",
+                                                               "method":  "POST",
+                                                               "path":  "/login/",
+                                                               "status":  302,
+                                                               "business":  [
+
+                                                                            ],
+                                                               "technical":  [
+                                                                                 "session",
+                                                                                 "last_login",
+                                                                                 "session"
+                                                                             ],
+                                                               "blocked":  [
+
+                                                                           ]
+                                                           },
+                                                           {
+                                                               "at":  "2026-11-28T02:14:27.973248+00:00",
+                                                               "method":  "GET",
+                                                               "path":  "/identity/",
+                                                               "status":  200,
+                                                               "business":  [
+
+                                                                            ],
+                                                               "technical":  [
+
+                                                                             ],
+                                                               "blocked":  [
+
+                                                                           ]
+                                                           },
+                                                           {
+                                                               "at":  "2026-11-28T02:14:28.157282+00:00",
+                                                               "method":  "GET",
+                                                               "path":  "/reservations/{existing}/cancel/",
+                                                               "status":  404,
+                                                               "business":  [
+                                                                                "business-read"
+                                                                            ],
+                                                               "technical":  [
+
+                                                                             ],
+                                                               "blocked":  [
+
+                                                                           ]
+                                                           },
+                                                           {
+                                                               "at":  "2026-11-28T02:14:28.330939+00:00",
+                                                               "method":  "GET",
+                                                               "path":  "/reservations/{missing}/cancel/",
+                                                               "status":  404,
+                                                               "business":  [
+                                                                                "business-read"
+                                                                            ],
+                                                               "technical":  [
+
+                                                                             ],
+                                                               "blocked":  [
+
+                                                                           ]
+                                                           },
+                                                           {
+                                                               "at":  "2026-11-28T02:14:28.483401+00:00",
+                                                               "method":  "GET",
+                                                               "path":  "/identity/",
+                                                               "status":  200,
+                                                               "business":  [
+
+                                                                            ],
+                                                               "technical":  [
+
+                                                                             ],
+                                                               "blocked":  [
+
+                                                                           ]
+                                                           },
+                                                           {
+                                                               "at":  "2026-11-28T02:14:28.756231+00:00",
+                                                               "method":  "POST",
+                                                               "path":  "/logout/",
+                                                               "status":  302,
+                                                               "business":  [
+
+                                                                            ],
+                                                               "technical":  [
+                                                                                 "session"
+                                                                             ],
+                                                               "blocked":  [
+
+                                                                           ]
+                                                           },
+                                                           {
+                                                               "at":  "2026-11-28T02:14:28.763467+00:00",
+                                                               "method":  "GET",
+                                                               "path":  "/login/",
+                                                               "status":  200,
+                                                               "business":  [
+
+                                                                            ],
+                                                               "technical":  [
+
+                                                                             ],
+                                                               "blocked":  [
+
+                                                                           ]
+                                                           }
+                                                       ]
+                                     },
+                         "admin":  {
+                                       "documents":  8,
+                                       "assertions":  [
+                                                          "signed-in role",
+                                                          "denied response does not project reservation fields",
+                                                          "denied response does not project reservation fields"
+                                                      ],
+                                       "endpoints":  [
+                                                         {
+                                                             "at":  "2026-11-28T02:14:31.425427+00:00",
+                                                             "method":  "GET",
+                                                             "path":  "/login/",
+                                                             "status":  200,
+                                                             "business":  [
+
+                                                                          ],
+                                                             "technical":  [
+
+                                                                           ],
+                                                             "blocked":  [
+
+                                                                         ]
+                                                         },
+                                                         {
+                                                             "at":  "2026-11-28T02:14:32.041512+00:00",
+                                                             "method":  "POST",
+                                                             "path":  "/login/",
+                                                             "status":  302,
+                                                             "business":  [
+
+                                                                          ],
+                                                             "technical":  [
+                                                                               "session",
+                                                                               "last_login",
+                                                                               "session"
+                                                                           ],
+                                                             "blocked":  [
+
+                                                                         ]
+                                                         },
+                                                         {
+                                                             "at":  "2026-11-28T02:14:32.099190+00:00",
+                                                             "method":  "GET",
+                                                             "path":  "/identity/",
+                                                             "status":  200,
+                                                             "business":  [
+
+                                                                          ],
+                                                             "technical":  [
+
+                                                                           ],
+                                                             "blocked":  [
+
+                                                                         ]
+                                                         },
+                                                         {
+                                                             "at":  "2026-11-28T02:14:32.274169+00:00",
+                                                             "method":  "GET",
+                                                             "path":  "/reservations/{existing}/cancel/",
+                                                             "status":  403,
+                                                             "business":  [
+
+                                                                          ],
+                                                             "technical":  [
+
+                                                                           ],
+                                                             "blocked":  [
+
+                                                                         ]
+                                                         },
+                                                         {
+                                                             "at":  "2026-11-28T02:14:32.441852+00:00",
+                                                             "method":  "GET",
+                                                             "path":  "/reservations/{missing}/cancel/",
+                                                             "status":  403,
+                                                             "business":  [
+
+                                                                          ],
+                                                             "technical":  [
+
+                                                                           ],
+                                                             "blocked":  [
+
+                                                                         ]
+                                                         },
+                                                         {
+                                                             "at":  "2026-11-28T02:14:32.605517+00:00",
+                                                             "method":  "GET",
+                                                             "path":  "/identity/",
+                                                             "status":  200,
+                                                             "business":  [
+
+                                                                          ],
+                                                             "technical":  [
+
+                                                                           ],
+                                                             "blocked":  [
+
+                                                                         ]
+                                                         },
+                                                         {
+                                                             "at":  "2026-11-28T02:14:32.769167+00:00",
+                                                             "method":  "POST",
+                                                             "path":  "/logout/",
+                                                             "status":  302,
+                                                             "business":  [
+
+                                                                          ],
+                                                             "technical":  [
+                                                                               "session"
+                                                                           ],
+                                                             "blocked":  [
+
+                                                                         ]
+                                                         },
+                                                         {
+                                                             "at":  "2026-11-28T02:14:32.774839+00:00",
+                                                             "method":  "GET",
+                                                             "path":  "/login/",
+                                                             "status":  200,
+                                                             "business":  [
+
+                                                                          ],
+                                                             "technical":  [
+
+                                                                           ],
+                                                             "blocked":  [
+
+                                                                         ]
+                                                         }
+                                                     ]
+                                   },
+                         "student":  {
+                                         "documents":  9,
+                                         "assertions":  [
+                                                            "signed-in role",
+                                                            "owner confirmation uses a native form",
+                                                            "abandon returns to the same selectable target"
+                                                        ],
+                                         "endpoints":  [
+                                                           {
+                                                               "at":  "2026-11-28T02:14:35.643459+00:00",
+                                                               "method":  "GET",
+                                                               "path":  "/login/",
+                                                               "status":  200,
+                                                               "business":  [
+
+                                                                            ],
+                                                               "technical":  [
+
+                                                                             ],
+                                                               "blocked":  [
+
+                                                                           ]
+                                                           },
+                                                           {
+                                                               "at":  "2026-11-28T02:14:36.268401+00:00",
+                                                               "method":  "POST",
+                                                               "path":  "/login/",
+                                                               "status":  302,
+                                                               "business":  [
+
+                                                                            ],
+                                                               "technical":  [
+                                                                                 "session",
+                                                                                 "last_login",
+                                                                                 "session"
+                                                                             ],
+                                                               "blocked":  [
+
+                                                                           ]
+                                                           },
+                                                           {
+                                                               "at":  "2026-11-28T02:14:36.332005+00:00",
+                                                               "method":  "GET",
+                                                               "path":  "/identity/",
+                                                               "status":  200,
+                                                               "business":  [
+
+                                                                            ],
+                                                               "technical":  [
+
+                                                                             ],
+                                                               "blocked":  [
+
+                                                                           ]
+                                                           },
+                                                           {
+                                                               "at":  "2026-11-28T02:14:36.493319+00:00",
+                                                               "method":  "GET",
+                                                               "path":  "/reservations/",
+                                                               "status":  200,
+                                                               "business":  [
+                                                                                "business-read",
+                                                                                "business-lock",
+                                                                                "business-read",
+                                                                                "business-read"
+                                                                            ],
+                                                               "technical":  [
+
+                                                                             ],
+                                                               "blocked":  [
+
+                                                                           ]
+                                                           },
+                                                           {
+                                                               "at":  "2026-11-28T02:14:36.658973+00:00",
+                                                               "method":  "GET",
+                                                               "path":  "/reservations/{existing}/cancel/",
+                                                               "status":  200,
+                                                               "business":  [
+                                                                                "business-read"
+                                                                            ],
+                                                               "technical":  [
+
+                                                                             ],
+                                                               "blocked":  [
+
+                                                                           ]
+                                                           },
+                                                           {
+                                                               "at":  "2026-11-28T02:14:36.884033+00:00",
+                                                               "method":  "GET",
+                                                               "path":  "/reservations/",
+                                                               "status":  200,
+                                                               "business":  [
+                                                                                "business-read",
+                                                                                "business-lock",
+                                                                                "business-read",
+                                                                                "business-read"
+                                                                            ],
+                                                               "technical":  [
+
+                                                                             ],
+                                                               "blocked":  [
+
+                                                                           ]
+                                                           },
+                                                           {
+                                                               "at":  "2026-11-28T02:14:37.038252+00:00",
+                                                               "method":  "GET",
+                                                               "path":  "/identity/",
+                                                               "status":  200,
+                                                               "business":  [
+
+                                                                            ],
+                                                               "technical":  [
+
+                                                                             ],
+                                                               "blocked":  [
+
+                                                                           ]
+                                                           },
+                                                           {
+                                                               "at":  "2026-11-28T02:14:37.257187+00:00",
+                                                               "method":  "POST",
+                                                               "path":  "/logout/",
+                                                               "status":  302,
+                                                               "business":  [
+
+                                                                            ],
+                                                               "technical":  [
+                                                                                 "session"
+                                                                             ],
+                                                               "blocked":  [
+
+                                                                           ]
+                                                           },
+                                                           {
+                                                               "at":  "2026-11-28T02:14:37.263198+00:00",
+                                                               "method":  "GET",
+                                                               "path":  "/login/",
+                                                               "status":  200,
+                                                               "business":  [
+
+                                                                            ],
+                                                               "technical":  [
+
+                                                                             ],
+                                                               "blocked":  [
+
+                                                                           ]
+                                                           }
+                                                       ]
+                                     }
+                     },
+    "formal_identity":  {
+                            "database":  "lab_booking",
+                            "login":  "lab_booking_app",
+                            "role":  "lab_booking_app",
+                            "role_oid":  "16389",
+                            "host":  "127.0.0.1",
+                            "port":  5433,
+                            "version":  "170012",
+                            "isolation":  "repeatable read",
+                            "read_only":  "on"
+                        },
+    "active_roles":  {
+                         "admin":  1,
+                         "student":  1,
+                         "teacher":  1
+                     },
+    "guard_hits":  0,
+    "cancel_post_count":  0,
+    "before_at":  "2026-11-28T02:14:17.460793+00:00",
+    "after_at":  "2026-11-28T02:14:40.352799+00:00",
+    "read_only_snapshots":  {
+                                "reservations":  {
+                                                     "count":  2,
+                                                     "digest":  "a8918074f42f251b51f896943379a8ae78003e63d88807438138a6f6132a1289"
+                                                 },
+                                "equipment":  {
+                                                  "count":  2,
+                                                  "digest":  "cc6f529bd1daafb08ab5bb8d5d8a7b137bc155977eef28b87cdb433cf3a7ff51"
+                                              },
+                                "history_projected":  {
+                                                          "count":  1,
+                                                          "digest":  "5012a6b8db7314ef9ed4bd9526b0bc0225c1c194229494445d61537bfdd67be2"
+                                                      },
+                                "account_security":  {
+                                                         "count":  3,
+                                                         "digest":  "b68f6047c3f99f23cbc2e7433319c84bf743f38c0980f90e91ab3fb44161819a"
+                                                     }
+                            },
+    "acl_unchanged":  true,
+    "effective_slots_before":  1,
+    "effective_slots_after":  1,
+    "effective_scope_inference":  "only pending plus expired; pending starts after window",
+    "migration_count":  19,
+    "grants_or_migrations_executed":  0,
+    "validated_source_files":  92,
+    "redacted_screenshot_sha256":  "30EC74779C39195B06F9A882DE4628CCDA3FAFD0E80EF9CFA8C6745716B3D7F4",
+    "raw_manifest":  [
+                         {
+                             "name":  "admin.chrome.jsonl",
+                             "sha256":  "CE9FA9949BB42E0E151074C718E25628E3575877437206B6030400DEE6D0BD84"
+                         },
+                         {
+                             "name":  "after-readonly.native.json",
+                             "sha256":  "FB42810AF392659E8E0B14783790422F0C873F276F82C6D189F726E0EF82617C"
+                         },
+                         {
+                             "name":  "after-readonly.stderr.txt",
+                             "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                         },
+                         {
+                             "name":  "after-readonly.stdout.txt",
+                             "sha256":  "C6CAA8AC6F7184BF7BD5C4B3740F481DAA5BA5640119F869AD888EBA729F3954"
+                         },
+                         {
+                             "name":  "anonymous.chrome.jsonl",
+                             "sha256":  "2F562BB11CF916E22B48CBA76C52E66499662BEC51AC058FBDA527339775D06F"
+                         },
+                         {
+                             "name":  "before-readonly.native.json",
+                             "sha256":  "91A684E6D1FB527306EE9F1FAD580A09B5CFC5C10B625CC6AAA023B5B846E07E"
+                         },
+                         {
+                             "name":  "before-readonly.stderr.txt",
+                             "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                         },
+                         {
+                             "name":  "before-readonly.stdout.txt",
+                             "sha256":  "426868A0C6DC09CFD6C4F2F0CF2E1FDDC9B601E3DFCF2D0DD83A717382040022"
+                         },
+                         {
+                             "name":  "browser-admin.native.json",
+                             "sha256":  "D1E919A9EB74E33858B1EDE65DFAD70ACF5A7B5768BD2695A7215339B3B62C30"
+                         },
+                         {
+                             "name":  "browser-admin.stderr.txt",
+                             "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                         },
+                         {
+                             "name":  "browser-admin.stdout.txt",
+                             "sha256":  "45D8E8CBCC0454E1A14C591334A0B75229C64A6356CE38FE03DE4A36132B4B2F"
+                         },
+                         {
+                             "name":  "browser-anonymous.native.json",
+                             "sha256":  "D1E919A9EB74E33858B1EDE65DFAD70ACF5A7B5768BD2695A7215339B3B62C30"
+                         },
+                         {
+                             "name":  "browser-anonymous.stderr.txt",
+                             "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                         },
+                         {
+                             "name":  "browser-anonymous.stdout.txt",
+                             "sha256":  "45D8E8CBCC0454E1A14C591334A0B75229C64A6356CE38FE03DE4A36132B4B2F"
+                         },
+                         {
+                             "name":  "browser-renderer.native.json",
+                             "sha256":  "0054546530A972D2B15A83100406DD1AC70BDFCDD9A377B269E911DB12D4D0F5"
+                         },
+                         {
+                             "name":  "browser-renderer.stderr.txt",
+                             "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                         },
+                         {
+                             "name":  "browser-renderer.stdout.txt",
+                             "sha256":  "324A2C3FE50E7D94B7836211709B8EEECF469D02702EA3D1DAFDD09C2BAA2EBB"
+                         },
+                         {
+                             "name":  "browser-student.native.json",
+                             "sha256":  "D1E919A9EB74E33858B1EDE65DFAD70ACF5A7B5768BD2695A7215339B3B62C30"
+                         },
+                         {
+                             "name":  "browser-student.stderr.txt",
+                             "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                         },
+                         {
+                             "name":  "browser-student.stdout.txt",
+                             "sha256":  "45D8E8CBCC0454E1A14C591334A0B75229C64A6356CE38FE03DE4A36132B4B2F"
+                         },
+                         {
+                             "name":  "browser-teacher.native.json",
+                             "sha256":  "D1E919A9EB74E33858B1EDE65DFAD70ACF5A7B5768BD2695A7215339B3B62C30"
+                         },
+                         {
+                             "name":  "browser-teacher.stderr.txt",
+                             "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                         },
+                         {
+                             "name":  "browser-teacher.stdout.txt",
+                             "sha256":  "45D8E8CBCC0454E1A14C591334A0B75229C64A6356CE38FE03DE4A36132B4B2F"
+                         },
+                         {
+                             "name":  "capture-story-2-4.generated.mjs",
+                             "sha256":  "2C48282A4416ECB15E99F67302E11D20902D412593F06BF588D17EF083698C03"
+                         },
+                         {
+                             "name":  "chrome-admin.stderr.txt",
+                             "sha256":  "BC2DECB9BA747C8F50D729F4DAC3A3DDB220B4AE98AD643CA4AC9EA327B7CC02"
+                         },
+                         {
+                             "name":  "chrome-admin.stdout.txt",
+                             "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                         },
+                         {
+                             "name":  "chrome-anonymous.stderr.txt",
+                             "sha256":  "0E0E3501334E3869CC42CBD026A34B5944D78C7F8D4BF359810589D53AF34511"
+                         },
+                         {
+                             "name":  "chrome-anonymous.stdout.txt",
+                             "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                         },
+                         {
+                             "name":  "chrome-renderer.stderr.txt",
+                             "sha256":  "D667B15FCC1E8516C9F7B55DE54E0BC9A66AEF1A55D12C80C5FD86FF57801147"
+                         },
+                         {
+                             "name":  "chrome-renderer.stdout.txt",
+                             "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                         },
+                         {
+                             "name":  "chrome-student.stderr.txt",
+                             "sha256":  "A844124B012BBD5367824434BC399925F9083B07AE9631DA8A3B4DE77E377755"
+                         },
+                         {
+                             "name":  "chrome-student.stdout.txt",
+                             "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                         },
+                         {
+                             "name":  "chrome-teacher.stderr.txt",
+                             "sha256":  "FA1E8C0B0F05C45625D7D9DEA4E1B91D1ECEE1B4678F5AFC63094512B1E7C3EA"
+                         },
+                         {
+                             "name":  "chrome-teacher.stdout.txt",
+                             "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                         },
+                         {
+                             "name":  "django.native.json",
+                             "sha256":  "8CA3C63440CC5F9A6A47AF1097828A68E014886347ED7769293E1B67D10DBFDE"
+                         },
+                         {
+                             "name":  "django.stderr.txt",
+                             "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                         },
+                         {
+                             "name":  "django.stdout.txt",
+                             "sha256":  "8B0CECED6EB527482B344E52A74345E29408A52FDD7E7AB7932036156B46C414"
+                         },
+                         {
+                             "name":  "driver-syntax.native.json",
+                             "sha256":  "AA7EDA607FAC37880DC9391D62432CCE6DCEB4C5C7A8B92FD0BEE77E1CF33E88"
+                         },
+                         {
+                             "name":  "driver-syntax.stderr.txt",
+                             "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                         },
+                         {
+                             "name":  "driver-syntax.stdout.txt",
+                             "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                         },
+                         {
+                             "name":  "python.native.json",
+                             "sha256":  "60ABC71FB79BF127524C70261AB67CE1F73393920B13823CEF1F02565D41CA5D"
+                         },
+                         {
+                             "name":  "python.stderr.txt",
+                             "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                         },
+                         {
+                             "name":  "python.stdout.txt",
+                             "sha256":  "36B4E3BD04433AC127CBDBDBF9BE5C72B076D056FE204AB4A00D705BF48062B0"
+                         },
+                         {
+                             "name":  "renderer.chrome.jsonl",
+                             "sha256":  "7A5FB60DD55C1D4057B19A59C283973049A8FD54EAD03E40104E679B16817A94"
+                         },
+                         {
+                             "name":  "sample-and-migrations-readonly.native.json",
+                             "sha256":  "9306A1519E82E46D7D85D384D908D349C6030B23ED21577FB01E2EB5CA4344CC"
+                         },
+                         {
+                             "name":  "sample-and-migrations-readonly.stderr.txt",
+                             "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                         },
+                         {
+                             "name":  "sample-and-migrations-readonly.stdout.txt",
+                             "sha256":  "83FEBC8BE91B661E69FADDA27FAE7B48C397708B78C714FE6E08987622CE5C97"
+                         },
+                         {
+                             "name":  "sample-plan.json",
+                             "sha256":  "5B58B487FE1E9C60B1C0A30CEEB90E531D001FF1A54387391E940FFB32515270"
+                         },
+                         {
+                             "name":  "server-stop.flag",
+                             "sha256":  "6C45CB72A36E63D522AA54ED8ADBD7A29A989474F2F77E0458AF8800564EF3CB"
+                         },
+                         {
+                             "name":  "server.jsonl",
+                             "sha256":  "B3AADD25435726136F83BB2F5502F23EEEDE9FABB235CAFB803DA293DBBAFF3E"
+                         },
+                         {
+                             "name":  "server.native.json",
+                             "sha256":  "8CB4FECFD533D390618B539DE3295CFB2506486C7961B3E20689EC5EB159B1EB"
+                         },
+                         {
+                             "name":  "server.stderr.txt",
+                             "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                         },
+                         {
+                             "name":  "server.stdout.txt",
+                             "sha256":  "D8B5882AF4A8C5F3C90C8E7FEEC8ED3D76E87932AE43B1DF6C5469C732026D40"
+                         },
+                         {
+                             "name":  "sources-after.sha256",
+                             "sha256":  "C56738969CB72B5D75203296571483BDC1B4D5A97F03A4A437DF66445A1E58F1"
+                         },
+                         {
+                             "name":  "sources-before.sha256",
+                             "sha256":  "C56738969CB72B5D75203296571483BDC1B4D5A97F03A4A437DF66445A1E58F1"
+                         },
+                         {
+                             "name":  "stages.txt",
+                             "sha256":  "AD5A3ED95B68119F4A0E506AFEC47F649F1C358782EA32CB0D8BBA61822CA8AA"
+                         },
+                         {
+                             "name":  "story-2-5-w01-inspect-20261128-101417-140-f457e5cda59d4f3eaad1029a4822aad6/acl-and-samples.stderr.txt",
+                             "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                         },
+                         {
+                             "name":  "story-2-5-w01-inspect-20261128-101417-140-f457e5cda59d4f3eaad1029a4822aad6/acl-and-samples.stdout.txt",
+                             "sha256":  "A8D806EE25915B03A2A4CADD422A400572D4234D64ACEE48737F62D022AD3B32"
+                         },
+                         {
+                             "name":  "story-2-5-w01-inspect-20261128-101417-140-f457e5cda59d4f3eaad1029a4822aad6/batch-marker.txt",
+                             "sha256":  "811991F96BFB18E9A8A32AF4D3F090A80445BEF46AF8892740E9C57DB84C2370"
+                         },
+                         {
+                             "name":  "story-2-5-w01-inspect-20261128-101417-140-f457e5cda59d4f3eaad1029a4822aad6/psql-native.json",
+                             "sha256":  "328A9A57CA495D1BFF33D0AE828E98509E12D907E1FE8FBC712D7FFECE6BB358"
+                         },
+                         {
+                             "name":  "story-2-5-w01-inspect-20261128-101417-140-f457e5cda59d4f3eaad1029a4822aad6/stages.txt",
+                             "sha256":  "88F35075BC2E12E69FE7283D6D739015AF9E980C8252C61FFFE3069A33A1382C"
+                         },
+                         {
+                             "name":  "story-2-5-w01-inspect-20261128-101417-140-f457e5cda59d4f3eaad1029a4822aad6/w01-inspect.json",
+                             "sha256":  "3D2A93CA436BC87258A2526C8D292470C4E800C0D718A96546AE073B9A3F6023"
+                         },
+                         {
+                             "name":  "story-2-5-w01-inspect-20261128-101440-045-5e2d4dcf09914b6390102f5d419b4d57/acl-and-samples.stderr.txt",
+                             "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                         },
+                         {
+                             "name":  "story-2-5-w01-inspect-20261128-101440-045-5e2d4dcf09914b6390102f5d419b4d57/acl-and-samples.stdout.txt",
+                             "sha256":  "80BCCB7E076DE5DA47A3335BDE70C03DC179BF4F4EB9058B9ADEFACB577F7D4F"
+                         },
+                         {
+                             "name":  "story-2-5-w01-inspect-20261128-101440-045-5e2d4dcf09914b6390102f5d419b4d57/batch-marker.txt",
+                             "sha256":  "811991F96BFB18E9A8A32AF4D3F090A80445BEF46AF8892740E9C57DB84C2370"
+                         },
+                         {
+                             "name":  "story-2-5-w01-inspect-20261128-101440-045-5e2d4dcf09914b6390102f5d419b4d57/psql-native.json",
+                             "sha256":  "17396CFD35D1B723AEF677CE14AA96F2A2FA45CCDAD998D87F1ED6E59C7C68CE"
+                         },
+                         {
+                             "name":  "story-2-5-w01-inspect-20261128-101440-045-5e2d4dcf09914b6390102f5d419b4d57/stages.txt",
+                             "sha256":  "88F35075BC2E12E69FE7283D6D739015AF9E980C8252C61FFFE3069A33A1382C"
+                         },
+                         {
+                             "name":  "story-2-5-w01-inspect-20261128-101440-045-5e2d4dcf09914b6390102f5d419b4d57/w01-inspect.json",
+                             "sha256":  "D465041B69043781B84FCA290E5325EADDE7309A3F059743BDFCB34CF4FD27C5"
+                         },
+                         {
+                             "name":  "student.chrome.jsonl",
+                             "sha256":  "65927CADB19CE01EF2C6BA6D9B72FE9DCB0F8B9367C3A7A9EB623B59CEBE2AF5"
+                         },
+                         {
+                             "name":  "student.chrome.jsonl.redacted.png",
+                             "sha256":  "30EC74779C39195B06F9A882DE4628CCDA3FAFD0E80EF9CFA8C6745716B3D7F4"
+                         },
+                         {
+                             "name":  "teacher.chrome.jsonl",
+                             "sha256":  "FACB939BF7911D8FFC5E13D1133054B91C344EC318BF02BABA1DF2C3171B8B8D"
+                         }
+                     ],
+    "recovery_tests":  [
+                           "corrected PowerShell receipt predicate passed on 27 original documents",
+                           "negative-control business-lock rejected",
+                           "negative-control guard rejection rejected",
+                           "no service, browser or database process restarted"
+                       ]
+}

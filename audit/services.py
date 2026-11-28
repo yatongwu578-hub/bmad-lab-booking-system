@@ -44,6 +44,22 @@ def append_reservation_expiry(reservation_id, decision_at):
     )
 
 
+def append_reservation_cancellation(reservation_id, applicant_id, before_status, decision_at):
+    """Append a self-cancellation within the device-locked transaction."""
+    OperationHistory.objects.create(
+        object_type=HistoryObject.RESERVATION,
+        reservation_id=reservation_id,
+        action="cancel",
+        before_status=before_status,
+        after_status=ReservationStatus.CANCELLED,
+        actor_type="applicant",
+        actor_id=applicant_id,
+        reason="",
+        decision_at=decision_at,
+        recorded_at=Now(),
+    )
+
+
 def read_admin_reservation_reasons(connection, reservation_ids):
     """Read the latest nonblank reason from a stored transition for each scoped ID."""
     if not reservation_ids:

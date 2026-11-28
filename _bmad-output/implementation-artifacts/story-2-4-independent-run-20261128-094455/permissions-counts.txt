@@ -1,0 +1,1 @@
+﻿denied=16 invalid=12 missing_controls=6

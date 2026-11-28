@@ -10,3 +10,10 @@ story-2-3-formal-20261127-120858-648-0dcaa5b4-serve-original/** -text
 smoke-20261127-145741-081-70fac945-formal-hold-original/** -text
 story-2-3-independent-run-20261127-114813-950-de7b7f2c/** -text
 story-2-3-run-20261127-111101-492-41d9eb74/** -text
+
+# Preserve the byte-exact historical ledger used by Story 2.4 verification.
+/story-2-4-legacy-125-ledger.bin -text
+/story-2-4-dev-run-20261127-234701/** -text
+/story-2-4-m01-dev-run-20261128-093324/** -text
+/story-2-4-formal-recovery-20261128/** -text
+/story-2-4-independent-run-20261128-094455/** -text

@@ -509,3 +509,41 @@
 3. **负责人实际确认。** “作为项目负责人，我确认Sprint 1原定八条Story均已完成逐项验收。” 指定保留 8／5、五条顺序，实验前冻结，不提前开发 2.4，并授权本轮提交和推送。没有代为确认另外两名成员意见、实验正式分组或实际启动日。
 4. **结果。** Sprint 1 已交付范围证据验收通过，归档回顾与下一 Sprint 准备。86/86 仅适用当前入口，NFR-001 沿用逐轮原证。延期不批量关闭，第二台 Windows 待复现。Sprint 2 五条 backlog，实际启动未登记，实验 A 未执行和未填数值。 [验收](_bmad-output/implementation-artifacts/sprint-1-final-acceptance-2026-11-27.md) · [回顾](retrospective.md) · [预登记和一次确认](_bmad-output/planning-artifacts/sprint-2-startup-and-experiment-a.md)
 5. **后验依据。** 原 JSONL 复算 10 个 201、190 个 409、每轮有效待审恰一；八条状态和 81 个实验候选源文件由原提交核对，不运行新业务测试、不重授。实际团队决定、第二台复现和实验证据随真实事件追加。
+
+## D-054 2026-11-27 负责人批准 Story 2.4 Checkpoint 1
+
+1. **触发。** BMAD 6.12.4 Build Step 2 提交 Story 2.4 的 AC-1～AC-8、T-01～T-04、NFR-002 设计及权限范围核对。此前负责人已批准原样保留历史工作树证据并继续规划。 [Checkpoint 1](_bmad-output/implementation-artifacts/story-2-4-checkpoint-1.md)
+2. **AI 建议。** 复用设备行锁、锁后重读和权限复核、唯一数据库时刻及原子历史。等于开始时间拒绝取消，待审核按 FR-018 失效，已批准保持原状。取消使用现有模型、列权和事务异常分类，不新建授权工具。
+3. **负责人决定。** 实际回复「批准并继续」，批准仅实施和隔离自测 Story 2.4。核心机制未变且旧证据有效时不重跑 20×10。正式库发布前再按实际权限和迁移情况核验，未批准操作正式数据。保留 Sprint 8／5、实验 A 及三人共同操作和审阅，不代签成员意见，不自动提交或推送。
+4. **结果。** 规格由 draft 经 ready-for-dev 进入 in-progress，看板只同步 2.4。实现本人取消、确认和结果路径；实际自测通过后才转 review，另开会话运行独立 Code Review。 [实施规格](_bmad-output/implementation-artifacts/spec-2-4-cancel-own-reservation.md)
+5. **后验依据。** 已准备原 125 项、8 项新增 Django 及真实 PostgreSQL／HTTP／Chrome 的隔离运行入口；以普通 PowerShell 原始回执判定，不把审阅和静态检查当成实测或最终验收。 [验证入口](_bmad-output/implementation-artifacts/verify-story-2-4.ps1)
+
+   **2026-11-27 开发实测。** 团队报告已在普通 PowerShell 运行隔离批次。由原始回执复算原 125 项同名与 8 项新增全部通过、16/16 探针、8 阶段退出 0、91 项输入相符及数据库基线／夹具清理通过。按负责人本会话明确的条件授权仅推进 2.4 到 review，由新会话独立 Code Review。未接触正式库，无迁移、授权、done、commit 或 push。 [开发证据](_bmad-output/implementation-artifacts/story-2-4-development-evidence.md) · [独立评审交接](_bmad-output/implementation-artifacts/story-2-4-code-review-handoff.md)
+
+## D-055 2026-11-28 负责人批准 Story 2.4 评审处置
+
+1. **触发。** BMAD 6.12.4 `bmad-code-review` full Step 4 呈现四个独立视角与 27 条逐项裁决，归并为 1 项正式 AC-3 阻塞、13 项非阻塞 Patch 候选、1 项原延期及 1 项驳回。实际开发批已离线核验，未独立实跑。 [独立评审](_bmad-output/implementation-artifacts/story-2-4-independent-review.md)
+2. **AI 建议。** 选择「保留为行动项」，仅整改 M01 的取消 POST 输入闸口，不改 FR-002/010/018、ADR-002/003/005 或共享事务。保留合法及权限对照，证明无效输入在业务副作用前被拒。其余改进按风险合理延期，整改后集中一次独立复验，复用仍有效的 NFR-001 原证。
+3. **负责人真实判断及依据。** 项目负责人明确回复「选择2：保留为行动项。」，并进一步批准「M01属于AC-3正式验收阻塞，必须交回原Build会话进行最小整改。」P01～P13 仅在不影响正式 AC、安全性、数据一致性的前提下延期，保留原编号、理由、残余风险及后续节点。D01/R01 原依据保持。负责人要求保留现有原证，独立运行安排在整改之后，不重跑整改前全量及 20 请求 × 10 轮。三人共同操作及审阅，不由本日志代签其他成员、不改变实验 A 或 Sprint 8／5。
+4. **结果。** 按 Step 4 仅将 2.4 规格从 `in-review`、Sprint 项从 `review` 同步退回 `in-progress`。M01 仍开放，已形成原 Build 续接交接，未代为启动旧会话或修改业务代码。P01～P13 合并至单一中央台账段，D01 保留原条，R01 保留驳回，未将 M01 记成延期。不访问正式业务库，不新增迁移或权限，不开发 2.6／2.7，不标 `done`，不暂存、提交或推送。 [人工处置](_bmad-output/implementation-artifacts/story-2-4-review-disposition.md) · [整改交接](_bmad-output/implementation-artifacts/story-2-4-remediation-handoff.md)
+5. **事后核验。** 台账保留原有字节前缀，P01～P13 和 D01 每编号各一次，未重复追加。开发 133/133 Django 零跳过、16/16 探针组、原 16/16 权限拒绝、8 阶段退出 0、91 项输入及隔离基线/清理原件保留。NFR-001 保留已核验历史 10 轮，每轮 1 成功、19 冲突、1 有效待审。这里只证实处置落地和旧证据未变，M01 的实测及独立复验结果待原 Build 整改后据实补录，不提前验收。 [合并核对](_bmad-output/implementation-artifacts/story-2-4-disposition-verification.json) · [开发原始回执](_bmad-output/implementation-artifacts/story-2-4-dev-run-20261127-234701/verified-receipt.json)
+
+   **2026-11-28 M01 开发专项通过。** 团队普通 PowerShell 本批 5/5 定向 Django、V01-M01 和 Chrome 两组通过。20 个格式拒绝及 4 个 CSRF 拒绝零涉及业务读写，两个合法对照路径及双角色原生表单通过。8 阶段退出 0、91 输入相符，隔离基线及清理通过。按本会话条件授权仅将 2.4 转回 review，交回原独立 Code Review 会话。M01 仍开放，未运行整改后完整独立复验，未接触正式库或改变其他裁决、Sprint 和实验范围。 [专项与复审交接](_bmad-output/implementation-artifacts/story-2-4-m01-code-review-return.md)
+
+## D-056 2026-11-28 负责人批准关闭 Story 2.4 M01
+
+1. **触发。** 原 BMAD 6.12.4 full Code Review 的 M01 定向复审之后，负责人报告在普通 PowerShell 执行完整独立复验，并要求据真实目录核对 AC-1～AC-8、M01、NFR-002 及退出码、散列与隔离库清理。实际批次为 `story-2-4-run-20261128-094455-909-fc3c5d766c644025be7d9e60ab0bda06`。 [独立复验](_bmad-output/implementation-artifacts/story-2-4-m01-independent-run-result.md)
+2. **AI 建议。** 将 M01 输入闸口的隔离关闭与正式运行分开。用真实的非法输入零副作用和合法取消/合法失效对照处置 AC-3，保留 D-055 其他决定。正式库只准备现有权限和迁移只读读回、安全现存样本及确认放弃/返回，隔离证据承接写入、跨界、竞态和故障，不为验证新造数据。
+3. **负责人真实决定及依据。** 本会话明确「若全部通过，我批准正式关闭M01，其余已批准延期事项保持原决定。」批准在核对 AC-1～AC-8、M01、权限、散列及隔离清理都通过时只关闭整改项，并直接准备最小正式方案。未批准本会话访问正式库、授权、迁移、标 done 或自动提交推送，不代录其他成员判断。
+4. **结果。** 满足依证据的关闭条件，规格勾选 M01，保留 `in-review`／`review`。P01～P13、D01 继续按唯一中央台账跟踪，R01 历史驳回保留。原失败发现、整改前开发、M01 专项与本独立批分别保留，不改业务代码或旧档。最小正式方案已备、未执行。Sprint 8／5、实验 A、三人共同操作和审阅不变，不启动 2.6／2.7。 [处置结果](_bmad-output/implementation-artifacts/story-2-4-m01-independent-run-result.md) · [正式运行方案](_bmad-output/implementation-artifacts/story-2-4-minimal-formal-run.md)
+5. **事后核验。** 135/135 Django 零跳过、17/17 探针、8 个原生阶段退出 0、唯一 `STORY24_VERIFICATION_OK`、91 项散列和隔离基线/清理通过。权限拒绝 16/16 限 Story 2.4，M01 20 个格式及 4 个 CSRF 补例不增计。外层进程独立退出码未入档，不代填。中央台账全文件散列未变，NFR-001 历史 20×10 未重跑。此处只记录团队实跑及本会话证据复算，无重复运行或正式验收。 [原始归档回执](_bmad-output/implementation-artifacts/story-2-4-independent-run-20261128-094455/verified-receipt.json)
+
+## D-057 2026-11-28 负责人批准 Story 2.4 最小正式运行
+
+1. **触发。** D-056 关闭 M01、保留既有延期，Story 2.4 待最小现场验证。 [独立原证](_bmad-output/implementation-artifacts/story-2-4-m01-independent-run-result.md)
+2. **AI 方案。** 精确读回已有 ACL、迁移和现存账号／预约，比较前后业务基线。只验证安全现存预约的确认与放弃、必要权限拒绝，阻断所有业务写和取消 POST。若无安全样本，如实保留覆盖缺口，引用独立隔离正例。 [方案](_bmad-output/implementation-artifacts/story-2-4-minimal-formal-run.md)
+3. **负责人实际决定。** 接受整改后独立复验、确认 M01 正式关闭，其余延期不变，批准按最小正式运行方案执行。只有现场验证通过、AC-1～8 证据完整且无新增验收阻塞，才批准最终验收、更新文档、提交与推送。不为正式现场制造业务数据。保持三人共同操作、Sprint 8／5 和实验 A；2.6／2.7 必须待条件冻结。
+4. **当前结果。** 已准备复用现有工具的正式入口；不修改业务代码。因沙箱不能打开两个受保护文件，已提供普通 PowerShell 命令。规格和 Sprint 仍在评审；未验收、暂存、提交或推送。
+5. **后验核验范围。** 已只读复算独立归档 51 个散列及 135/135、17/17 历史结果，外层退出码仍不可补造。本会话未连接正式库或运行正式 Chrome，正式回执待原机实际执行。 [普通 PowerShell 入口](_bmad-output/implementation-artifacts/run-story-2-4-minimal-formal.ps1)
+
+   **2026-11-28 最终验收。** 负责人报告原机外层 EXIT=1，并指示仅在实证完整时按 D-057 验收及提交推送。复核证实 12 原生阶段退出 0、27 个文档和正式前后读回完整，汇总误判了两条归属限定读取，原失败保留。只修汇总验收工具并离线回放，未访问正式库重跑，未取消、收尾、授权或迁移。不代填组员意见。AC-1～AC-8 与正式最小验证条件满足，规格及 Sprint 仅推进 2.4 至 done。M01、延期、Sprint 8／5 与实验冻结安排不变。 [最终验收与证据](_bmad-output/implementation-artifacts/story-2-4-final-acceptance.md)

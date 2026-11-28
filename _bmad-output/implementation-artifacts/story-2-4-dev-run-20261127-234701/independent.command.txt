@@ -1,0 +1,1 @@
+﻿F:\softwork\SE-Management\bmad-lab-booking-system\.venv\Scripts\python.exe "manage.py" "verify_own_cancellation" "--evidence" "F:\softwork\outputs\story-2-4-run-20261127-234701-350-82341f5be92a40969b6d2e98fef79be1\independent.jsonl"

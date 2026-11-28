@@ -147,7 +147,7 @@ $env:LAB_BOOKING_DB_MODE = 'test'
 
 罗思婕、周何馨于 2026-11-19 完成业务与质量审核。吴亚彤于 2026-11-21 批准两轮范围和逐项处置，随后确认排期并正式批准 Sprint 1 启动。Sprint 1 为 11 月 22 日至 26 日，保留 1.1～1.4、2.1、2.2、2.3、2.5。Sprint 2 为 11 月 27 日至 29 日，保留 2.4、2.6、2.7、2.8、3.1。2.1 首次验收保留 NFR-001 的 20 个独立授权请求 × 10 轮，实验 A 的 2.6／2.7 保留为候选。R-01、R-03 沿用批准和验收证据，R-04、Read Committed 与 T-01～T-04 按既定节点落实。 [Sprint 启动交接](_bmad-output/planning-artifacts/sprint-plan.md#9-sprint-1-启动确认与-story-11-交接) · [D-017](decision-log.md#d-017-2026-11-21-负责人正式批准-sprint-1-启动)
 
-正式开发与独立评审分会话，真实测试、问题处置及负责人验收后才标 done。Sprint 1 交付范围整体验收通过，负责人已确认八条逐项验收，末项实际日期 2026-11-27，比计划晚一日。可运行增量为设备管理、申请和查询。回顾已按实证整理，尚无团队会议记录。Epic 2 保持 `in-progress`，Sprint 2 的 2.4→2.6→2.7→2.8→3.1 均为 backlog，实际启动日未登记。实验 A 须在 2.6／2.7 开发前冻结共同起点、分组、隔离与度量。 [Sprint 跟踪](_bmad-output/implementation-artifacts/sprint-status.yaml) · [Sprint 1 验收](_bmad-output/implementation-artifacts/sprint-1-final-acceptance-2026-11-27.md) · [项目回顾](retrospective.md) · [Sprint 2 启动准备／实验 A](_bmad-output/planning-artifacts/sprint-2-startup-and-experiment-a.md)
+正式开发与独立评审分会话，真实测试、问题处置及负责人验收后才标 done。Sprint 1 八条已逐项验收，末项日期 2026-11-27，可运行增量为设备管理、申请和查询。Sprint 2 的 Story 2.4 已于 2026-11-28 验收，师生可从「我的预约」取消尚未开始的本人待审核或已批准预约。Epic 2 保持 `in-progress`，2.6、2.7、2.8、3.1 未开发。实验 A 须在 2.6／2.7 开发前冻结共同起点、分组、隔离与度量。 [Sprint 跟踪](_bmad-output/implementation-artifacts/sprint-status.yaml) · [Sprint 1 验收](_bmad-output/implementation-artifacts/sprint-1-final-acceptance-2026-11-27.md) · [Story 2.4 验收](_bmad-output/implementation-artifacts/story-2-4-final-acceptance.md) · [项目回顾](retrospective.md) · [实验 A](_bmad-output/planning-artifacts/sprint-2-startup-and-experiment-a.md)
 
 ## 项目与当前进度
 
@@ -278,10 +278,10 @@ bmad-lab-booking-system/
 | M1 | 两轮Product Brief和PRD及内部审核、负责人确认已完成，第二轮定稿已提交main，可进入M2架构 |
 | M2 | Architecture及8条ADR、[project-context](_bmad-output/planning-artifacts/project-context.md)及14条PC已定稿；Epic/Story文档已final，3 Epic/13 Story的Story状态仍draft，组员5项意见已按负责人决定修改，见[本轮汇总](docs/team/m2-epics-summary.md)。第三次Step-04复核已获负责人批准并完成Finalize。随后完成就绪检查及 Sprint 计划，CONCERNS 经负责人有条件接受。 [就绪证据](_bmad-output/planning-artifacts/implementation-readiness.md) |
 | M3 | Sprint 1 八条 Story 均完成逐项验收，整体验收范围和真实回顾材料已归档。实验 B 已取消。 [验收证据](_bmad-output/implementation-artifacts/sprint-1-final-acceptance-2026-11-27.md) |
-| M4 | Sprint 2 与实验 A 已预备、未启动。第二台 Windows 复现、实验 A 实测、约 10 分钟录屏及最终版本仍待完成。 [启动准备](_bmad-output/planning-artifacts/sprint-2-startup-and-experiment-a.md) |
-| 人机决策 | 根目录日志已记录至 D-053，未代填团队意见，课程要求的否决或实质修改以真实团队判断为准。 [决策日志](decision-log.md) |
-| FR追溯 | 18 条 FR 已映射至 ADR／PC 与 Story／AC。Story 1.2 的 FR-016／FR-002 已链接到独立测试和业务库证据。 [追溯与验收](_bmad-output/implementation-artifacts/story-1-2-final-acceptance.md) |
-| NFR | NFR-001 实证 20 独立请求 × 10 轮。NFR-002 已交付入口主矩阵 86/86，合法对照另列，未交付操作不计入。 [验收、分母与追溯](_bmad-output/implementation-artifacts/sprint-1-final-acceptance-2026-11-27.md) |
+| M4 | Sprint 2 的 Story 2.4 已验收。下一阶段先冻结实验 A 条件；第二台 Windows 复现、实验 A 实测、约 10 分钟录屏及最终版本仍待完成。 [启动准备](_bmad-output/planning-artifacts/sprint-2-startup-and-experiment-a.md) |
+| 人机决策 | 根目录日志已记录至 D-057，未代填团队意见，课程要求的否决或实质修改以真实团队判断为准。 [决策日志](decision-log.md) |
+| FR追溯 | 18 条 FR 已映射至 ADR／PC 与 Story／AC。Story 1.2 的 FR-016／FR-002 与 Story 2.4 的 FR-002／010／015／018 均有独立测试及正式验证证据。 [创建设备](_bmad-output/implementation-artifacts/story-1-2-final-acceptance.md) · [本人取消](_bmad-output/implementation-artifacts/story-2-4-final-acceptance.md) |
+| NFR | NFR-001 实证 20 独立请求 × 10 轮。NFR-002 的 Sprint 1 已交付入口主矩阵 86/86，Story 2.4 新入口独立 16/16，M01 补例及合法对照另计，未交付操作不计入。 [Sprint 1 分母与追溯](_bmad-output/implementation-artifacts/sprint-1-final-acceptance-2026-11-27.md) · [Story 2.4 独立复验](_bmad-output/implementation-artifacts/story-2-4-m01-independent-run-result.md) |
 | Architecture 及 project-context 后续待办 | R-03 已完成本机环境核验，D-024 的 Read Committed 和 D-026 的设备迁移、授权及业务库运行已留证。第二台 Windows 复现仍待执行，其他待办按既定节点推进。 [运行证据](_bmad-output/implementation-artifacts/story-1-2-runtime-evidence.md) · [延期台账](_bmad-output/implementation-artifacts/deferred-work.md) |
 
 ## AI使用声明与证据限制

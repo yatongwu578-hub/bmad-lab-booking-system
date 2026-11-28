@@ -1,10 +1,16 @@
+import re
+from urllib.parse import unquote_to_bytes
+
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
-from django.http import Http404, HttpResponseForbidden
+from django.core.exceptions import PermissionDenied, RequestDataTooBig
+from django.http import Http404, HttpResponseBadRequest, HttpResponseForbidden
+from django.http.request import RawPostDataException, UnreadablePostError
+from django.middleware.csrf import CSRF_SECRET_LENGTH, CSRF_TOKEN_LENGTH
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_GET, require_http_methods
 
 from equipment.models import EquipmentStatus
@@ -14,10 +20,13 @@ from .forms import AdminReservationFilterForm, OccupancyDateForm, ReservationFor
 from .models import ReservationStatus
 from .services import (
     BEIJING,
+    CANCELLATION_STATUSES,
     ReservationFailed,
     ReservationUnknown,
+    cancel_own_reservation,
     get_admin_reservation,
     get_admin_reservations,
+    get_cancellation_candidate,
     get_daily_occupancy,
     get_own_reservations,
     get_reservation_result,
@@ -36,6 +45,15 @@ READ_UNKNOWN = "结果待核查，暂勿重复查询。"
 READ_FORBIDDEN = "无权查询本人预约。"
 RESULT_NOT_FOUND = "预约记录不存在或不可访问。"
 ADMIN_FORBIDDEN = "无权查询管理员预约记录。"
+CANCELLATION_MESSAGES = {
+    "cancelled": "预约已取消，原记录已保留。",
+    "terminal": "预约当前状态不允许取消。",
+    "started": "预约开始时间已到，不能取消。",
+    "expired": "预约开始时间已到，不能取消。该待审核预约已失效。",
+}
+CANCELLATION_TOKEN_FIELD = b"csrfmiddlewaretoken"
+# Each field-name/token byte may be percent-encoded, plus the literal '=' separator.
+MAX_CANCELLATION_FORM_LENGTH = 3 * (len(CANCELLATION_TOKEN_FIELD) + CSRF_TOKEN_LENGTH) + 1
 HISTORY_ACTION_LABELS = {"approve": "批准", "reject": "拒绝", "cancel": "取消", "expire": "失效"}
 HISTORY_ACTOR_LABELS = {"system": "系统", "admin": "业务管理员", "student": "学生", "teacher": "教师",
                         "applicant": "申请人"}
@@ -50,6 +68,7 @@ def _beijing_text(value):
 def _display_record(record):
     return dict(
         record,
+        cancellation_candidate=record["status"] in CANCELLATION_STATUSES,
         status_label=ReservationStatus(record["status"]).label,
         equipment_status_label=(EquipmentStatus(record["equipment__status"]).label
                                 if "equipment__status" in record else None),
@@ -112,7 +131,11 @@ def reservation_list(request):
         return render(request, "reservations/list.html", {"error": READ_FAILED}, status=503)
     except ReservationUnknown:
         return render(request, "reservations/list.html", {"error": READ_UNKNOWN}, status=503)
-    return render(request, "reservations/list.html", {"records": [_display_record(row) for row in records]})
+    displayed = [_display_record(row) for row in records]
+    return render(request, "reservations/list.html", {
+        "records": displayed,
+        "cancellation_candidates": [row for row in displayed if row["cancellation_candidate"]],
+    })
 
 
 @never_cache
@@ -130,6 +153,62 @@ def reservation_result(request, pk):
     if record is None:
         return _render_result(request, error=RESULT_NOT_FOUND, status=404)
     return _render_result(request, record)
+
+
+def _valid_cancellation_form(request):
+    if request.content_type != "application/x-www-form-urlencoded":
+        return False
+    declared_length = request.META.get("CONTENT_LENGTH") or ""
+    if not re.fullmatch(r"[0-9]{1,3}", declared_length):
+        return False
+    length = int(declared_length)
+    if not 0 < length <= MAX_CANCELLATION_FORM_LENGTH:
+        return False
+    try:
+        body = request.body
+    except (RawPostDataException, UnreadablePostError, RequestDataTooBig):
+        return False
+    if len(body) != length or re.search(rb"%(?![0-9A-Fa-f]{2})", body):
+        return False
+    name, separator, value = body.partition(b"=")
+    if not separator or unquote_to_bytes(name) != CANCELLATION_TOKEN_FIELD:
+        return False
+    token = unquote_to_bytes(value)
+    # The view checks form shape. Django CSRF still authenticates the token.
+    return len(token) in (CSRF_SECRET_LENGTH, CSRF_TOKEN_LENGTH) and re.fullmatch(rb"[A-Za-z0-9]+", token) is not None
+
+
+@never_cache
+@require_http_methods(["GET", "POST"])
+@login_required
+@csrf_protect
+def reservation_cancel(request, pk):
+    template = "reservations/cancel.html"
+    if request.GET or (request.method == "POST" and not _valid_cancellation_form(request)):
+        return HttpResponseBadRequest("取消预约请求格式无效。")
+    try:
+        if request.method == "GET":
+            record = get_cancellation_candidate(request.user, pk)
+            if record is not None:
+                return render(request, template, {"record": _display_record(record), "confirmation": True})
+        else:
+            outcome = cancel_own_reservation(request.user, pk)
+            if outcome.record is not None:
+                success = outcome.outcome == "cancelled"
+                return render(request, template, {
+                    "record": _display_record(outcome.record),
+                    "message": CANCELLATION_MESSAGES[outcome.outcome],
+                    "cancelled": success,
+                }, status=200 if success else 409)
+    except PermissionDenied:
+        return HttpResponseForbidden("无权取消本人预约。")
+    except ReservationFailed:
+        message = ("无法读取取消确认信息，预约未更改。" if request.method == "GET"
+                   else "本次取消未成功，数据库事务已回滚。")
+        return render(request, template, {"error": message}, status=503)
+    except ReservationUnknown:
+        return render(request, template, {"error": "取消结果待核查，请勿重复提交。"}, status=503)
+    return render(request, template, {"error": RESULT_NOT_FOUND}, status=404)
 
 
 @never_cache
