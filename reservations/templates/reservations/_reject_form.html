@@ -1,0 +1,7 @@
+<form method="post" action="{{ reject_url }}">
+    {% csrf_token %}
+    {{ reject_form.non_field_errors }}
+    {{ reject_form.reason.errors }}
+    <p>{{ reject_form.reason.label_tag }}<br>{{ reject_form.reason }}</p>
+    <button type="submit">拒绝预约</button>
+</form>

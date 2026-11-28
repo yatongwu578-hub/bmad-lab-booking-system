@@ -19,4 +19,12 @@
 
 **前轮跟踪。** epic-1-retro-item-1-windows-preflight 已在 W01 有同形预检证据但还缺第二台 Windows。epic-1-retro-item-2-verification-evidence 已有阶段和独立只读恢复实例。epic-1-retro-item-3-login-return-path 维持原任务，2.5 的拒绝和合法导航不替代编辑路由回归。三项仍按原状态跟踪，未经人工确认不代改。这些都是改进提案，不增加 Story 或自动实施。 [状态与行动项](_bmad-output/implementation-artifacts/sprint-status.yaml)
 
-团队发言、议定行动及实际启动记录在[同一次集中确认](_bmad-output/planning-artifacts/sprint-2-startup-and-experiment-a.md#三人一次集中确认)补录真实事实。Sprint 2 回顾、实验 A 数据及录屏仍待实际发生。 [课程基线](docs/course-requirements.md)
+团队发言、议定行动及实际启动记录在[同一次集中确认](_bmad-output/planning-artifacts/sprint-2-startup-and-experiment-a.md#三人一次集中确认)补录真实事实。Sprint 2 共同回顾及录屏仍待实际发生。 [课程基线](docs/course-requirements.md)
+
+## 实验 A 业务实施截面（D1，非 C 封账）
+
+两组在 2026-11-28T21:10:43.0878369+08:00 正式 done。X、Y 各 3 个计入的实际独立 Story 会话，首轮均 0/1（0%）。Y 的 R1 命中 PC-004/005，X 无已确认命中。R1 截面有两个可区分的 Y ADR 实现偏离，期末累计和 done 后返工仍待共同观察截止 C，不能先填 0。
+
+目前 Y−X 的故事会话差为 0、首过率差为 0 个百分点、R1 规则命中差为 +2。命中主要集中在锁后唯一取时和业务拒绝不能撤销合法 FR-018 的边界。12 个故事的机械情景是 0 个额外首过、0 个额外会话，规则命中差情景为 24；这些计数不能直接抵扣规划工时。共同计时与 C 期末证据未齐，净收益不预判。样本仅两条，处理方式与不同故事绑定，另有 Y 的 S0 后、整改前跨组评审材料暴露，必须限制因果解释。详见 [实际度量及分析材料](docs/team/experiment-a-implementation-evidence.md)。
+
+正式验证不造样，只对已核验的终态详情进行 Chrome 验证，批准与拒绝正向、并发和故障仍绑定隔离证据。正式工具第一次启动器/子进程 PID 判断失败及后续真实恢复均保留，没有覆盖首评或印证业务回归。下一步仅 [Story 2.8 开发准备](_bmad-output/implementation-artifacts/story-2-8-build-handoff.md)，Sprint 8/5 不变。

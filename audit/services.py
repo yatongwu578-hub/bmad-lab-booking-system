@@ -60,6 +60,38 @@ def append_reservation_cancellation(reservation_id, applicant_id, before_status,
     )
 
 
+def append_reservation_approval(reservation_id, admin_id, decision_at):
+    """Append approval within the reservation service's device-locked transaction."""
+    OperationHistory.objects.create(
+        object_type=HistoryObject.RESERVATION,
+        reservation_id=reservation_id,
+        action="approve",
+        before_status=ReservationStatus.PENDING,
+        after_status=ReservationStatus.APPROVED,
+        actor_type="admin",
+        actor_id=admin_id,
+        reason="",
+        decision_at=decision_at,
+        recorded_at=Now(),
+    )
+
+
+def append_reservation_rejection(reservation_id, admin_id, reason, decision_at):
+    """Append the administrator's decision in the same transaction as the status change."""
+    OperationHistory.objects.create(
+        object_type=HistoryObject.RESERVATION,
+        reservation_id=reservation_id,
+        action="reject",
+        before_status=ReservationStatus.PENDING,
+        after_status=ReservationStatus.REJECTED,
+        actor_type="admin",
+        actor_id=admin_id,
+        reason=reason,
+        decision_at=decision_at,
+        recorded_at=Now(),
+    )
+
+
 def read_admin_reservation_reasons(connection, reservation_ids):
     """Read the latest nonblank reason from a stored transition for each scoped ID."""
     if not reservation_ids:

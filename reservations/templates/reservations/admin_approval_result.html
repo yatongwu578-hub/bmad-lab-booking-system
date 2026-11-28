@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>预约批准结果 · 实验室设备预约</title>
+</head>
+<body>
+<main>
+    <h1>预约批准结果</h1>
+    <p role="{% if approved %}status{% else %}alert{% endif %}">{{ message }}</p>
+    {% if detail_url %}<p><a href="{{ detail_url }}">返回预约详情</a></p>{% endif %}
+    <p><a href="{% url 'admin-reservation-list' %}">返回预约管理</a></p>
+</main>
+</body>
+</html>

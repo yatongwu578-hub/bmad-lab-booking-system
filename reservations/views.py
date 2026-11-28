@@ -6,23 +6,24 @@ from django.core.exceptions import PermissionDenied, RequestDataTooBig
 from django.http import Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.http.request import RawPostDataException, UnreadablePostError
 from django.middleware.csrf import CSRF_SECRET_LENGTH, CSRF_TOKEN_LENGTH
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
-from django.views.decorators.http import require_GET, require_http_methods
+from django.views.decorators.http import require_GET, require_POST, require_http_methods
 
 from equipment.models import EquipmentStatus
 from equipment.services import get_equipment_detail
 
-from .forms import AdminReservationFilterForm, OccupancyDateForm, ReservationForm
+from .forms import AdminReservationFilterForm, AdminReservationRejectForm, OccupancyDateForm, ReservationForm
 from .models import ReservationStatus
 from .services import (
     BEIJING,
     CANCELLATION_STATUSES,
     ReservationFailed,
     ReservationUnknown,
+    approve_reservation,
     cancel_own_reservation,
     get_admin_reservation,
     get_admin_reservations,
@@ -30,6 +31,7 @@ from .services import (
     get_daily_occupancy,
     get_own_reservations,
     get_reservation_result,
+    reject_reservation,
     require_applicant,
     require_occupancy_reader,
     require_reservation_admin,
@@ -45,6 +47,15 @@ READ_UNKNOWN = "结果待核查，暂勿重复查询。"
 READ_FORBIDDEN = "无权查询本人预约。"
 RESULT_NOT_FOUND = "预约记录不存在或不可访问。"
 ADMIN_FORBIDDEN = "无权查询管理员预约记录。"
+APPROVAL_RESULTS = {
+    "approved": (200, "预约已批准，原预约时段和占用已保留。"),
+    "terminal": (409, "预约当前状态不允许批准。"),
+    "expired": (409, "预约开始时间已到，不能批准。该待审核预约已失效。"),
+    "unavailable": (409, "设备当前不可用，不能批准预约。"),
+    "missing": (404, "预约记录不存在。"),
+}
+APPROVAL_FAILED = "本次批准操作未成功，数据库事务已回滚。"
+APPROVAL_UNKNOWN = "批准结果待核查，请勿重复提交。可主动返回预约详情核查。"
 CANCELLATION_MESSAGES = {
     "cancelled": "预约已取消，原记录已保留。",
     "terminal": "预约当前状态不允许取消。",
@@ -289,7 +300,8 @@ def admin_reservation_detail(request, pk):
         back_url = reverse("admin-reservation-list")
         if not form.is_valid():
             return render(request, template, {"back_url": back_url, "error": "设备编号参数无效。"}, status=400)
-        back_url += _filter_query(form.cleaned_data["equipment"])
+        filter_query = _filter_query(form.cleaned_data["equipment"])
+        back_url += filter_query
         record = get_admin_reservation(request.user, pk)
     except PermissionDenied:
         return HttpResponseForbidden(ADMIN_FORBIDDEN)
@@ -299,6 +311,80 @@ def admin_reservation_detail(request, pk):
         return render(request, template, {"back_url": back_url, "error": READ_UNKNOWN}, status=503)
     if record is None:
         return render(request, template, {"back_url": back_url, "error": RESULT_NOT_FOUND}, status=404)
-    return render(request, template, {
+    context = {
         "back_url": back_url, "record": _display_record(record), "history": _display_history(record["history"]),
-    })
+        "approval_candidate": (record["status"] == ReservationStatus.PENDING
+                               and record["equipment__status"] == EquipmentStatus.AVAILABLE),
+    }
+    if record["status"] == ReservationStatus.PENDING:
+        context.update(
+            reject_form=AdminReservationRejectForm(),
+            reject_url=reverse("admin-reservation-reject", args=[pk]) + filter_query,
+        )
+    return render(request, template, context)
+
+
+@never_cache
+@require_POST
+@login_required
+@csrf_protect
+def admin_reservation_approve(request, pk):
+    detail_url = reverse("admin-reservation-detail", args=[pk])
+    try:
+        outcome = approve_reservation(request.user, pk)
+    except PermissionDenied:
+        return HttpResponseForbidden("无权批准预约。")
+    except ReservationFailed:
+        status, message = 503, APPROVAL_FAILED
+    except ReservationUnknown:
+        status, message = 503, APPROVAL_UNKNOWN
+    else:
+        status, message = APPROVAL_RESULTS[outcome]
+        if outcome == "missing":
+            detail_url = None
+    return render(request, "reservations/admin_approval_result.html", {
+        "detail_url": detail_url, "message": message, "approved": status == 200,
+    }, status=status)
+
+
+@never_cache
+@require_POST
+@login_required
+@csrf_protect
+def admin_reservation_reject(request, pk):
+    template = "reservations/admin_reject.html"
+    context = {"back_url": reverse("admin-reservation-detail", args=[pk])}
+    try:
+        require_reservation_admin(request.user)
+        filter_form = AdminReservationFilterForm(request.GET)
+        if not filter_form.is_valid():
+            return render(request, template, {**context, "error": "设备编号参数无效。"}, status=400)
+        filter_query = _filter_query(filter_form.cleaned_data["equipment"])
+        context["back_url"] += filter_query
+        if request.content_type not in {"application/x-www-form-urlencoded", "multipart/form-data"}:
+            return render(request, template, {**context, "error": "拒绝预约请求格式无效。"}, status=400)
+        form = AdminReservationRejectForm(request.POST, request.FILES)
+        outcome = "invalid_form"
+        if form.is_valid():
+            outcome = reject_reservation(request.user, pk, form.cleaned_data["reason"])
+    except PermissionDenied:
+        return HttpResponseForbidden("无权拒绝预约。")
+    except ReservationFailed:
+        return render(request, template, {**context, "error": "本次拒绝未成功，数据库事务已回滚。"}, status=503)
+    except ReservationUnknown:
+        return render(request, template, {**context, "error": "拒绝结果待核查，请勿重复提交。"}, status=503)
+    if outcome in ("invalid_form", "reason_required"):
+        if outcome == "reason_required":
+            form.add_error("reason", form.fields["reason"].error_messages["required"])
+        return render(request, template, {
+            **context, "reject_form": form,
+            "reject_url": reverse("admin-reservation-reject", args=[pk]) + filter_query,
+        }, status=400)
+    if outcome == "rejected":
+        return redirect(context["back_url"])
+    status, error = {
+        "missing": (404, RESULT_NOT_FOUND),
+        "terminal": (409, "只有待审核的预约可以拒绝。"),
+        "expired": (409, "预约开始时间已到，该待审核预约已失效，未执行拒绝。"),
+    }[outcome]
+    return render(request, template, {**context, "error": error}, status=status)

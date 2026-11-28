@@ -52,3 +52,19 @@ class AdminReservationFilterForm(forms.Form):
         else:
             cleaned["equipment"] = None
         return cleaned
+
+
+class AdminReservationRejectForm(forms.Form):
+    reason = forms.CharField(
+        # A blank reason still reaches the locked decision, which may expire a due booking.
+        label="拒绝原因", required=False, widget=forms.Textarea(attrs={"rows": 4, "required": True}),
+        error_messages={"required": "请输入拒绝原因。"},
+    )
+
+    def clean(self):
+        cleaned = super().clean()
+        if self.files or self.data.keys() - {"reason", "csrfmiddlewaretoken"}:
+            raise forms.ValidationError("提交包含不允许的字段。")
+        if isinstance(self.data, MultiValueDict) and any(len(values) != 1 for _, values in self.data.lists()):
+            raise forms.ValidationError("提交包含重复字段。")
+        return cleaned

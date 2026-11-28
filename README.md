@@ -126,6 +126,10 @@ Story 2.2 已按 D-045 验收。独立复验为 103/103 Django、21/21 真实 Po
 
 用业务管理员登录，从「我的身份 → 预约管理」进入 `/reservations/manage/`，可按设备编号筛选，打开详情及真实处理历史，再返回原筛选。匿名重定向登录，学生、教师直访被拒。这里只查询，不提供批准、拒绝、取消或设备状态操作。D-052 依据八条 AC、独立隔离及正式 Chrome／ACL／后置快照批准验收。 [最终验收](_bmad-output/implementation-artifacts/story-2-5-final-acceptance.md)
 
+### Story 2.6 / 2.7 · 管理员批准与拒绝（已验收）
+
+业务管理员可从单条待审核预约详情使用独立批准或拒绝表单。批准保留原时段占用，拒绝需非空原因并释放占用；到期只按 FR-018 处理，不重复写入。组合全量 149/150，唯一跳过是既有设备描述的可选 Chrome 检查。两种真实等锁顺序均通过。正式只实测已失效详情、角色与历史展示，没有安全待审核正例；批准和拒绝的正向操作已有隔离实证。 [负责人验收](_bmad-output/implementation-artifacts/story-2-6-2-7-final-acceptance.md) · [FR→AC→证据](docs/team/experiment-a-implementation-evidence.md)
+
 ### 隔离库自动化测试
 
 使用已迁移的预建隔离库运行完整自动化测试。入口先核验连接与角色权限，检查无待迁移项且账号和会话为空。随后在单进程运行回滚式测试，并比较前后表清单、迁移记录、账号数和会话数。库不存在或核验失败时停止。此入口保留隔离库，不访问维护库，不执行建库、迁移、清库或删库。
@@ -147,7 +151,7 @@ $env:LAB_BOOKING_DB_MODE = 'test'
 
 罗思婕、周何馨于 2026-11-19 完成业务与质量审核。吴亚彤于 2026-11-21 批准两轮范围和逐项处置，随后确认排期并正式批准 Sprint 1 启动。Sprint 1 为 11 月 22 日至 26 日，保留 1.1～1.4、2.1、2.2、2.3、2.5。Sprint 2 为 11 月 27 日至 29 日，保留 2.4、2.6、2.7、2.8、3.1。2.1 首次验收保留 NFR-001 的 20 个独立授权请求 × 10 轮，实验 A 的 2.6／2.7 保留为候选。R-01、R-03 沿用批准和验收证据，R-04、Read Committed 与 T-01～T-04 按既定节点落实。 [Sprint 启动交接](_bmad-output/planning-artifacts/sprint-plan.md#9-sprint-1-启动确认与-story-11-交接) · [D-017](decision-log.md#d-017-2026-11-21-负责人正式批准-sprint-1-启动)
 
-正式开发与独立评审分会话，真实测试、问题处置及负责人验收后才标 done。Sprint 1 八条已逐项验收，末项日期 2026-11-27，可运行增量为设备管理、申请和查询。Sprint 2 的 Story 2.4 已于 2026-11-28 验收，师生可从「我的预约」取消尚未开始的本人待审核或已批准预约。Epic 2 保持 `in-progress`，2.6、2.7、2.8、3.1 未开发。实验 A 须在 2.6／2.7 开发前冻结共同起点、分组、隔离与度量。 [Sprint 跟踪](_bmad-output/implementation-artifacts/sprint-status.yaml) · [Sprint 1 验收](_bmad-output/implementation-artifacts/sprint-1-final-acceptance-2026-11-27.md) · [Story 2.4 验收](_bmad-output/implementation-artifacts/story-2-4-final-acceptance.md) · [项目回顾](retrospective.md) · [实验 A](_bmad-output/planning-artifacts/sprint-2-startup-and-experiment-a.md)
+正式开发与独立评审分会话，真实测试、问题处置及负责人验收后才标 done。Sprint 1 八条已逐项验收，末项日期 2026-11-27，可运行增量为设备管理、申请和查询。Sprint 2 的 Story 2.4 已于 2026-11-28 验收，师生可从「我的预约」取消尚未开始的本人待审核或已批准预约。Epic 2 保持 in-progress。2.6 与 2.7 已验收，2.8、3.1 尚未开发。实验 A 已记录 D1 和实际实施差异，期末指标等待共同观察截止 C。 [Sprint 跟踪](_bmad-output/implementation-artifacts/sprint-status.yaml) · [Sprint 1 验收](_bmad-output/implementation-artifacts/sprint-1-final-acceptance-2026-11-27.md) · [Story 2.4 验收](_bmad-output/implementation-artifacts/story-2-4-final-acceptance.md) · [项目回顾](retrospective.md) · [实验 A](_bmad-output/planning-artifacts/sprint-2-startup-and-experiment-a.md)
 
 ## 项目与当前进度
 
@@ -278,7 +282,7 @@ bmad-lab-booking-system/
 | M1 | 两轮Product Brief和PRD及内部审核、负责人确认已完成，第二轮定稿已提交main，可进入M2架构 |
 | M2 | Architecture及8条ADR、[project-context](_bmad-output/planning-artifacts/project-context.md)及14条PC已定稿；Epic/Story文档已final，3 Epic/13 Story的Story状态仍draft，组员5项意见已按负责人决定修改，见[本轮汇总](docs/team/m2-epics-summary.md)。第三次Step-04复核已获负责人批准并完成Finalize。随后完成就绪检查及 Sprint 计划，CONCERNS 经负责人有条件接受。 [就绪证据](_bmad-output/planning-artifacts/implementation-readiness.md) |
 | M3 | Sprint 1 八条 Story 均完成逐项验收，整体验收范围和真实回顾材料已归档。实验 B 已取消。 [验收证据](_bmad-output/implementation-artifacts/sprint-1-final-acceptance-2026-11-27.md) |
-| M4 | Sprint 2 的 Story 2.4 已验收。下一阶段先冻结实验 A 条件；第二台 Windows 复现、实验 A 实测、约 10 分钟录屏及最终版本仍待完成。 [启动准备](_bmad-output/planning-artifacts/sprint-2-startup-and-experiment-a.md) |
+| M4 | Sprint 2 已验收 Story 2.4、2.6、2.7。实验 A 已有实证与 D1 截面，C 封账、2.8/3.1、第二台 Windows 复现及演示录屏仍待完成。 [启动准备](_bmad-output/planning-artifacts/sprint-2-startup-and-experiment-a.md) |
 | 人机决策 | 根目录日志已记录至 D-057，未代填团队意见，课程要求的否决或实质修改以真实团队判断为准。 [决策日志](decision-log.md) |
 | FR追溯 | 18 条 FR 已映射至 ADR／PC 与 Story／AC。Story 1.2 的 FR-016／FR-002 与 Story 2.4 的 FR-002／010／015／018 均有独立测试及正式验证证据。 [创建设备](_bmad-output/implementation-artifacts/story-1-2-final-acceptance.md) · [本人取消](_bmad-output/implementation-artifacts/story-2-4-final-acceptance.md) |
 | NFR | NFR-001 实证 20 独立请求 × 10 轮。NFR-002 的 Sprint 1 已交付入口主矩阵 86/86，Story 2.4 新入口独立 16/16，M01 补例及合法对照另计，未交付操作不计入。 [Sprint 1 分母与追溯](_bmad-output/implementation-artifacts/sprint-1-final-acceptance-2026-11-27.md) · [Story 2.4 独立复验](_bmad-output/implementation-artifacts/story-2-4-m01-independent-run-result.md) |

@@ -10,8 +10,10 @@ from django.db.models import Q
 from accounts.models import Role, User
 from accounts.policies import RESERVATION_ROLES, can_reserve, is_business_admin
 from audit.services import (
+    append_reservation_approval,
     append_reservation_cancellation,
     append_reservation_expiry,
+    append_reservation_rejection,
     read_admin_reservation_reasons,
     read_reservation_history,
     read_reservation_reasons,
@@ -288,6 +290,78 @@ def _recheck_reservation_admin(pk):
     account = User.objects.filter(pk=pk).values_list("is_active", "role").first()
     if account != (True, Role.ADMIN):
         raise PermissionDenied
+
+
+def approve_reservation(user, pk):
+    require_reservation_admin(user)
+
+    def approve(connection):
+        _recheck_reservation_admin(user.pk)
+        scoped = Reservation.objects.filter(pk=pk)
+        equipment_id = scoped.values_list("equipment_id", flat=True).first()
+        if equipment_id is None or lock_equipment(equipment_id) is None:
+            return "missing"
+
+        _recheck_reservation_admin(user.pk)
+        target = scoped.filter(equipment_id=equipment_id)
+        row = target.values("status", "start_at").first()
+        if row is None:
+            return "missing"
+        equipment_status = Equipment.objects.values_list("status", flat=True).get(pk=equipment_id)
+        decision_at = _decision_time(connection)
+        if row["status"] != ReservationStatus.PENDING:
+            return "terminal"
+        if decision_at >= row["start_at"]:
+            if _expire(target, decision_at) != [pk]:
+                raise ReservationFailed
+            # Return normally so the system expiry and its audit commit together.
+            return "expired"
+        if equipment_status != EquipmentStatus.AVAILABLE:
+            return "unavailable"
+        if target.filter(status=ReservationStatus.PENDING).update(status=ReservationStatus.APPROVED) != 1:
+            raise ReservationFailed
+        append_reservation_approval(pk, user.pk, decision_at)
+        return "approved"
+
+    return _durable_operation(approve)
+
+
+def reject_reservation(user, pk, reason):
+    require_reservation_admin(user)
+    if reason is None:
+        reason = ""
+    if not isinstance(reason, str) or "\0" in reason:
+        raise ValueError("必须提供有效的拒绝原因。")
+    reason = reason.strip()
+
+    def reject(connection):
+        _recheck_reservation_admin(user.pk)
+        scoped = Reservation.objects.filter(pk=pk)
+        equipment_id = scoped.values_list("equipment_id", flat=True).first()
+        if equipment_id is None or lock_equipment(equipment_id) is None:
+            return "missing"
+        # The account or reservation may have changed while waiting for the device lock.
+        _recheck_reservation_admin(user.pk)
+        target = scoped.filter(equipment_id=equipment_id)
+        row = target.values("status", "start_at").first()
+        if row is None:
+            return "missing"
+        decision_at = _decision_time(connection)
+        if row["status"] != ReservationStatus.PENDING:
+            return "terminal"
+
+        if row["start_at"] <= decision_at:
+            if _expire(target, decision_at) != [pk]:
+                raise ReservationFailed
+            return "expired"
+        if not reason:
+            return "reason_required"
+        if target.filter(status=ReservationStatus.PENDING).update(status=ReservationStatus.REJECTED) != 1:
+            raise ReservationFailed
+        append_reservation_rejection(pk, user.pk, reason, decision_at)
+        return "rejected"
+
+    return _durable_operation(reject)
 
 
 def _read_admin_reservations(user, *, equipment_number=None, pk=None):

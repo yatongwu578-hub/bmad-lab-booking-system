@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>拒绝预约 · 实验室设备预约</title>
+</head>
+<body><main>
+    <h1>拒绝预约</h1>
+    <p><a href="{{ back_url }}">返回预约详情</a></p>
+    {% if error %}
+        <p role="alert">{{ error }}</p>
+    {% else %}
+        <p>拒绝原因将对申请人可见。</p>
+        {% include "reservations/_reject_form.html" %}
+    {% endif %}
+</main></body>
+</html>

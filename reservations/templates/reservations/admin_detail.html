@@ -22,6 +22,17 @@
             <dt>设备当前状态</dt><dd>{{ record.equipment_status_label }}</dd>
             <dt>处理原因</dt><dd>{{ record.reason|default_if_none:"" }}</dd>
         </dl>
+        {% if approval_candidate %}
+            <form method="post" action="{% url 'admin-reservation-approve' record.id %}">
+                {% csrf_token %}
+                <button type="submit">批准预约</button>
+            </form>
+        {% endif %}
+        {% if reject_form %}
+            <h2>拒绝预约</h2>
+            <p>拒绝原因将对申请人可见。</p>
+            {% include "reservations/_reject_form.html" %}
+        {% endif %}
         <h2>操作历史</h2>
         {% if history %}
             <table>

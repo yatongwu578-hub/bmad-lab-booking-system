@@ -48,8 +48,8 @@ development_status:
   2-3-查询本人全部预约及处理结果: done
   2-4-取消本人尚未开始的预约: done
   2-5-管理员查询预约详情并按设备筛选: done
-  2-6-管理员批准待审核预约: backlog
-  2-7-管理员拒绝待审核预约: backlog
+  2-6-管理员批准待审核预约: done
+  2-7-管理员拒绝待审核预约: done
   2-8-管理员取消预约并记录原因: backlog
   epic-2-retrospective: optional
 
